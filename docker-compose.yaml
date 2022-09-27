@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  nextjs:
+    container_name: MDGround3-service
+    ports:
+      - "3000:3000"
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - "/usr/src/app/node_modules"
+      - "/usr/src/app/.next"
+
+  mysql:
+    container_name: MDGround3-db
+    platform: linux/x86_64
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: md1234
+      MYSQL_DATABASE: md3
+    restart: always
+    ports:
+      - "33069:3306"
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_bin"
+      ]
+
+  adminer:
+    container_name: MDGround3-adminer
+    platform: linux/x86_64
+    image: adminer
+    restart: always
+    ports:
+      - 8099:8080
