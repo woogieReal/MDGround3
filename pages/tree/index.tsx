@@ -1,9 +1,15 @@
+import TreeSection from '@/components/tree/sections/treeSection'
+import ViewSection from '@/components/tree/sections/viewSection'
+import { Grid } from '@mui/material'
 import type { NextPage } from 'next'
 
 const Home: NextPage = () => {
 
   return (
-    <div>오</div>
+    <Grid>
+      <TreeSection/>
+      <ViewSection/>
+    </Grid>
   )
 }
 
