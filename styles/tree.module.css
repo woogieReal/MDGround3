@@ -1,0 +1,14 @@
+.resizableContainer {
+  height: 100vh;
+  width: 100vw;
+}
+
+.resizableDrawer {
+  position: relative;
+}
+
+#resizeButton {
+  padding: 1px;
+  min-width: 12px;
+  cursor: COL-RESIZE;
+}

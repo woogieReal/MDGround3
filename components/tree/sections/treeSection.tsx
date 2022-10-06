@@ -14,6 +14,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import DrawerHeader from '@/components/tree/modules/drawerHeader';
 import { MouseEventHandler } from 'react';
+import styles from '@/styles/tree.module.css'
 
 interface Props {
   open: boolean;
@@ -26,7 +27,7 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
 
   return (
     <Drawer
-      id='resizableDrawer'
+      className={styles.resizableDrawer}
       sx={{
         width: drawerWidth,
         flexShrink: 0,

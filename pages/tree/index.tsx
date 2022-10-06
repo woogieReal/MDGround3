@@ -1,13 +1,14 @@
 import TreeSection from '@/components/tree/sections/treeSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Grid } from '@mui/material'
+import { Box, Button, Grid } from '@mui/material'
 import type { NextPage } from 'next'
 import { useCallback, useState } from 'react'
+import styles from '@/styles/tree.module.css'
 
 const MIN_DRAWER_WIDTH = 240;
 
 const Home: NextPage = () => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(true);
   const [drawerWidth, setDrawerWidth] = useState<number>(MIN_DRAWER_WIDTH);
 
   const handleDrawerOpen = () => {
@@ -35,7 +36,7 @@ const Home: NextPage = () => {
 
   return (
     <Box
-      id='resizableContainer'
+      className={styles.resizableContainer}
       sx={{ display: 'flex' }}
     >
       <TreeSection
@@ -44,7 +45,7 @@ const Home: NextPage = () => {
         setDrawerWidth={setDrawerWidth}
         handleDrawerClose={handleDrawerClose}
       />
-      {open && <button onMouseDown={handler} />}
+      {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
       <ViewSection
         open={open}
         drawerWidth={drawerWidth}
