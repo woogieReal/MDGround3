@@ -12,3 +12,13 @@
   min-width: 12px;
   cursor: COL-RESIZE;
 }
+
+.treeButton {
+  text-transform: none !important;
+  padding: 1px !important;
+  white-space: nowrap;
+}
+
+.treeIcon {
+  margin-right: 5px;
+}

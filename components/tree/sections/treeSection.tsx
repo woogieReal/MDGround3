@@ -6,15 +6,14 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import DrawerHeader from '@/components/tree/modules/drawerHeader';
 import { MouseEventHandler } from 'react';
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import styles from '@/styles/tree.module.css'
+import mockData from '@/tests/tree/mockData';
+import { ResTree } from '@/src/models/tree.model';
+import RecursiveButton from '../modules/recursiveButton';
 
 interface Props {
   open: boolean;
@@ -42,37 +41,18 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
     >
       <DrawerHeader>
         <IconButton onClick={handleDrawerClose}>
+          woogieReal
           {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>
       </DrawerHeader>
       <Divider />
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton onClick={() => {
-              setDrawerWidth(100 * 2 * (index + 1));
-            }}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <DndProvider backend={HTML5Backend}>
+        <List>
+          {mockData.map((data: ResTree, index) => (
+            <RecursiveButton key={`${index}-${data.treeId}`} data={data} index={index} />
+          ))}
+        </List>
+      </DndProvider>
     </Drawer>
   )
 }
