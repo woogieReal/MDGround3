@@ -36,7 +36,7 @@ const Home: NextPage = () => {
 
   return (
     <Box
-      className={styles.resizableContainer}
+      id={styles.resizableContainer}
       sx={{ display: 'flex' }}
     >
       <TreeSection

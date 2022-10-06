@@ -14,6 +14,7 @@ import styles from '@/styles/tree.module.css'
 import mockData from '@/tests/tree/mockData';
 import { ResTree } from '@/src/models/tree.model';
 import RecursiveButton from '../modules/recursiveButton';
+import { Box } from '@mui/material';
 
 interface Props {
   open: boolean;
@@ -26,7 +27,7 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
 
   return (
     <Drawer
-      className={styles.resizableDrawer}
+      id={styles.resizableDrawer}
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -47,11 +48,11 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
       </DrawerHeader>
       <Divider />
       <DndProvider backend={HTML5Backend}>
-        <List>
+        <Box id={styles.recursiveTreeSection}>
           {mockData.map((data: ResTree, index) => (
             <RecursiveButton key={`${index}-${data.treeId}`} data={data} index={index} />
           ))}
-        </List>
+        </Box>
       </DndProvider>
     </Drawer>
   )
