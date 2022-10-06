@@ -18,14 +18,33 @@ const Home: NextPage = () => {
     setOpen(false);
   };
 
+  const handler = (mouseDownEvent: any) => {
+    const startSize = drawerWidth;
+    const startPosition = mouseDownEvent.pageX;
+
+    function onMouseMove(mouseMoveEvent: any) {
+      setDrawerWidth(currentSize => (startSize - startPosition + mouseMoveEvent.pageX));
+    }
+    function onMouseUp() {
+      document.body.removeEventListener("mousemove", onMouseMove);
+    }
+
+    document.body.addEventListener("mousemove", onMouseMove);
+    document.body.addEventListener("mouseup", onMouseUp, { once: true });
+  };
+
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      id='resizableContainer'
+      sx={{ display: 'flex' }}
+    >
       <TreeSection
         open={open}
         drawerWidth={drawerWidth}
         setDrawerWidth={setDrawerWidth}
         handleDrawerClose={handleDrawerClose}
       />
+      {open && <button onMouseDown={handler} />}
       <ViewSection
         open={open}
         drawerWidth={drawerWidth}

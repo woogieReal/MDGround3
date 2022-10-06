@@ -26,6 +26,7 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
 
   return (
     <Drawer
+      id='resizableDrawer'
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -37,7 +38,6 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
       variant="persistent"
       anchor="left"
       open={open}
-      PaperProps={{ style: { width: drawerWidth } }}
     >
       <DrawerHeader>
         <IconButton onClick={handleDrawerClose}>
