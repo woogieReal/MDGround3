@@ -1,28 +1,25 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DrawerHeader from '@/components/tree/modules/drawerHeader';
-import { MouseEventHandler } from 'react';
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { MouseEventHandler, useState } from 'react';
 import styles from '@/styles/tree.module.css'
 import mockData from '@/tests/tree/mockData';
 import { ResTree } from '@/src/models/tree.model';
-import RecursiveButton from '../modules/recursiveButton';
-import { Box } from '@mui/material';
+import RecursivTreeItem from '../modules/recursivTreeItem';
+import TreeView from '@mui/lab/TreeView';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface Props {
   open: boolean;
   drawerWidth: number;
-  setDrawerWidth: Function;
   handleDrawerClose: MouseEventHandler;
 }
-const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: Props) => {
+const TreeSection = ({ open, drawerWidth, handleDrawerClose }: Props) => {
   const theme = useTheme();
 
   return (
@@ -47,13 +44,17 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerClose }: P
         </IconButton>
       </DrawerHeader>
       <Divider />
-      <DndProvider backend={HTML5Backend}>
-        <Box id={styles.recursiveTreeSection}>
-          {mockData.map((data: ResTree, index) => (
-            <RecursiveButton key={`${index}-${data.treeId}`} data={data} index={index} />
-          ))}
-        </Box>
-      </DndProvider>
+      <TreeView
+        aria-label="multi-select"
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+        multiSelect
+        sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+      >
+        {mockData.map((data: ResTree, index) => (
+          <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} />
+        ))}
+      </TreeView>
     </Drawer>
   )
 }

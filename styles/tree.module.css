@@ -13,21 +13,6 @@
   cursor: COL-RESIZE;
 }
 
-.treeButton {
-  text-transform: none !important;
-  padding: 1px !important;
+.treeItem {
   white-space: nowrap;
-  min-width: 0 !important;
-}
-
-.treeIcon {
-  margin-right: 5px;
-}
-
-#recursiveTreeSection {
-  padding: 5px;
-}
-
-.childRecursiveTreeSection {
-  margin-left: 15px;
 }

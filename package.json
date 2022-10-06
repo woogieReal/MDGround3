@@ -14,6 +14,7 @@
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.4",
     "@mui/icons-material": "^5.10.6",
+    "@mui/lab": "^5.0.0-alpha.102",
     "@mui/material": "^5.10.7",
     "@tanstack/react-query": "^4.8.0",
     "@tanstack/react-query-devtools": "^4.8.0",
@@ -23,8 +24,6 @@
     "next": "12.3.1",
     "path": "^0.12.7",
     "react": "18.2.0",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.2.0"
   },
   "devDependencies": {

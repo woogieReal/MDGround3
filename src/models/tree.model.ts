@@ -1,5 +1,5 @@
 export interface Tree {
-  treeId: number;
+  treeId: string;
   treeType: number;
   treeName: string;
   treeContent: string;
@@ -8,7 +8,7 @@ export interface Tree {
 }
 
 export interface ResTree {
-  treeId: number;
+  treeId: string;
   treeType: number;
   treeName: string;
   treeContent: string;

@@ -42,7 +42,6 @@ const Home: NextPage = () => {
       <TreeSection
         open={open}
         drawerWidth={drawerWidth}
-        setDrawerWidth={setDrawerWidth}
         handleDrawerClose={handleDrawerClose}
       />
       {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
