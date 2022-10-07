@@ -1,6 +1,6 @@
 import { ResTree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
-import styles from '@/styles/tree.module.css'
+import styles from '@/styles/tree.module.scss'
 
 interface Props {
   data: ResTree;
