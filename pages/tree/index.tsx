@@ -5,6 +5,7 @@ import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
+import TabPanel from '@/components/tree/modules/tabPanel'
 
 const MIN_DRAWER_WIDTH = 240;
 
@@ -59,7 +60,7 @@ const Home: NextPage = () => {
         aria-label="Vertical tabs example"
         sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible' }}
       >
-        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={handleDrawerShow} />
+        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => value === 0 && handleDrawerShow()} />
         <Tab label="Item Two" {...a11yProps(1)} />
         <Tab label="Item Three" {...a11yProps(2)} />
       </Tabs>
@@ -68,10 +69,18 @@ const Home: NextPage = () => {
         drawerWidth={drawerWidth}
       />
       {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
-      <ViewSection
-        open={open}
-        drawerWidth={drawerWidth}
-      />
+      <TabPanel value={value} index={0}>
+        <ViewSection
+          open={open}
+          drawerWidth={drawerWidth}
+        />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <ViewSection
+          open={open}
+          drawerWidth={drawerWidth}
+        />
+      </TabPanel>
     </Box>
   )
 }

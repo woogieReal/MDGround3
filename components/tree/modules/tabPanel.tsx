@@ -15,8 +15,8 @@ const TabPanel = ({ children, index, value }: Props) => {
       aria-labelledby={`vertical-tab-${index}`}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+        <Box>
+          {children}
         </Box>
       )}
     </div>
