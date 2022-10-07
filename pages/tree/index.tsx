@@ -54,6 +54,21 @@ const Home: NextPage = () => {
     setOpen(!open);
   };
 
+  const handler = (mouseDownEvent: any) => {
+    const startSize = drawerWidth;
+    const startPosition = mouseDownEvent.pageX;
+
+    function onMouseMove(mouseMoveEvent: any) {
+      setDrawerWidth(startSize - startPosition + mouseMoveEvent.pageX);
+    }
+    function onMouseUp() {
+      document.body.removeEventListener("mousemove", onMouseMove);
+    }
+
+    document.body.addEventListener("mousemove", onMouseMove);
+    document.body.addEventListener("mouseup", onMouseUp, { once: true });
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <Tabs
@@ -74,7 +89,7 @@ const Home: NextPage = () => {
         setDrawerWidth={setDrawerWidth}
         handleDrawerShow={handleDrawerShow}
       />
-
+      {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
       <ViewSection
         open={open}
         drawerWidth={drawerWidth}
