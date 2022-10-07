@@ -9,12 +9,6 @@ import TabPanel from '@/components/tree/modules/tabPanel'
 
 const MIN_DRAWER_WIDTH = 240;
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
 function a11yProps(index: number) {
   return {
     id: `vertical-tab-${index}`,
@@ -25,10 +19,10 @@ function a11yProps(index: number) {
 const Home: NextPage = () => {
   const [open, setOpen] = useState<boolean>(true);
   const [drawerWidth, setDrawerWidth] = useState<number>(MIN_DRAWER_WIDTH);
-  const [value, setValue] = useState<number>(0);
+  const [tabVaue, setTabVaue] = useState<number>(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabVaue(newValue);
   };
 
   const handleDrawerShow = () => {
@@ -55,12 +49,12 @@ const Home: NextPage = () => {
       <Tabs
         orientation="vertical"
         variant="scrollable"
-        value={value}
-        onChange={handleChange}
+        value={tabVaue}
+        onChange={handleTabChange}
         aria-label="Vertical tabs example"
         sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible' }}
       >
-        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => value === 0 && handleDrawerShow()} />
+        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => tabVaue === 0 && handleDrawerShow()} />
         <Tab label="Item Two" {...a11yProps(1)} />
         <Tab label="Item Three" {...a11yProps(2)} />
       </Tabs>
@@ -69,13 +63,13 @@ const Home: NextPage = () => {
         drawerWidth={drawerWidth}
       />
       {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
-      <TabPanel value={value} index={0}>
+      <TabPanel value={tabVaue} index={0}>
         <ViewSection
           open={open}
           drawerWidth={drawerWidth}
         />
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={tabVaue} index={1}>
         <ViewSection
           open={open}
           drawerWidth={drawerWidth}
