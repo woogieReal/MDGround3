@@ -1,8 +1,8 @@
 import TreeSection from '@/components/tree/sections/treeSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Button, Grid, IconButton, Tabs, Tab, Typography } from '@mui/material'
+import { Box, Button, Tabs, Tab, Typography } from '@mui/material'
 import type { NextPage } from 'next'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -12,26 +12,6 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
 }
 
 function a11yProps(index: number) {
@@ -58,10 +38,10 @@ const Home: NextPage = () => {
     const startSize = drawerWidth;
     const startPosition = mouseDownEvent.pageX;
 
-    function onMouseMove(mouseMoveEvent: any) {
+    const onMouseMove = (mouseMoveEvent: any) => {
       setDrawerWidth(startSize - startPosition + mouseMoveEvent.pageX);
     }
-    function onMouseUp() {
+    const onMouseUp = () => {
       document.body.removeEventListener("mousemove", onMouseMove);
     }
 
@@ -86,8 +66,6 @@ const Home: NextPage = () => {
       <TreeSection
         open={open}
         drawerWidth={drawerWidth}
-        setDrawerWidth={setDrawerWidth}
-        handleDrawerShow={handleDrawerShow}
       />
       {open && <Button id={styles.resizeButton} onMouseDown={handler} />}
       <ViewSection

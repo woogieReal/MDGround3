@@ -10,34 +10,14 @@ import { ResTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { Box } from '@mui/material';
 import DrawerHeader from '@/components/tree/modules/drawerHeader';
-import { MouseEventHandler } from 'react';
 
 interface Props {
   open: boolean;
   drawerWidth: number;
-  setDrawerWidth: Function;
-  handleDrawerShow: MouseEventHandler;
 }
-const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerShow }: Props) => {
-  const theme = useTheme();
-
-  const handler = (mouseDownEvent: any) => {
-    const startSize = drawerWidth;
-    const startPosition = mouseDownEvent.pageX;
-
-    function onMouseMove(mouseMoveEvent: any) {
-      setDrawerWidth(startSize - startPosition + mouseMoveEvent.pageX);
-    }
-    function onMouseUp() {
-      document.body.removeEventListener("mousemove", onMouseMove);
-    }
-
-    document.body.addEventListener("mousemove", onMouseMove);
-    document.body.addEventListener("mouseup", onMouseUp, { once: true });
-  };
+const TreeSection = ({ open, drawerWidth }: Props) => {
 
   return (
     <Box
@@ -48,11 +28,9 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerShow }: Pr
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          // left: `${Number(styles.verticalTabWidth) || 0}px`,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            // left: `${Number(styles.verticalTabWidth) || 0}px`,
           },
         }}
         variant="persistent"
@@ -75,7 +53,6 @@ const TreeSection = ({ open, drawerWidth, setDrawerWidth, handleDrawerShow }: Pr
             <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} />
           ))}
         </TreeView>
-        <Button id={styles.resizeButton} onMouseDown={handler} />
       </Drawer>
     </Box>
   )
