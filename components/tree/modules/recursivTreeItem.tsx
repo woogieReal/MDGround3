@@ -1,4 +1,4 @@
-import { ResTree, TreeType } from "@/src/models/tree.model";
+import { ResTree } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 

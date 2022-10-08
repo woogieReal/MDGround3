@@ -5,7 +5,7 @@ import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
-import TabPanel from '@/components/tree/modules/tabPanel'
+import TabPanel from '@/components/common/atoms/tabPanel'
 
 const MIN_DRAWER_WIDTH = 240;
 

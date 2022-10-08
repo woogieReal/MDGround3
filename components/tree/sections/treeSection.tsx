@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
 import mockData from '@/tests/tree/mockData';
@@ -11,7 +9,6 @@ import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box } from '@mui/material';
-import DrawerHeader from '@/components/tree/modules/drawerHeader';
 
 interface Props {
   open: boolean;
@@ -38,9 +35,9 @@ const TreeSection = ({ open, drawerWidth }: Props) => {
         transitionDuration={0}
         open={open}
       >
-        <DrawerHeader id={styles.resizableDrawerHeader}>
+        <Box id={styles.resizableDrawerHeader}>
 
-        </DrawerHeader>
+        </Box>
         <Divider />
         <TreeView
           aria-label="multi-select"
