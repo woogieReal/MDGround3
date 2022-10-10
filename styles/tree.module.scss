@@ -28,5 +28,6 @@ $verticalTabWidthPX: 90px;
 }
 
 :export {
-  verticalTabWidth: verticalTabWidth
+  verticalTabWidth: $verticalTabWidth;
+  verticalTabWidthPX: $verticalTabWidthPX;
 }

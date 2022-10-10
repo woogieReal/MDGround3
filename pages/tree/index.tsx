@@ -52,7 +52,7 @@ const Home: NextPage = () => {
         value={tabVaue}
         onChange={handleTabChange}
         aria-label="Vertical tabs example"
-        sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible' }}
+        sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible', width: styles.verticalTabWidthPX }}
       >
         <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => tabVaue === 0 && handleDrawerShow()} />
         <Tab label="Item Two" {...a11yProps(1)} />
