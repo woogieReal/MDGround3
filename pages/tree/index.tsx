@@ -5,6 +5,7 @@ import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
 
 const MIN_DRAWER_WIDTH = 240;
@@ -55,8 +56,7 @@ const Home: NextPage = () => {
         sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible', width: styles.verticalTabWidthPX }}
       >
         <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => tabVaue === 0 && handleDrawerShow()} />
-        <Tab label="Item Two" {...a11yProps(1)} />
-        <Tab label="Item Three" {...a11yProps(2)} />
+        <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} />
       </Tabs>
       <TreeSection
         open={open}
