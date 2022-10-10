@@ -1,20 +1,36 @@
-import * as React from 'react';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
-import mockData from '@/tests/tree/mockData';
 import { ResTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box } from '@mui/material';
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { ApiName } from '@/src/apis/apiInfo';
+import { useState } from 'react';
+import { AxiosResponse } from 'axios';
+import ApiHandler from '@/src/apis/apiHandler';
+
 
 interface Props {
   open: boolean;
   drawerWidth: number;
 }
 const TreeSection = ({ open, drawerWidth }: Props) => {
+  const [trees, setTrees] = useState<ResTree[]>([]);
+  const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES), {
+    onSuccess(res: AxiosResponse) {
+      setTrees(res.data);
+    },
+  });
+
+  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, 77), {
+    onSuccess(res: AxiosResponse) {
+      console.log(res);
+    },
+  });
 
   return (
     <Box
@@ -46,7 +62,7 @@ const TreeSection = ({ open, drawerWidth }: Props) => {
           multiSelect
           sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
         >
-          {mockData.map((data: ResTree, index) => (
+          {trees.map((data: ResTree, index: number) => (
             <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} />
           ))}
         </TreeView>
