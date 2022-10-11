@@ -1,9 +1,9 @@
-import { ResTrees } from "@/src/models/tree.model";
+import { ResGetTrees } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 
 interface Props {
-  data: ResTrees;
+  data: ResGetTrees;
   depth: number;
 }
 const RecursivTreeItem = ({ data, depth }: Props) => {
@@ -11,7 +11,7 @@ const RecursivTreeItem = ({ data, depth }: Props) => {
 
   return (
     <TreeItem nodeId={data.treeId} label={data.treeName} className={styles.treeItem}>
-      {hasChildren && data.treeChildren.map((item: ResTrees, idx: number) => (
+      {hasChildren && data.treeChildren.map((item: ResGetTrees, idx: number) => (
         <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} />
       ))}
     </TreeItem>

@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ResTrees } from "@/src/models/tree.model";
+import { ResGetTrees } from "@/src/models/tree.model";
 import mockData from "@/tests/tree/mockData";
 
 // Fake trees data
-const trees: ResTrees[] = mockData;
+const trees: ResGetTrees[] = mockData;
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   const {
