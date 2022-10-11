@@ -1,6 +1,6 @@
-import { ResTree } from "@/src/models/tree.model";
+import { ResTrees } from "@/src/models/tree.model";
 
-const mockData: ResTree[] = [
+const mockData: ResTrees[] = [
   {
     treeId: "77",
     treeType: 10,

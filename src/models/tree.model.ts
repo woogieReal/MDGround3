@@ -7,12 +7,12 @@ export interface Tree {
   treeChildren: Tree[];
 }
 
-export interface ResTree {
+export interface ResTrees {
   treeId: string;
   treeType: number;
   treeName: string;
   treePath: string;
-  treeChildren: ResTree[];
+  treeChildren: ResTrees[];
 }
 
 export enum TreeType {
