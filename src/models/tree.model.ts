@@ -11,9 +11,8 @@ export interface ResTree {
   treeId: string;
   treeType: number;
   treeName: string;
-  treeContent: string;
   treePath: string;
-  treeChildren: Tree[];
+  treeChildren: ResTree[];
 }
 
 export enum TreeType {
