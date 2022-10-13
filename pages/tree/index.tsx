@@ -7,6 +7,11 @@ import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
+import { Tree } from '@/src/models/tree.model'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { ApiName } from '@/src/apis/apiInfo'
+import ApiHandler from '@/src/apis/apiHandler'
+import { AxiosResponse } from 'axios'
 
 const MIN_DRAWER_WIDTH = 240;
 
@@ -21,6 +26,8 @@ const Home: NextPage = () => {
   const [open, setOpen] = useState<boolean>(true);
   const [drawerWidth, setDrawerWidth] = useState<number>(MIN_DRAWER_WIDTH);
   const [tabVaue, setTabVaue] = useState<number>(0);
+  const [viewTabValue, setViewTabValue] = useState<number>(0);
+  const [trees, setTrees] = useState<Tree[]>([]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabVaue(newValue);
@@ -29,6 +36,12 @@ const Home: NextPage = () => {
   const handleDrawerShow = () => {
     setOpen(!open);
   };
+
+  // const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, trees[viewTabValue].treeId], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, trees[viewTabValue].treeId), {
+  //   onSuccess(res: AxiosResponse) {
+  //     console.log(res);
+  //   },
+  // });
 
   const handler = (mouseDownEvent: any) => {
     const startSize = drawerWidth;

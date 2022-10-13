@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ResGetTrees } from "@/src/models/tree.model";
-import mockData from "@/tests/tree/mockData";
+import { Tree } from "@/src/models/tree.model";
+import { mockGetTreeData } from "@/tests/tree/mockData";
 
 // Fake trees data
-const trees: ResGetTrees[] = mockData;
+const eachTree: Tree[] = mockGetTreeData;
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -14,7 +14,9 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case "GET":
-      res.status(200).json(trees.find((tree: ResGetTrees) => tree.treeId === id));
+      res
+        .status(200)
+        .json(eachTree.find((tree: Tree) => tree.treeId === id));
       break;
     case "PUT":
       res.status(200).json(body);

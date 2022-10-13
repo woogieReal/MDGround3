@@ -1,21 +1,21 @@
 export interface Tree {
   treeId: string;
-  treeType: number;
+  treeType: TreeType;
   treeName: string;
-  treeContent: string;
+  treeContent?: string;
   treePath: string;
-  treeChildren: Tree[];
-}
-
-export interface ResGetTrees {
-  treeId: string;
-  treeType: number;
-  treeName: string;
-  treePath: string;
-  treeChildren: ResGetTrees[];
+  treeChildren?: Tree[];
 }
 
 export enum TreeType {
   FORDER = 10,
   FILE = 20,
+}
+
+export const initialFileTree = {
+  treeId: 'initial',
+  treeType: TreeType.FILE,
+  treeName: 'initial file',
+  treeContent: 'initial content',
+  treePath: '',
 }

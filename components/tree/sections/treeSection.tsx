@@ -2,7 +2,7 @@ import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
-import { ResGetTrees } from '@/src/models/tree.model';
+import { Tree, TreeType, initialFileTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -19,18 +19,18 @@ interface Props {
   drawerWidth: number;
 }
 const TreeSection = ({ open, drawerWidth }: Props) => {
-  const [trees, setTrees] = useState<ResGetTrees[]>([]);
+  const [trees, setTrees] = useState<Tree[]>([]);
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES), {
     onSuccess(res: AxiosResponse) {
       setTrees(res.data);
     },
   });
 
-  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, 77), {
-    onSuccess(res: AxiosResponse) {
-      console.log(res);
-    },
-  });
+  const handleTreeClick = (data: Tree) => {
+    if (data.treeType === TreeType.FILE) {
+      console.log(data);
+    }
+  }
 
   return (
     <Box
@@ -62,8 +62,8 @@ const TreeSection = ({ open, drawerWidth }: Props) => {
           multiSelect
           sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
         >
-          {trees.map((data: ResGetTrees, index: number) => (
-            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} />
+          {trees.map((data: Tree, index: number) => (
+            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick}/>
           ))}
         </TreeView>
       </Drawer>
