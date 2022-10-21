@@ -18,8 +18,9 @@ interface Props {
   open: boolean;
   drawerWidth: number;
   verticalTabVaue: number;
+  setSelectedFile: Function;
 }
-const DrawerSection = ({ open, drawerWidth, verticalTabVaue }: Props) => {
+const DrawerSection = ({ open, drawerWidth, verticalTabVaue, setSelectedFile }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES), {
     onSuccess(res: AxiosResponse) {
@@ -29,7 +30,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue }: Props) => {
 
   const handleTreeClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
-      console.log(data);
+      setSelectedFile(data);
     }
   }
 

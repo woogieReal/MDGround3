@@ -3,12 +3,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
+import { Tree } from '@/src/models/tree.model';
 
 interface Props {
   open: boolean;
   drawerWidth: number;
+  file: Tree;
 }
-const ViewSection = ({ open, drawerWidth }: Props) => {
+const ViewSection = ({ open, drawerWidth, file }: Props) => {
 
   const [num, setNum] = useState<number>(0);
 
@@ -32,10 +34,12 @@ const ViewSection = ({ open, drawerWidth }: Props) => {
   }));
 
   return (
-    <Box sx={{  marginTop: styles.appHeaderHeightPX }} >
+    <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
-        <Button onClick={() => setNum(num + 1)}>{num}</Button>
+        {/* <Button onClick={() => setNum(num + 1)}>{num}</Button> */}
+        <div dangerouslySetInnerHTML={{ __html: file?.treeContent || '' }}></div>
+        {/* <div>{file?.treeContent}</div> */}
       </Main>
     </Box>
   );
