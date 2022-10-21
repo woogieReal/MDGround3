@@ -76,8 +76,12 @@ const Home: NextPage = () => {
 
   const handleTreeDoubleClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
-      if (!selectedFileIds.includes(data.treeId)) {
-        setFileTabVaue(fileTabVaue => files.length);
+      if (files.length === 0) {
+        handleTreeClick(data);
+      } else {
+        if (!selectedFileIds.includes(data.treeId)) {
+          setFileTabVaue(fileTabVaue => files.length);
+        }
       }
     }
   }
@@ -128,7 +132,7 @@ const Home: NextPage = () => {
       </Tabs>
       <AppBar
         component="nav"
-        color='transparent'
+        color='inherit'
         sx={{
           left: appBarLeft,
           height: styles.appHeaderHeightPX
