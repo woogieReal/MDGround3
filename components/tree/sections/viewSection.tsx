@@ -9,9 +9,10 @@ import Markdown from 'marked-react';
 interface Props {
   open: boolean;
   drawerWidth: number;
-  file: Tree;
+  fileTabVaue: number;
+  files: Tree[];
 }
-const ViewSection = ({ open, drawerWidth, file }: Props) => {
+const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   const [num, setNum] = useState<number>(0);
 
@@ -38,7 +39,7 @@ const ViewSection = ({ open, drawerWidth, file }: Props) => {
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
-        <Markdown>{file?.treeContent || ''}</Markdown>
+        <Markdown>{files[fileTabVaue]?.treeContent || ''}</Markdown>
       </Main>
     </Box>
   );

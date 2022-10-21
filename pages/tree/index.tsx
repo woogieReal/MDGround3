@@ -31,11 +31,17 @@ function a11yProps(index: number) {
 }
 
 const Home: NextPage = () => {
+  // drawer
   const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
   const [drawerWidth, setDrawerWidth] = useState<number>(MIN_DRAWER_WIDTH);
+
+  // appBar
   const [appBarLeft, setAppBarLeft] = useState<number>(APP_BAR_LEFT);
+
+  // tabs
   const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
   const [fileTabVaue, setFileTabVaue] = useState<number>(0);
+
   const [selectedFile, setSelectedFile] = useState<Tree>(INITIAL_SELECTED_FILEL);
   const [files, setFiles] = useState<Tree[]>([]);
 
@@ -91,7 +97,7 @@ const Home: NextPage = () => {
         sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible', width: styles.verticalTabWidthPX }}
       >
         <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => handleDrawerShow(0)} />
-        <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} />
+        {/* <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} /> */}
       </Tabs>
       <AppBar
         component="nav"
@@ -109,9 +115,9 @@ const Home: NextPage = () => {
           indicatorColor="secondary"
           textColor="inherit"
         >
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          {files?.map((file: Tree, index: number) => (
+            <Tab key={`${index}-${file.treeId}`} label={file.treeName} {...a11yProps(index)} />   
+          ))}
         </Tabs>
       </AppBar>
       <DrawerSection
@@ -125,15 +131,11 @@ const Home: NextPage = () => {
         <ViewSection
           open={drawerOpen}
           drawerWidth={drawerWidth}
-          file={files[fileTabVaue]}
+          fileTabVaue={fileTabVaue}
+          files={files}
         />
       </TabPanel>
-      <TabPanel value={verticalTabVaue} index={1}>
-        {/* <ViewSection
-          open={drawerOpen}
-          drawerWidth={drawerWidth}
-        /> */}
-      </TabPanel>
+      {/* <TabPanel value={verticalTabVaue} index={1}></TabPanel> */}
     </Box>
   )
 }
