@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { Tree } from '@/src/models/tree.model';
+import Markdown from 'marked-react';
 
 interface Props {
   open: boolean;
@@ -37,9 +38,7 @@ const ViewSection = ({ open, drawerWidth, file }: Props) => {
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
-        {/* <Button onClick={() => setNum(num + 1)}>{num}</Button> */}
-        <div dangerouslySetInnerHTML={{ __html: file?.treeContent || '' }}></div>
-        {/* <div>{file?.treeContent}</div> */}
+        <Markdown>{file?.treeContent || ''}</Markdown>
       </Main>
     </Box>
   );
