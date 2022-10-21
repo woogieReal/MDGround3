@@ -1,6 +1,6 @@
 import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Button, Tabs, Tab, Typography } from '@mui/material'
+import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar } from '@mui/material'
 import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
@@ -73,6 +73,17 @@ const Home: NextPage = () => {
         <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => handleDrawerShow(0)} />
         <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} />
       </Tabs>
+      <AppBar 
+        component="nav" 
+        sx={{ 
+          left: drawerWidth + Number(styles.verticalTabWidth),
+          height: styles.appHeaderHeightPX
+        }}
+      >
+        <Toolbar>
+          asdasd
+        </Toolbar>
+      </AppBar>
       <DrawerSection
         open={drawerOpen}
         drawerWidth={drawerWidth}

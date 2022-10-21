@@ -2,6 +2,7 @@ import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useState } from 'react';
 import { Button, Box } from '@mui/material';
+import styles from '@/styles/tree.module.scss'
 
 interface Props {
   open: boolean;
@@ -31,7 +32,7 @@ const ViewSection = ({ open, drawerWidth }: Props) => {
   }));
 
   return (
-    <Box>
+    <Box sx={{  marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
         <Button onClick={() => setNum(num + 1)}>{num}</Button>

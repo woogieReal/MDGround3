@@ -1,5 +1,6 @@
 $verticalTabWidth: 90;
 $verticalTabWidthPX: 90px;
+$appHeaderHeightPX: 48px;
 
 #resizableContainer {
   height: 100vh;
@@ -11,10 +12,6 @@ $verticalTabWidthPX: 90px;
 
 #resizableDrawer > div {
   left: $verticalTabWidthPX;
-}
-
-#resizableDrawerHeader {
-  min-height: 48px;
 }
 
 #resizeButton {
@@ -30,4 +27,5 @@ $verticalTabWidthPX: 90px;
 :export {
   verticalTabWidth: $verticalTabWidth;
   verticalTabWidthPX: $verticalTabWidthPX;
+  appHeaderHeightPX: $appHeaderHeightPX;
 }

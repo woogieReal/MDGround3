@@ -52,7 +52,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue }: Props) => {
         transitionDuration={0}
         open={open}
       >
-        <Box id={styles.resizableDrawerHeader}>
+        <Box sx={{ height: styles.appHeaderHeightPX }}>
 
         </Box>
         <Divider />
