@@ -8,16 +8,15 @@ interface Props {
 const TabPanel = ({ children, index, value }: Props) => {
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-    >
-      <Box sx={{ display: value !== index ? 'none' : 'block' }}>
+      <Box 
+        role="tabpanel"
+        hidden={value !== index}
+        id={`vertical-tabpanel-${index}`}
+        aria-labelledby={`vertical-tab-${index}`}
+        sx={{ display: value !== index ? 'none' : 'block', width: '100%' }}
+      >
         {children}
       </Box>
-    </div>
   );
 }
 
