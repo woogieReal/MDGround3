@@ -1,4 +1,4 @@
-import TreeSection from '@/components/tree/sections/treeSection'
+import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
 import { Box, Button, Tabs, Tab, Typography } from '@mui/material'
 import type { NextPage } from 'next'
@@ -33,8 +33,10 @@ const Home: NextPage = () => {
     setVerticalTabVaue(newValue);
   };
 
-  const handleDrawerShow = () => {
-    setDrawerOpen(!drawerOpen);
+  const handleDrawerShow = (tabNum: number) => {
+    if (verticalTabVaue === tabNum) {
+      setDrawerOpen(!drawerOpen);
+    }
   };
 
   // const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, trees[viewTabValue].treeId], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, trees[viewTabValue].treeId), {
@@ -43,7 +45,7 @@ const Home: NextPage = () => {
   //   },
   // });
 
-  const handler = (mouseDownEvent: any) => {
+  const drawerResizeHandler = (mouseDownEvent: any) => {
     const startSize = drawerWidth;
     const startPosition = mouseDownEvent.pageX;
 
@@ -68,14 +70,15 @@ const Home: NextPage = () => {
         aria-label="Vertical tabs example"
         sx={{ borderRight: 1, borderColor: 'divider', overflow: 'visible', width: styles.verticalTabWidthPX }}
       >
-        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => verticalTabVaue === 0 && handleDrawerShow()} />
-        <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} />
+        <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => handleDrawerShow(0)} />
+        <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} />
       </Tabs>
-      <TreeSection
+      <DrawerSection
         open={drawerOpen}
         drawerWidth={drawerWidth}
+        verticalTabVaue={verticalTabVaue}
       />
-      {drawerOpen && <Button id={styles.resizeButton} onMouseDown={handler} />}
+      {drawerOpen && <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />}
       <TabPanel value={verticalTabVaue} index={0}>
         <ViewSection
           open={drawerOpen}

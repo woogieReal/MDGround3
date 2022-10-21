@@ -17,8 +17,9 @@ import ApiHandler from '@/src/apis/apiHandler';
 interface Props {
   open: boolean;
   drawerWidth: number;
+  verticalTabVaue: number;
 }
-const TreeSection = ({ open, drawerWidth }: Props) => {
+const DrawerSection = ({ open, drawerWidth, verticalTabVaue }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES), {
     onSuccess(res: AxiosResponse) {
@@ -60,10 +61,16 @@ const TreeSection = ({ open, drawerWidth }: Props) => {
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
           multiSelect
-          sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+          sx={{ 
+            height: 216, 
+            flexGrow: 1, 
+            maxWidth: 400, 
+            overflowY: 'auto', 
+            display: verticalTabVaue === 0 ? 'block' : 'none' 
+          }}
         >
           {trees.map((data: Tree, index: number) => (
-            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick}/>
+            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick} />
           ))}
         </TreeView>
       </Drawer>
@@ -71,4 +78,4 @@ const TreeSection = ({ open, drawerWidth }: Props) => {
   )
 }
 
-export default TreeSection;
+export default DrawerSection;
