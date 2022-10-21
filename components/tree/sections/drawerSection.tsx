@@ -60,7 +60,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           sx={{ 
             height: 216, 
             flexGrow: 1, 
-            maxWidth: 400, 
             overflowY: 'auto', 
             display: verticalTabVaue === 0 ? 'block' : 'none' 
           }}
