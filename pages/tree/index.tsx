@@ -44,6 +44,7 @@ const Home: NextPage = () => {
 
   const [selectedFile, setSelectedFile] = useState<Tree>(INITIAL_SELECTED_FILEL);
   const [files, setFiles] = useState<Tree[]>([]);
+  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
 
   const handleVerticalTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setVerticalTabVaue(newValue);
@@ -58,6 +59,28 @@ const Home: NextPage = () => {
       setDrawerOpen(!drawerOpen);
     }
   };
+
+  const handleTreeClick = (data: Tree) => {
+    console.log('clicked');
+    if (data.treeType === TreeType.FILE) {
+      setTimeout(() => {
+        const tabValue = selectedFileIds.indexOf(data.treeId);
+        if (tabValue >= 0) {
+          setFileTabVaue(tabValue);
+        } else {
+          setSelectedFile(data);
+        }
+      }, 150)
+    }
+  }
+
+  const handleTreeDoubleClick = (data: Tree) => {
+    if (data.treeType === TreeType.FILE) {
+      if (!selectedFileIds.includes(data.treeId)) {
+        setFileTabVaue(fileTabVaue => files.length);
+      }
+    }
+  }
 
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile.treeId], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, selectedFile.treeId), {
     onSuccess(res: AxiosResponse) {
@@ -85,6 +108,10 @@ const Home: NextPage = () => {
   useEffect(() => {
     setAppBarLeft(drawerOpen ? drawerWidth + Number(styles.verticalTabWidth) : Number(styles.verticalTabWidth))
   }, [drawerOpen, drawerWidth])
+
+  useEffect(() => {
+    setSelectedFileIds(files.map((file: Tree) => file.treeId))
+  }, [files])
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -116,7 +143,7 @@ const Home: NextPage = () => {
           textColor="inherit"
         >
           {files?.map((file: Tree, index: number) => (
-            <Tab key={`${index}-${file.treeId}`} label={file.treeName} {...a11yProps(index)} />   
+            <Tab key={`${index}-${file.treeId}`} label={file.treeName} {...a11yProps(index)} />
           ))}
         </Tabs>
       </AppBar>
@@ -124,7 +151,8 @@ const Home: NextPage = () => {
         open={drawerOpen}
         drawerWidth={drawerWidth}
         verticalTabVaue={verticalTabVaue}
-        setSelectedFile={setSelectedFile}
+        handleTreeClick={handleTreeClick}
+        handleTreeDoubleClick={handleTreeDoubleClick}
       />
       {drawerOpen && <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />}
       <TabPanel value={verticalTabVaue} index={0}>

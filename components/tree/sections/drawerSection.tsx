@@ -18,21 +18,16 @@ interface Props {
   open: boolean;
   drawerWidth: number;
   verticalTabVaue: number;
-  setSelectedFile: Function;
+  handleTreeClick: Function;
+  handleTreeDoubleClick: Function;
 }
-const DrawerSection = ({ open, drawerWidth, verticalTabVaue, setSelectedFile }: Props) => {
+const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES), {
     onSuccess(res: AxiosResponse) {
       setTrees(res.data);
     },
   });
-
-  const handleTreeClick = (data: Tree) => {
-    if (data.treeType === TreeType.FILE) {
-      setSelectedFile(data);
-    }
-  }
 
   return (
     <Box
@@ -71,7 +66,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, setSelectedFile }: 
           }}
         >
           {trees.map((data: Tree, index: number) => (
-            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick} />
+            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick} onDoubleClickHandler={handleTreeDoubleClick}/>
           ))}
         </TreeView>
       </Drawer>

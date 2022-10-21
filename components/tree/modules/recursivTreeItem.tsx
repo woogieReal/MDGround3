@@ -6,14 +6,21 @@ interface Props {
   data: Tree;
   depth: number;
   onClickHandler: Function;
+  onDoubleClickHandler: Function;
 }
-const RecursivTreeItem = ({ data, depth, onClickHandler }: Props) => {
+const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }: Props) => {
   const hasChildren = data.treeChildren?.length! > 0 ? true : false;
 
   return (
-    <TreeItem nodeId={data.treeId} label={data.treeName} className={styles.treeItem} onClick={() => onClickHandler(data)} >
+    <TreeItem
+      nodeId={data.treeId}
+      label={data.treeName}
+      className={styles.treeItem}
+      onClick={() => onClickHandler(data)}
+      onDoubleClick={() => onDoubleClickHandler(data)}
+    >
       {hasChildren && data.treeChildren?.map((item: Tree, idx: number) => (
-        <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} onClickHandler={onClickHandler} />
+        <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} onClickHandler={onClickHandler} onDoubleClickHandler={onDoubleClickHandler} />
       ))}
     </TreeItem>
   )
