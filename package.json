@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "migrate:prod": "node src/sqls/index.mjs prod",
+    "migrate:dev": "node src/sqls/index.mjs dev",
+    "migrate:clean": "node src/sqls/index.mjs clean",
     "lint": "next lint"
   },
   "dependencies": {
