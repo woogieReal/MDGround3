@@ -24,7 +24,7 @@ services:
       MYSQL_DATABASE: md3
     restart: always
     ports:
-      - "33069:3306"
+      - "33068:3306"
     command:
       [
         "mysqld",
@@ -38,4 +38,4 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8099:8080
+      - 8098:8080
