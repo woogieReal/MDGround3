@@ -19,3 +19,11 @@ export const initialFileTree = {
   treeContent: 'initial content',
   treePath: '',
 }
+
+export const InitialTree: Tree = {
+  treeId: 0,
+  treeType: TreeType.FILE,
+  treeName: 'introduce',
+  treeContent: '# Welcome!',
+  treePath: ''
+}

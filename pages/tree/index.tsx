@@ -7,7 +7,7 @@ import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
-import { Tree, TreeType } from '@/src/models/tree.model'
+import { InitialTree, Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
@@ -16,12 +16,6 @@ import { useEffect } from 'react'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
-const INITIAL_SELECTED_FILEL: Tree = {
-  treeId: 0,
-  treeType: TreeType.FILE,
-  treeName: 'introduce',
-  treePath: ''
-}
 
 function a11yProps(index: number) {
   return {
@@ -42,7 +36,7 @@ const Home: NextPage = () => {
   const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
   const [fileTabVaue, setFileTabVaue] = useState<number>(0);
 
-  const [selectedFile, setSelectedFile] = useState<Tree>(INITIAL_SELECTED_FILEL);
+  const [selectedFile, setSelectedFile] = useState<Tree>(InitialTree);
   const [files, setFiles] = useState<Tree[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
 
