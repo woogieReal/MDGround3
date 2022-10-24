@@ -12,6 +12,7 @@ const getRawSqlClient = async () => {
 		user: process.env.MYSQL_USER,
 		password: process.env.MYSQL_ROOT_PASSWORD,
 		database: process.env.MYSQL_DATABASE,
+		multipleStatements: true,
 	};
 
 	return await mysql.createConnection(options);
