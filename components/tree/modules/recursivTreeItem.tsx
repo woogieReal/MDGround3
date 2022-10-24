@@ -13,7 +13,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
 
   return (
     <TreeItem
-      nodeId={data.treeId}
+      nodeId={String(data.treeId)}
       label={data.treeName}
       className={styles.treeItem}
       onClick={() => onClickHandler(data)}

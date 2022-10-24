@@ -16,7 +16,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
     case "GET":
       res
         .status(200)
-        .json(eachTree.find((tree: Tree) => tree.treeId === id));
+        .json(eachTree.find((tree: Tree) => tree.treeId === Number(id)));
       break;
     case "PUT":
       res.status(200).json(body);

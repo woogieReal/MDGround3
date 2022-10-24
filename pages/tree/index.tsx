@@ -17,7 +17,7 @@ import { useEffect } from 'react'
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
 const INITIAL_SELECTED_FILEL: Tree = {
-  treeId: 'INTRODUCE',
+  treeId: 0,
   treeType: TreeType.FILE,
   treeName: 'introduce',
   treePath: ''
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
 
   const [selectedFile, setSelectedFile] = useState<Tree>(INITIAL_SELECTED_FILEL);
   const [files, setFiles] = useState<Tree[]>([]);
-  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
+  const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
 
   const handleVerticalTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setVerticalTabVaue(newValue);
