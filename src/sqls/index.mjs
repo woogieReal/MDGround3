@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise';
 import path from 'path';
 import fs from  'fs';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -18,6 +19,18 @@ const getRawSqlClient = async () => {
 	return await mysql.createConnection(options);
 }
 
+const generateChecksum = (str, algorithm, encoding) => {
+	return crypto
+		.createHash(algorithm || 'md5')
+		.update(str, 'utf8')
+		.digest(encoding || 'hex');
+}
+
+const checkIsDevFile = (fileName) => {
+	return fileName.split('-')[0].split('_')[2] > 100;
+}
+
+const CONFIG_PATH = path.join('src', 'sqls', 'config');
 const PROD_PATH = path.join('src', 'sqls', 'prod');
 const DEV_PATH = path.join('src', 'sqls', 'dev');
 
@@ -31,22 +44,72 @@ if (migrateType === 'clean') {
 	await connection.query(`DROP DATABASE ${process.env.MYSQL_DATABASE}`);
 	await connection.query(`CREATE DATABASE ${process.env.MYSQL_DATABASE}`);
 } else {
-	let migrationFileNames = prodSqlFileNames;
-	if (migrateType === 'dev') {
-		migrationFileNames = migrationFileNames.concat(devSqlFileNames);
+	await connection.execute(fs.readFileSync(path.join(CONFIG_PATH, '0_0_1-CREATE_MIGRATION_TABLE.sql')).toString());
+
+	const [rows, columns] = await connection.query(`
+		SELECT 
+			  migration_file_name AS migrationFileName
+			, checksum AS checksum
+		FROM migration
+	`);
+
+	let migrationFileNames = [];
+
+	try {
+		if (migrateType === 'prod') {
+			migrationFileNames = migrationFileNames.concat(prodSqlFileNames);
+	
+			rows.forEach((migratedFile) => {
+				if (!checkIsDevFile(migratedFile.migrationFileName)) {
+					if (!migrationFileNames.includes(migratedFile.migrationFileName)) {
+						throw new Error(`migrated file ${migratedFile.migrationFileName} does not exist`);
+					}
+				}
+			})
+		} else if (migrateType === 'dev') {
+			migrationFileNames = migrationFileNames.concat(prodSqlFileNames, devSqlFileNames);
+	
+			rows.forEach((migratedFile) => {
+				if (!migrationFileNames.includes(migratedFile.migrationFileName)) {
+					throw new Error(`migrated file ${migratedFile.migrationFileName} does not exist`);
+				}
+			})
+		}
+	} catch (err) {
+		console.log(err.message);
 	}
+	
 	migrationFileNames.sort();
 
 	for (const fileName of migrationFileNames) {
 		try {
-			const isDevFile = fileName.split('-')[0].split('_')[2] > 100;
+			const isDevFile = checkIsDevFile(fileName);
 			const fileFullPath = path.join(isDevFile ? DEV_PATH : PROD_PATH, fileName);
 			const fileContent = fs.readFileSync(fileFullPath).toString();
-			await connection.query(fileContent);
-			console.log('Success', fileName)
+
+			const [migrationId, migrationFileName] = fileName.split('-');
+			const checkSum = generateChecksum(fileContent);
+
+			const migratedFile = rows.find((migratedFile) => migratedFile.migrationFileName === fileName);
+			if (migratedFile) {
+				if (migratedFile.checksum !== checkSum) {
+					throw new Error(`Fail: migrated file ${migratedFile.migrationFileName} is changed`);
+				} else {
+					continue;
+				}
+			}
+
+			await connection.beginTransaction();
+
+			await connection.execute(fileContent);
+			await connection.execute(`INSERT INTO migration VALUES('${migrationId}', '${migrationFileName}', '${fileName}', '${checkSum}', CURRENT_TIMESTAMP)`)
+
+			console.log('Success:', fileName)
+			await connection.commit();
 		} catch (err) {
-			console.log('Fail', fileName)
-			throw err;
+			console.log(`Fail:`, fileName)
+			console.log(err.message)
+			await connection.rollback();
 		}
 	}
 }
