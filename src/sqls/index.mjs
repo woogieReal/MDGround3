@@ -101,8 +101,8 @@ if (migrateType === 'clean') {
 
 			await connection.beginTransaction();
 
-			await connection.execute(fileContent);
-			await connection.execute(`INSERT INTO migration VALUES('${migrationId}', '${migrationFileName}', '${fileName}', '${checkSum}', CURRENT_TIMESTAMP)`)
+			await connection.query(fileContent);
+			await connection.query(`INSERT INTO migration VALUES('${migrationId}', '${migrationFileName}', '${fileName}', '${checkSum}', CURRENT_TIMESTAMP)`)
 
 			console.log('Success:', fileName)
 			await connection.commit();
