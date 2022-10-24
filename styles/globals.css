@@ -24,3 +24,9 @@ a {
     background: black;
   }
 }
+
+/* .MuiTreeItem-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} */
