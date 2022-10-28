@@ -27,3 +27,5 @@ export const InitialTree: Tree = {
   treeContent: '# Welcome!',
   treePath: ''
 }
+
+export const TEST_USER_ID = '92aa8f60-51e2-11ed-bf27-0242ac140002';

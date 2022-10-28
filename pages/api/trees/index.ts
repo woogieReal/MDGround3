@@ -48,7 +48,6 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             const parentTreeIndex = parentTrees.findIndex(
               (parent) => parent.treeId === parentTreeId
             );
-            console.log(parentTrees[parentTreeIndex]);
             parentTrees[parentTreeIndex].treeChildren
               ? parentTrees[parentTreeIndex].treeChildren!.push(child)
               : (parentTrees[parentTreeIndex].treeChildren = [child]);

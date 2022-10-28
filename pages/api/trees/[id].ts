@@ -33,7 +33,39 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       });
       break;
     case "PUT":
-      res.status(200).json(body);
+      DBConnection.transactionExecutor(async (connection: Connection) => {
+        const request = JSON.parse(body)
+        let query = '';
+        let params = [];
+
+        query += `
+          UPDATE tree 
+          SET updated_datetime = CURRENT_TIMESTAMP
+        `;
+
+        if (request.treeName) {
+          query += ` , tree_name = ? `;
+          params.push(request.treeName);
+        }
+        if (request.treeContent) {
+          query += ` , tree_content = ? `;
+          params.push(request.treeContent);
+        }
+        if (request.treePath) {
+          query += ` , tree_path = ? `;
+          params.push(request.treePath);
+        }
+
+        query += `
+          WHERE user_id = ?
+          AND tree_id = ?
+        `;
+        params.push(request.userId);
+        params.push(id);
+
+        const result = await connection.execute(query, params);
+        res.status(200).json(result);
+      });
       break;
     case "DELETE":
       res.status(200).json(id);
