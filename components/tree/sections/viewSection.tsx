@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { Tree } from '@/src/models/tree.model';
-import Markdown from 'marked-react';
 
 interface Props {
   open: boolean;
@@ -39,7 +38,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
-        <Markdown>{files[fileTabVaue]?.treeContent || ''}</Markdown>
+        {files[fileTabVaue]?.treeContent || ''}
       </Main>
     </Box>
   );
