@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { Tree } from '@/src/models/tree.model';
-import Markdown from 'marked-react';
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import dynamic from "next/dynamic";
 
 interface Props {
   open: boolean;
@@ -35,11 +37,27 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     }),
   }));
 
+  const MDEditor = dynamic(
+    () => import("@uiw/react-md-editor").then((mod) => mod.default),
+    { ssr: false }
+  );
+  const EditerMarkdown = dynamic(
+    () =>
+      import("@uiw/react-md-editor").then((mod) => {
+        return mod.default.Markdown;
+      }),
+    { ssr: false }
+  );
+
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Main open={open}>
-        <Markdown>{files[fileTabVaue]?.treeContent || ''}</Markdown>
+        <MDEditor
+          value={files[fileTabVaue]?.treeContent || ''}
+          onChange={() => {}}
+        />
+        <EditerMarkdown source={files[fileTabVaue]?.treeContent || ''} style={{ whiteSpace: 'pre-wrap' }} />
       </Main>
     </Box>
   );
