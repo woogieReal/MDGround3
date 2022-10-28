@@ -55,7 +55,6 @@ const Home: NextPage = () => {
   };
 
   const handleTreeClick = (data: Tree) => {
-    console.log('clicked');
     if (data.treeType === TreeType.FILE) {
       setTimeout(() => {
         const tabValue = selectedFileIds.indexOf(data.treeId);
