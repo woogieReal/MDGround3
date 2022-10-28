@@ -24,6 +24,8 @@ export default class DBConnection {
       await connection.rollback();
       console.log(err);
       throw err;
+    } finally {
+      connection.end();
     }
     return result;
   }
