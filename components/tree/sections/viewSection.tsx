@@ -4,7 +4,15 @@ import { useEffect, useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { Tree } from '@/src/models/tree.model';
-import UiwMdEditer from '@/components/tree/modules/uiwMDEditer';
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import dynamic from "next/dynamic";
+import useWindowDimensions from "@/src/hooks/useWindowDimensions";
+
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor"),
+  { ssr: false }
+);
 
 interface Props {
   open: boolean;
@@ -13,9 +21,8 @@ interface Props {
   files: Tree[];
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
-
-  const [num, setNum] = useState<number>(0);
-  const [content, setContent] = useState<string>(files[fileTabVaue]?.treeContent || '');
+  const { width, height } = useWindowDimensions();
+  const [content, setContent] = useState<string>('');
 
   const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean;
@@ -40,17 +47,18 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     if (files[fileTabVaue]?.treeContent) {
       setContent(files[fileTabVaue]?.treeContent || '');
     }
-  }, [files[fileTabVaue]?.treeContent])
+  }, [files[fileTabVaue]?.treeContent]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
-      <Main id={styles.viewMain} open={open}>
-        <UiwMdEditer
+      <Box id={styles.viewMain} sx={{ marginLeft: open ? '0px' : `-${drawerWidth}px` }}>
+        <MDEditor
           value={content}
-          setValue={setContent}
+          onChange={(e) => setContent(e as string)}
+          height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
         />
-      </Main>
+      </Box>
     </Box>
   );
 }

@@ -24,7 +24,8 @@ $resizeButtonWidhthPX: 12px;
 }
 
 #viewMain {
-  padding: $resizeButtonWidhthPX $resizeButtonWidhthPX 0px 0px;
+  padding-top: $resizeButtonWidhthPX;
+  padding-right: $resizeButtonWidhthPX;
 }
 
 .treeItem {
