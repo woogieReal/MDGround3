@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button, Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { Tree } from '@/src/models/tree.model';
-import UiwMdEditer from '@/components/common/atoms/uiwMDEditer';
+import UiwMdEditer from '@/components/tree/modules/uiwMDEditer';
 
 interface Props {
   open: boolean;
@@ -45,7 +45,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
-      <Main open={open}>
+      <Main id={styles.viewMain} open={open}>
         <UiwMdEditer
           value={content}
           setValue={setContent}

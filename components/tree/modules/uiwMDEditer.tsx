@@ -1,7 +1,8 @@
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import useWindowDimensions from "@/src/hooks/useWindowDimensions";
+import styles from '@/styles/tree.module.scss'
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
@@ -14,8 +15,14 @@ interface Props {
 }
 
 const UiwMdEditer = ({ value, setValue }: Props) => {
+  const { width, height } = useWindowDimensions();
+
   return (
-    <MDEditor value={value} onChange={(e) => setValue(e as string)} />
+    <MDEditor
+      value={value}
+      onChange={(e) => setValue(e as string)}
+      height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth)*2)}
+    />
   );
 }
 
