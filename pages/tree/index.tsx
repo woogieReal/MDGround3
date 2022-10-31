@@ -13,6 +13,7 @@ import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
 import { AxiosResponse } from 'axios'
 import { useEffect } from 'react'
+import { CommonQueryOptions } from '@/src/apis/reactQuery'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -36,7 +37,7 @@ const Home: NextPage = () => {
   const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
   const [fileTabVaue, setFileTabVaue] = useState<number>(0);
 
-  const [selectedFile, setSelectedFile] = useState<Tree>(InitialTree);
+  const [selectedFile, setSelectedFile] = useState<Tree | null>(null);
   const [files, setFiles] = useState<Tree[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
 
@@ -79,11 +80,14 @@ const Home: NextPage = () => {
     }
   }
 
-  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile.treeId], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, selectedFile.treeId), {
+  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, null, null, selectedFile.treeId), {
+    ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
-      const updatedFiles = [...files];
-      updatedFiles[fileTabVaue] = res.data;
-      setFiles(updatedFiles);
+      if (res) {
+        const updatedFiles = [...files];
+        updatedFiles[fileTabVaue] = res.data;
+        setFiles(updatedFiles);
+      }
     },
   });
 
