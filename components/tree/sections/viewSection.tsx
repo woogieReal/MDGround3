@@ -1,7 +1,6 @@
-import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
-import { Button, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
@@ -60,7 +59,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         <MDEditor
           value={content}
           onChange={handlChangeContent}
-          preview={isReading ? 'preview' : 'edit'}
+          preview={isReading ? 'preview' : 'live'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
         />
       </Box>
