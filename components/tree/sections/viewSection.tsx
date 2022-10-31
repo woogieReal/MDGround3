@@ -25,6 +25,7 @@ interface Props {
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
+  const [isReading, setIsReading] = useState<boolean>(true);
   const [content, setContent] = useState<string>('');
 
   const isSaveKey = (e: any) => e.ctrlKey && e.code === 'Enter';
@@ -40,8 +41,11 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: content, userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
   useEffect(() => {
-    if (files[fileTabVaue]?.treeContent) {
+    if (files[fileTabVaue]) {
+      setIsReading(true);
       setContent(files[fileTabVaue]?.treeContent || '');
+    } else {
+      setIsReading(false);
     }
   }, [files[fileTabVaue]?.treeContent]);
 
@@ -56,6 +60,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         <MDEditor
           value={content}
           onChange={handlChangeContent}
+          preview={isReading ? 'preview' : 'edit'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
         />
       </Box>
