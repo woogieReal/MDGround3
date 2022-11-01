@@ -1,8 +1,10 @@
-import { Tree } from "@/src/models/tree.model";
+import { Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 import { Box, Popover, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 interface Props {
   data: Tree;
@@ -37,6 +39,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
         nodeId={String(data.treeId)}
         label={data.treeName}
         className={styles.treeItem}
+        icon={data.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
         onClick={() => onClickHandler(data)}
         onDoubleClick={() => onDoubleClickHandler(data)}
         onContextMenu={handleContextMenu}
