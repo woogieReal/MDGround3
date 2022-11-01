@@ -18,6 +18,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
 
   const handleContextMenu = (event: React.BaseSyntheticEvent) => {
     event.preventDefault();
+    event.stopPropagation()
     setAnchorEl(event.currentTarget);
   }
 
