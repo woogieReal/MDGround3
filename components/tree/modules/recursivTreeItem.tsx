@@ -12,7 +12,7 @@ interface Props {
 }
 const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }: Props) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [isOpenPopOver, setIsOpenPopOver] = useState<boolean>(false);
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   const hasChildren = data.treeChildren?.length! > 0 ? true : false;
 
@@ -21,12 +21,12 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
     setAnchorEl(event.currentTarget);
   }
 
-  const handleClose = () => {
+  const handleClosePopup = () => {
     setAnchorEl(null);
   };
 
   useEffect(() => {
-    setIsOpenPopOver(Boolean(anchorEl));
+    setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
   return (
@@ -46,9 +46,9 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
       </TreeItem>
       <Popover
         id={String(data.treeId)}
-        open={isOpenPopOver}
+        open={isPopupOpen}
         anchorEl={anchorEl}
-        onClose={handleClose}
+        onClose={handleClosePopup}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
