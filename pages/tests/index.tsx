@@ -1,39 +1,15 @@
 import * as React from 'react';
-import Popover from '@mui/material/Popover';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 
-export default function BasicPopover() {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+export default function TextInputWithFocusButton() {
+  const inputEl = React.useRef<HTMLInputElement>(null);
+  const onButtonClick = () => {
+    // `current` points to the mounted text input element
+    inputEl.current?.focus();
   };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
   return (
-    <div>
-      <Button aria-describedby={id} variant="contained" onClick={handleClick}>
-        Open Popover
-      </Button>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
-      </Popover>
-    </div>
+    <>
+      <input ref={inputEl} type="text" />
+      <button onClick={onButtonClick}>Focus the input</button>
+    </>
   );
 }
