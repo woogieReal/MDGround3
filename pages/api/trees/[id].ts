@@ -4,7 +4,7 @@ import { Connection, RowDataPacket } from "mysql2/promise";
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   const {
-    query: { id },
+    query: { id, userId },
     body,
     method,
   } = _req;
@@ -12,7 +12,10 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case "GET":
       DBConnection.transactionExecutor(async (connection: Connection) => {
-        const [rows, fields] = await connection.query(`
+        let query = '';
+        let params: any[] = [];
+
+        query += `
           SELECT 
               tree_id AS treeId
             , tree_type AS treeType
@@ -24,16 +27,53 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , updated_datetime AS updatedDatetime
             , deleted_datetime AS deletedDatetime
           FROM tree
-          WHERE 1 = 1
+          WHERE user_id = ?
           AND delete_yn = 'N'
           AND tree_id = ?
           ORDER BY tree_path
-        `, [id]);
+        `;
+
+        params.push(userId);
+        params.push(id);
+
+        const [rows, fields] = await connection.query(query, params);
         res.status(200).json((rows as RowDataPacket[])[0]);
       });
       break;
     case "PUT":
-      res.status(200).json(body);
+      DBConnection.transactionExecutor(async (connection: Connection) => {
+        const request = JSON.parse(body)
+        let query = '';
+        let params: any[] = [];
+
+        query += `
+          UPDATE tree 
+          SET updated_datetime = CURRENT_TIMESTAMP
+        `;
+
+        if (request.treeName) {
+          query += ` , tree_name = ? `;
+          params.push(request.treeName);
+        }
+        if (request.treeContent) {
+          query += ` , tree_content = ? `;
+          params.push(request.treeContent);
+        }
+        if (request.treePath) {
+          query += ` , tree_path = ? `;
+          params.push(request.treePath);
+        }
+
+        query += `
+          WHERE user_id = ?
+          AND tree_id = ?
+        `;
+        params.push(request.userId);
+        params.push(id);
+
+        const result = await connection.execute(query, params);
+        res.status(200).json(result);
+      });
       break;
     case "DELETE":
       res.status(200).json(id);

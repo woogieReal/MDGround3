@@ -7,12 +7,13 @@ import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
-import { InitialTree, Tree, TreeType } from '@/src/models/tree.model'
+import { TEST_USER_ID, Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
 import { AxiosResponse } from 'axios'
 import { useEffect } from 'react'
+import { CommonQueryOptions } from '@/src/apis/reactQuery'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -36,7 +37,7 @@ const Home: NextPage = () => {
   const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
   const [fileTabVaue, setFileTabVaue] = useState<number>(0);
 
-  const [selectedFile, setSelectedFile] = useState<Tree>(InitialTree);
+  const [selectedFile, setSelectedFile] = useState<Tree | null>(null);
   const [files, setFiles] = useState<Tree[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
 
@@ -55,7 +56,6 @@ const Home: NextPage = () => {
   };
 
   const handleTreeClick = (data: Tree) => {
-    console.log('clicked');
     if (data.treeType === TreeType.FILE) {
       setTimeout(() => {
         const tabValue = selectedFileIds.indexOf(data.treeId);
@@ -80,11 +80,14 @@ const Home: NextPage = () => {
     }
   }
 
-  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile.treeId], async () => await ApiHandler.callApi(ApiName.GET_TREE, null, null, selectedFile.treeId), {
+  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
+    ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
-      const updatedFiles = [...files];
-      updatedFiles[fileTabVaue] = res.data;
-      setFiles(updatedFiles);
+      if (res) {
+        const updatedFiles = [...files];
+        updatedFiles[fileTabVaue] = res.data;
+        setFiles(updatedFiles);
+      }
     },
   });
 

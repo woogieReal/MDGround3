@@ -1,12 +1,20 @@
-import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useState } from 'react';
-import { Button, Box } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
-import { Tree } from '@/src/models/tree.model';
+import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import dynamic from "next/dynamic";
+import useWindowDimensions from "@/src/hooks/useWindowDimensions";
+import { useMutation } from '@tanstack/react-query';
+import ApiHandler from '@/src/apis/apiHandler';
+import { ApiName } from '@/src/apis/apiInfo';
+
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor"),
+  { ssr: false }
+);
 
 interface Props {
   open: boolean;
@@ -15,50 +23,46 @@ interface Props {
   files: Tree[];
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
+  const { width, height } = useWindowDimensions();
+  const [isReading, setIsReading] = useState<boolean>(true);
+  const [content, setContent] = useState<string>('');
 
-  const [num, setNum] = useState<number>(0);
+  const isSaveKey = (e: any) => e.ctrlKey && e.code === 'Enter';
 
-  const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-    open?: boolean;
-  }>(({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: `0px`,
-    }),
-  }));
+  const handlChangeContent = (e: any) => {
+    setContent(e as string);
+  }
 
-  const MDEditor = dynamic(
-    () => import("@uiw/react-md-editor").then((mod) => mod.default),
-    { ssr: false }
-  );
-  const EditerMarkdown = dynamic(
-    () =>
-      import("@uiw/react-md-editor").then((mod) => {
-        return mod.default.Markdown;
-      }),
-    { ssr: false }
-  );
+  const handleKeyPress = (e: any) => {
+    isSaveKey(e) && updateTree.mutate();
+  }
+
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: content, userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
+
+  useEffect(() => {
+    if (files[fileTabVaue]) {
+      setIsReading(true);
+      setContent(files[fileTabVaue]?.treeContent || '');
+    } else {
+      setIsReading(false);
+    }
+  }, [files[fileTabVaue]?.treeContent]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
-      <Main open={open}>
+      <Box
+        id={styles.viewMain}
+        sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
+        onKeyPress={handleKeyPress}
+      >
         <MDEditor
-          value={files[fileTabVaue]?.treeContent || ''}
-          onChange={() => {}}
+          value={content}
+          onChange={handlChangeContent}
+          preview={isReading ? 'preview' : 'live'}
+          height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
         />
-        <EditerMarkdown source={files[fileTabVaue]?.treeContent || ''} style={{ whiteSpace: 'pre-wrap' }} />
-      </Main>
+      </Box>
     </Box>
   );
 }

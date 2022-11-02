@@ -1,6 +1,9 @@
 $verticalTabWidth: 90;
 $verticalTabWidthPX: 90px;
+$appHeaderHeight: 48;
 $appHeaderHeightPX: 48px;
+$resizeButtonWidhth: 12;
+$resizeButtonWidhthPX: 12px;
 
 #resizableContainer {
   height: 100vh;
@@ -16,16 +19,34 @@ $appHeaderHeightPX: 48px;
 
 #resizeButton {
   padding: 1px;
-  min-width: 12px;
+  min-width: $resizeButtonWidhthPX;
   cursor: COL-RESIZE;
+}
+
+#viewMain {
+  padding-top: $resizeButtonWidhthPX;
+  padding-right: $resizeButtonWidhthPX;
 }
 
 .treeItem {
   white-space: nowrap;
 }
 
+.newTreeInputIcon {
+  font-size: large !important;
+  margin: 0px 6px;
+}
+
+#newTreeInput {
+  border: 0.5px solid gray;
+  border-radius: 3px;
+}
+
 :export {
   verticalTabWidth: $verticalTabWidth;
   verticalTabWidthPX: $verticalTabWidthPX;
+  appHeaderHeight: $appHeaderHeight;
   appHeaderHeightPX: $appHeaderHeightPX;
+  resizeButtonWidhth: $resizeButtonWidhth;
+  resizeButtonWidhthPX: $resizeButtonWidhthPX;
 }

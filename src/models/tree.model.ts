@@ -5,6 +5,7 @@ export interface Tree {
   treeContent?: string;
   treePath: string;
   treeChildren?: Tree[];
+  userId?: string;
 }
 
 export enum TreeType {
@@ -23,7 +24,9 @@ export const initialFileTree = {
 export const InitialTree: Tree = {
   treeId: 0,
   treeType: TreeType.FILE,
-  treeName: 'introduce',
-  treeContent: '# Welcome!',
+  treeName: '',
+  treeContent: '',
   treePath: ''
 }
+
+export const TEST_USER_ID = '92aa8f60-51e2-11ed-bf27-0242ac140002';
