@@ -61,7 +61,46 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       });
       break;
     case "POST":
-      res.status(200).json(body);
+      DBConnection.transactionExecutor(async (connection: Connection) => {
+        const request = JSON.parse(body)
+        let query = '';
+        let params = [];
+
+        query += `
+          INSERT INTO tree 
+            (
+                tree_id
+              , tree_type
+              , tree_name
+              , tree_content
+              , tree_path
+              , user_id
+            )
+          VALUES 
+            (
+                (
+                  SELECT MAX(IFNULL(t.tree_id, 0)) + 1 
+                  FROM tree t 
+                  WHERE t.user_id = ?
+                )
+              , ?
+              , ?
+              , ?
+              , ?
+              , ?
+            )
+        `;
+
+        params.push(request.userId);
+        params.push(request.treeType);
+        params.push(request.treeName);
+        params.push(request.treeContent);
+        params.push(request.treePath);
+        params.push(request.userId);
+
+        const result = await connection.execute(query, params);
+        res.status(200).json(result);
+      });
       break;
     default:
       res.setHeader("Allow", ["GET", "POST"]);
