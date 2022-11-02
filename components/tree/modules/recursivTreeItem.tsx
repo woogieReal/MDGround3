@@ -1,13 +1,13 @@
 import { InitialTree, TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
-import { Box, List, ListItem, ListItemButton, ListItemText, Popover, TextField } from "@mui/material";
+import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { ValidationResponse } from "@/src/models/validation.model";
@@ -24,6 +24,7 @@ interface Props {
 }
 const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }: Props) => {
   const inputEl = useRef<HTMLInputElement>(null);
+  const treeFullPath = data.treePath ? data.treePath + '|' + data.treeId : String(data.treeId);
 
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -39,7 +40,6 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
 
   const createTree = useMutation(async () => await ApiHandler.callApi(ApiName.CREATE_TREE, null, { ...newTree, userId: TEST_USER_ID }), {
     onSuccess(res: AxiosResponse) {
-      console.log(res);
       setNewTreeInputOpen(false);
       setNewTree(InitialTree);
       setIsReadyToCreate(false);
@@ -58,10 +58,8 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
   };
 
   const handleClickCreate = (treeType: TreeType) => {
-    const treePath = data.treePath ? data.treePath + '|' + data.treeId : String(data.treeId);
-
     setNewTreeInputOpen(true);
-    setNewTree({ ...newTree, treeType, treePath });
+    setNewTree({ ...newTree, treeType, treePath: treeFullPath });
     setAnchorEl(null);
   }
 
@@ -104,7 +102,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
         onDoubleClick={() => onDoubleClickHandler(data)}
         onContextMenu={handleContextMenu}
       >
-        {hasChildren && data.treeChildren?.map((item: Tree, idx: number) => (
+        {hasChildren && data.treeChildren?.map((item: Tree) => (
           <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} onClickHandler={onClickHandler} onDoubleClickHandler={onDoubleClickHandler} />
         ))}
         {newTreeInputOpen &&
