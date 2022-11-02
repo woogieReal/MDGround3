@@ -32,6 +32,16 @@ $resizeButtonWidhthPX: 12px;
   white-space: nowrap;
 }
 
+.newTreeInputIcon {
+  font-size: large !important;
+  margin: 0px 6px;
+}
+
+#newTreeInput {
+  border: 0.5px solid gray;
+  border-radius: 3px;
+}
+
 :export {
   verticalTabWidth: $verticalTabWidth;
   verticalTabWidthPX: $verticalTabWidthPX;
