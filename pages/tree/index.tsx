@@ -7,7 +7,7 @@ import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
-import { InitialTree, Tree, TreeType } from '@/src/models/tree.model'
+import { Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
