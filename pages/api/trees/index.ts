@@ -4,12 +4,19 @@ import { Connection } from "mysql2/promise";
 import { Tree } from "@/src/models/tree.model";
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
-  const { body, method } = _req;
+  const { 
+    query: { userId, treePath },
+    body, 
+    method 
+  } = _req;
 
   switch (method) {
     case "GET":
       DBConnection.transactionExecutor(async (connection: Connection) => {
-        const [rows, fields] = await connection.query(`
+        let query = '';
+        let params: any[] = [];
+
+        query += `
           SELECT 
               tree_id AS treeId
             , tree_type AS treeType
@@ -17,10 +24,24 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , tree_path AS treePath
             , delete_yn AS deleteYn
           FROM tree
-          WHERE 1 = 1
+          WHERE user_id = ?
           AND delete_yn = 'N'
+        `;
+
+        params.push(userId);
+
+        if (treePath) {
+          query += `
+            AND tree_path = ?
+          `;
+          params.push(treePath);
+        }
+
+        query += `
           ORDER BY tree_path, FIELD(tree_type, 20, 10)
-        `);
+        `;
+
+        const [rows, fields] = await connection.query(query, params);
 
         const depthToTree = new Map();
         const trees: Tree[] = rows as Tree[];
@@ -64,7 +85,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       DBConnection.transactionExecutor(async (connection: Connection) => {
         const request = JSON.parse(body)
         let query = '';
-        let params = [];
+        let params: any[] = [];
 
         query += `
           INSERT INTO tree 

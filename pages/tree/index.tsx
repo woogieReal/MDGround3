@@ -7,7 +7,7 @@ import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
-import { Tree, TreeType } from '@/src/models/tree.model'
+import { TEST_USER_ID, Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
@@ -80,7 +80,7 @@ const Home: NextPage = () => {
     }
   }
 
-  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, null, null, selectedFile.treeId), {
+  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
       if (res) {

@@ -4,7 +4,7 @@ import { Connection, RowDataPacket } from "mysql2/promise";
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   const {
-    query: { id },
+    query: { id, userId },
     body,
     method,
   } = _req;
@@ -12,7 +12,10 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case "GET":
       DBConnection.transactionExecutor(async (connection: Connection) => {
-        const [rows, fields] = await connection.query(`
+        let query = '';
+        let params: any[] = [];
+
+        query += `
           SELECT 
               tree_id AS treeId
             , tree_type AS treeType
@@ -24,11 +27,16 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , updated_datetime AS updatedDatetime
             , deleted_datetime AS deletedDatetime
           FROM tree
-          WHERE 1 = 1
+          WHERE user_id = ?
           AND delete_yn = 'N'
           AND tree_id = ?
           ORDER BY tree_path
-        `, [id]);
+        `;
+
+        params.push(userId);
+        params.push(id);
+
+        const [rows, fields] = await connection.query(query, params);
         res.status(200).json((rows as RowDataPacket[])[0]);
       });
       break;
@@ -36,7 +44,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       DBConnection.transactionExecutor(async (connection: Connection) => {
         const request = JSON.parse(body)
         let query = '';
-        let params = [];
+        let params: any[] = [];
 
         query += `
           UPDATE tree 
