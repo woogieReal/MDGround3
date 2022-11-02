@@ -6,6 +6,6 @@ RUN rm -rf node_modules .next
 
 RUN npm install
 
-EXPOSE 3000
+EXPOSE 3600
 
 CMD [ "npm", "run", "dev"]

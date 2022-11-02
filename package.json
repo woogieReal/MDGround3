@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3600",
     "build": "next build",
     "start": "next start",
     "migrate:prod": "node src/sqls/index.mjs prod",
