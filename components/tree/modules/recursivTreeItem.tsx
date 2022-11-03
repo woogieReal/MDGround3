@@ -14,6 +14,7 @@ import { ValidationResponse } from "@/src/models/validation.model";
 import { validateCreateTree } from "@/src/scripts/tree/validation";
 import { AxiosResponse } from "axios";
 import { isEnter } from "@/src/scripts/common/keyPress";
+import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -171,6 +172,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
           </List>
         </Box>
       </Popover>
+      <LodingBackDrop isOpen={createTree.isLoading} />
     </Box>
   )
 }

@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
+import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 
 
 interface Props {
@@ -78,6 +79,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           ))}
         </TreeView>
       </Drawer>
+      <LodingBackDrop isOpen={getTrees.isLoading} />
     </Box>
   )
 }

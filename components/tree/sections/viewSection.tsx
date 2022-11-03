@@ -11,6 +11,7 @@ import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
 import { isCtrlEnter } from '@/src/scripts/common/keyPress';
+import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
@@ -62,6 +63,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
         />
       </Box>
+      <LodingBackDrop isOpen={updateTree.isLoading} />
     </Box>
   );
 }
