@@ -13,6 +13,7 @@ import { ApiName } from "@/src/apis/apiInfo";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { validateCreateTree } from "@/src/scripts/tree/validation";
 import { AxiosResponse } from "axios";
+import { isEnter } from "@/src/scripts/common/keyPress";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -49,10 +50,10 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     },
   });
 
-  const handleContextMenu = (event: React.BaseSyntheticEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
+  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
   }
 
   const handleClosePopup = () => {
@@ -65,19 +66,23 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     setAnchorEl(null);
   }
 
-  const handleChangeNewTreeName = (event: React.BaseSyntheticEvent) => {
-    !isInputed && setIsInputed(true);
-    setNewTree({ ...newTree, treeName: event.target.value });
-  }
-
   const handlBlurNewTreeInput = () => {
     isInputed && checkReadyToCreate();
+  }
+
+  const handleChangeNewTreeName = (e: React.BaseSyntheticEvent) => {
+    !isInputed && setIsInputed(true);
+    setNewTree({ ...newTree, treeName: e.target.value });
   }
 
   const checkReadyToCreate = () => {
     const response: ValidationResponse = validateCreateTree(newTree);
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
+  }
+
+  const handleKeyPress = (e: any) => {
+    isEnter(e) && checkReadyToCreate();
   }
 
   useEffect(() => {
@@ -121,9 +126,10 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
               ref={inputEl}
               id={styles.newTreeInput}
               type='text'
-              onBlur={handlBlurNewTreeInput}
               value={newTree.treeName}
+              onBlur={handlBlurNewTreeInput}
               onChange={handleChangeNewTreeName}
+              onKeyUp={handleKeyPress}
             />
           </Box>
         }
