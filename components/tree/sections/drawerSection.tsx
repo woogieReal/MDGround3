@@ -67,7 +67,14 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           }}
         >
           {trees.map((data: Tree, index: number) => (
-            <RecursivTreeItem key={`${index}-${data.treeId}`} data={data} depth={1} onClickHandler={handleTreeClick} onDoubleClickHandler={handleTreeDoubleClick} />
+            <RecursivTreeItem
+              key={`${index}-${data.treeId}`}
+              data={data}
+              depth={1}
+              fetchDatas={getTrees.refetch}
+              onClickHandler={handleTreeClick}
+              onDoubleClickHandler={handleTreeDoubleClick}
+            />
           ))}
         </TreeView>
       </Drawer>

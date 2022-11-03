@@ -19,10 +19,11 @@ const iconStyle = { marginRight: '10px' };
 interface Props {
   data: Tree;
   depth: number;
+  fetchDatas: Function;
   onClickHandler: Function;
   onDoubleClickHandler: Function;
 }
-const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }: Props) => {
+const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleClickHandler }: Props) => {
   const inputEl = useRef<HTMLInputElement>(null);
   const treeFullPath = data.treePath ? data.treePath + '|' + data.treeId : String(data.treeId);
 
@@ -44,6 +45,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
       setNewTree(InitialTree);
       setIsReadyToCreate(false);
       setIsInputed(false);
+      fetchDatas();
     },
   });
 
@@ -103,7 +105,14 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
         onContextMenu={handleContextMenu}
       >
         {hasChildren && data.treeChildren?.map((item: Tree) => (
-          <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} onClickHandler={onClickHandler} onDoubleClickHandler={onDoubleClickHandler} />
+          <RecursivTreeItem
+            key={item.treeId}
+            data={item}
+            depth={depth + 1}
+            fetchDatas={fetchDatas}
+            onClickHandler={onClickHandler}
+            onDoubleClickHandler={onDoubleClickHandler}
+          />
         ))}
         {newTreeInputOpen &&
           <Box>
