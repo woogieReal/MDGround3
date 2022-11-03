@@ -61,6 +61,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           onChange={handlChangeContent}
           preview={isReading ? 'preview' : 'live'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
+          style={{ whiteSpace: 'pre-wrap' }}
         />
       </Box>
       <LodingBackDrop isOpen={updateTree.isLoading} />
