@@ -46,7 +46,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     } else {
       setIsReading(false);
     }
-  }, [files[fileTabVaue]?.treeContent]);
+  }, [files[fileTabVaue]]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
