@@ -13,16 +13,19 @@ import { ApiName } from "@/src/apis/apiInfo";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { validateCreateTree } from "@/src/scripts/tree/validation";
 import { AxiosResponse } from "axios";
+import { isEnter } from "@/src/scripts/common/keyPress";
+import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 
 const iconStyle = { marginRight: '10px' };
 
 interface Props {
   data: Tree;
   depth: number;
+  fetchDatas: Function;
   onClickHandler: Function;
   onDoubleClickHandler: Function;
 }
-const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }: Props) => {
+const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleClickHandler }: Props) => {
   const inputEl = useRef<HTMLInputElement>(null);
   const treeFullPath = data.treePath ? data.treePath + '|' + data.treeId : String(data.treeId);
 
@@ -44,13 +47,14 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
       setNewTree(InitialTree);
       setIsReadyToCreate(false);
       setIsInputed(false);
+      fetchDatas();
     },
   });
 
-  const handleContextMenu = (event: React.BaseSyntheticEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
+  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
   }
 
   const handleClosePopup = () => {
@@ -63,13 +67,17 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
     setAnchorEl(null);
   }
 
-  const handleChangeNewTreeName = (event: React.BaseSyntheticEvent) => {
-    !isInputed && setIsInputed(true);
-    setNewTree({ ...newTree, treeName: event.target.value });
-  }
-
   const handlBlurNewTreeInput = () => {
     isInputed && checkReadyToCreate();
+  }
+
+  const handleChangeNewTreeInput = (e: React.BaseSyntheticEvent) => {
+    !isInputed && setIsInputed(true);
+    setNewTree({ ...newTree, treeName: e.target.value });
+  }
+
+  const handleKeyPressNewTreeInput = (e: any) => {
+    isEnter(e) && checkReadyToCreate();
   }
 
   const checkReadyToCreate = () => {
@@ -103,7 +111,14 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
         onContextMenu={handleContextMenu}
       >
         {hasChildren && data.treeChildren?.map((item: Tree) => (
-          <RecursivTreeItem key={item.treeId} data={item} depth={depth + 1} onClickHandler={onClickHandler} onDoubleClickHandler={onDoubleClickHandler} />
+          <RecursivTreeItem
+            key={item.treeId}
+            data={item}
+            depth={depth + 1}
+            fetchDatas={fetchDatas}
+            onClickHandler={onClickHandler}
+            onDoubleClickHandler={onDoubleClickHandler}
+          />
         ))}
         {newTreeInputOpen &&
           <Box>
@@ -112,9 +127,10 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
               ref={inputEl}
               id={styles.newTreeInput}
               type='text'
-              onBlur={handlBlurNewTreeInput}
               value={newTree.treeName}
-              onChange={handleChangeNewTreeName}
+              onBlur={handlBlurNewTreeInput}
+              onChange={handleChangeNewTreeInput}
+              onKeyUp={handleKeyPressNewTreeInput}
             />
           </Box>
         }
@@ -156,6 +172,7 @@ const RecursivTreeItem = ({ data, depth, onClickHandler, onDoubleClickHandler }:
           </List>
         </Box>
       </Popover>
+      <LodingBackDrop isOpen={createTree.isLoading} />
     </Box>
   )
 }
