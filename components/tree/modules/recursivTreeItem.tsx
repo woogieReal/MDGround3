@@ -70,19 +70,19 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     isInputed && checkReadyToCreate();
   }
 
-  const handleChangeNewTreeName = (e: React.BaseSyntheticEvent) => {
+  const handleChangeNewTreeInput = (e: React.BaseSyntheticEvent) => {
     !isInputed && setIsInputed(true);
     setNewTree({ ...newTree, treeName: e.target.value });
+  }
+
+  const handleKeyPressNewTreeInput = (e: any) => {
+    isEnter(e) && checkReadyToCreate();
   }
 
   const checkReadyToCreate = () => {
     const response: ValidationResponse = validateCreateTree(newTree);
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
-  }
-
-  const handleKeyPress = (e: any) => {
-    isEnter(e) && checkReadyToCreate();
   }
 
   useEffect(() => {
@@ -128,8 +128,8 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
               type='text'
               value={newTree.treeName}
               onBlur={handlBlurNewTreeInput}
-              onChange={handleChangeNewTreeName}
-              onKeyUp={handleKeyPress}
+              onChange={handleChangeNewTreeInput}
+              onKeyUp={handleKeyPressNewTreeInput}
             />
           </Box>
         }
