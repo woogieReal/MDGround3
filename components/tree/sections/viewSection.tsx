@@ -12,6 +12,7 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
 import { isCtrlEnter } from '@/src/scripts/common/keyPress';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
+import remarkBreaks from 'remark-breaks'
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
@@ -61,7 +62,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           onChange={handlChangeContent}
           preview={isReading ? 'preview' : 'live'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
-          style={{ whiteSpace: 'pre-wrap' }}
+          previewOptions={{
+            remarkPlugins: [[remarkBreaks]]
+          }}
         />
       </Box>
       <LodingBackDrop isOpen={updateTree.isLoading} />
