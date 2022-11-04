@@ -51,6 +51,12 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     },
   });
 
+  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, data.treeId), {
+    onSuccess(res: AxiosResponse) {
+      fetchDatas();
+    },
+  });
+
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -61,6 +67,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     setAnchorEl(null);
   };
 
+  // 생성
   const handleClickCreate = (treeType: TreeType) => {
     setNewTreeInputOpen(true);
     setNewTree({ ...newTree, treeType, treePath: treeFullPath });
@@ -84,6 +91,13 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     const response: ValidationResponse = validateCreateTree(newTree);
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
+  }
+  // -- 생성
+
+  // 삭제
+  const handlClickDelte = () => {
+    setAnchorEl(null);
+    deleteTree.mutate();
   }
 
   useEffect(() => {
@@ -163,7 +177,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
                 </ListItem>
               </>
             }
-            <ListItem disablePadding>
+            <ListItem disablePadding onClick={() => handlClickDelte()} >
               <ListItemButton>
                 <DeleteOutlineOutlinedIcon sx={iconStyle} />
                 <ListItemText primary="delete" />
