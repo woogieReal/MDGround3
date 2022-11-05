@@ -3,4 +3,5 @@ export enum ApiName {
   GET_TREE = "getTree",
   UPDATE_TREE = "updateTree",
   CREATE_TREE = "createTree",
+  DELETE_TREE = "deleteTree",
 }

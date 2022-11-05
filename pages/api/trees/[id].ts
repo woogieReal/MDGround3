@@ -72,11 +72,29 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         params.push(id);
 
         const result = await connection.execute(query, params);
-        res.status(200).json(result);
+        res.status(200).json(result[0]);
       });
       break;
     case "DELETE":
-      res.status(200).json(id);
+      DBConnection.transactionExecutor(async (connection: Connection) => {
+        const request = body;
+        let query = '';
+        let params: any[] = [];
+
+        query += `
+          UPDATE tree 
+          SET delete_yn = 'Y'
+            , deleted_datetime = CURRENT_TIMESTAMP
+          WHERE user_id = ?
+          AND tree_id = ?
+        `;
+
+        params.push(request.userId);
+        params.push(id);
+
+        const result = await connection.execute(query, params);
+        res.status(200).json(result[0]);
+      });
       break;
     default:
       res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
