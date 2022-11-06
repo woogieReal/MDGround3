@@ -87,6 +87,14 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         let query = '';
         let params: any[] = [];
 
+        const [rows, fields] = await connection.execute(`
+          SELECT MAX(IFNULL(t.tree_id, 0)) + 1 AS newTreeId
+          FROM tree t 
+          WHERE t.user_id = ?
+        `, [request.userId]);
+
+        const newTree = (rows as { newTreeId: number }[])[0];
+
         query += `
           INSERT INTO tree 
             (
@@ -99,11 +107,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             )
           VALUES 
             (
-                (
-                  SELECT MAX(IFNULL(t.tree_id, 0)) + 1 
-                  FROM tree t 
-                  WHERE t.user_id = ?
-                )
+                ?
               , ?
               , ?
               , ?
@@ -112,15 +116,15 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             )
         `;
 
-        params.push(request.userId);
+        params.push(newTree.newTreeId);
         params.push(request.treeType);
         params.push(request.treeName);
         params.push(request.treeContent);
         params.push(request.treePath);
         params.push(request.userId);
 
-        const result = await connection.execute(query, params);
-        res.status(200).json(result);
+        await connection.execute(query, params);
+        res.status(200).json(newTree);
       });
       break;
     default:
