@@ -74,7 +74,7 @@ const Home: NextPage = () => {
         handleTreeClick(data);
       } else {
         if (!selectedFileIds.includes(data.treeId)) {
-          setFileTabVaue(fileTabVaue => files.length);
+          setFileTabVaue(files.length);
         }
       }
     }

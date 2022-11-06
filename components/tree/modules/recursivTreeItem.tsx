@@ -26,8 +26,10 @@ interface Props {
   onDoubleClickHandler: Function;
 }
 const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleClickHandler }: Props) => {
+  const [tree, setTree] = useState<Tree>(data);
+
   const inputEl = useRef<HTMLInputElement>(null);
-  const treeFullPath = data.treePath ? data.treePath + '|' + data.treeId : String(data.treeId);
+  const treeFullPath = tree.treePath ? tree.treePath + '|' + tree.treeId : String(tree.treeId);
 
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -39,7 +41,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
   const [isReadyToCreate, setIsReadyToCreate] = useState<boolean>(false);
   const [isInputed, setIsInputed] = useState<boolean>(false);
 
-  const hasChildren = data.treeChildren?.length! > 0 ? true : false;
+  const hasChildren = tree.treeChildren?.length! > 0 ? true : false;
 
   const createTree = useMutation(async () => await ApiHandler.callApi(ApiName.CREATE_TREE, null, { ...newTree, userId: TEST_USER_ID }), {
     onSuccess(res: AxiosResponse) {
@@ -47,11 +49,17 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
       setNewTree(InitialTree);
       setIsReadyToCreate(false);
       setIsInputed(false);
-      fetchDatas();
+
+      const newTree: Tree = res.data as Tree;
+      const treeChildren: Tree[] = tree.treeChildren || [];
+      treeChildren.push(newTree);
+
+      setTree(currentTree => { return { ...currentTree, treeChildren } });
+      onDoubleClickHandler(newTree);
     },
   });
 
-  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, data.treeId), {
+  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, tree.treeId), {
     onSuccess(res: AxiosResponse) {
       fetchDatas();
     },
@@ -115,16 +123,16 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
   return (
     <Box>
       <TreeItem
-        id={String(data.treeId)}
-        nodeId={String(data.treeId)}
-        label={data.treeName}
+        id={String(tree.treeId)}
+        nodeId={String(tree.treeId)}
+        label={tree.treeName}
         className={styles.treeItem}
-        icon={data.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
-        onClick={() => onClickHandler(data)}
-        onDoubleClick={() => onDoubleClickHandler(data)}
+        icon={tree.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
+        onClick={() => onClickHandler(tree)}
+        onDoubleClick={() => onDoubleClickHandler(tree)}
         onContextMenu={handleContextMenu}
       >
-        {hasChildren && data.treeChildren?.map((item: Tree) => (
+        {hasChildren && tree.treeChildren?.map((item: Tree) => (
           <RecursivTreeItem
             key={item.treeId}
             data={item}
@@ -150,7 +158,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
         }
       </TreeItem>
       <Popover
-        id={String(data.treeId)}
+        id={String(tree.treeId)}
         open={isPopupOpen}
         anchorEl={anchorEl}
         onClose={handleClosePopup}
@@ -161,7 +169,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
       >
         <Box>
           <List>
-            {data.treeType === TreeType.FORDER &&
+            {tree.treeType === TreeType.FORDER &&
               <>
                 <ListItem disablePadding onClick={() => handleClickCreate(TreeType.FILE)}>
                   <ListItemButton>
