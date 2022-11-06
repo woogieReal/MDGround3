@@ -42,7 +42,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   useEffect(() => {
     if (files[fileTabVaue]) {
-      setIsReading(true);
+      const idContentExist = !!files[fileTabVaue]?.treeContent;
+      setIsReading(idContentExist);
       setContent(files[fileTabVaue]?.treeContent || '');
     } else {
       setIsReading(false);
