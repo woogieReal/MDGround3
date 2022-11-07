@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
@@ -15,7 +15,7 @@ import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 
 const MDEditor = dynamic(
-  () => import("@uiw/react-md-editor"),
+  () => import("@uiw/react-md-editor/lib/Editor"),
   { ssr: false }
 );
 
@@ -28,22 +28,35 @@ interface Props {
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
   const [isReading, setIsReading] = useState<boolean>(true);
-  const [content, setContent] = useState<string>('');
+  const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
+  const [currentTabTreeId, setTreeId] = useState<number>(0);
 
   const handlChangeContent = (e: any) => {
-    setContent(e as string);
+    const currentEachTabContent = new Map(eachTabContent);
+    currentEachTabContent.set(currentTabTreeId, e as string);
+    setEachTabContent(currentEachTabContent);
   }
 
   const handleKeyPress = (e: any) => {
     isCtrlEnter(e) && updateTree.mutate();
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: content, userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
   useEffect(() => {
     if (files[fileTabVaue]) {
-      setIsReading(true);
-      setContent(files[fileTabVaue]?.treeContent || '');
+      const targetTreeId = files[fileTabVaue].treeId;
+      setTreeId(targetTreeId);
+
+      const currentEachTabContent = new Map(eachTabContent);
+
+      if (!currentEachTabContent.get(targetTreeId)) {
+        currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
+        setEachTabContent(currentEachTabContent);
+
+        const isContentExist = !!files[fileTabVaue].treeContent;
+        setIsReading(isContentExist);
+      }
     } else {
       setIsReading(false);
     }
@@ -58,7 +71,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         onKeyPress={handleKeyPress}
       >
         <MDEditor
-          value={content}
+          value={eachTabContent.get(currentTabTreeId)}
           onChange={handlChangeContent}
           preview={isReading ? 'preview' : 'live'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
