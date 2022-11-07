@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
@@ -15,7 +15,7 @@ import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 
 const MDEditor = dynamic(
-  () => import("@uiw/react-md-editor"),
+  () => import("@uiw/react-md-editor/lib/Editor"),
   { ssr: false }
 );
 
@@ -48,14 +48,14 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       const targetTreeId = files[fileTabVaue].treeId;
       setTreeId(targetTreeId);
 
-      const isContentExist = !!files[fileTabVaue]?.treeContent;
-      setIsReading(isContentExist);
-
       const currentEachTabContent = new Map(eachTabContent);
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
         setEachTabContent(currentEachTabContent);
+
+        const isContentExist = !!files[fileTabVaue].treeContent;
+        setIsReading(isContentExist);
       }
     } else {
       setIsReading(false);
