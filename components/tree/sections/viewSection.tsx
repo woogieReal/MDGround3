@@ -28,23 +28,35 @@ interface Props {
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
   const [isReading, setIsReading] = useState<boolean>(true);
-  const [content, setContent] = useState<string>('');
+  const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
+  const [currentTabTreeId, setTreeId] = useState<number>(0);
 
   const handlChangeContent = (e: any) => {
-    setContent(e as string);
+    const currentEachTabContent = new Map(eachTabContent);
+    currentEachTabContent.set(currentTabTreeId, e as string);
+    setEachTabContent(currentEachTabContent);
   }
 
   const handleKeyPress = (e: any) => {
     isCtrlEnter(e) && updateTree.mutate();
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: content, userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
   useEffect(() => {
     if (files[fileTabVaue]) {
-      const idContentExist = !!files[fileTabVaue]?.treeContent;
-      setIsReading(idContentExist);
-      setContent(files[fileTabVaue]?.treeContent || '');
+      const targetTreeId = files[fileTabVaue].treeId;
+      setTreeId(targetTreeId);
+
+      const isContentExist = !!files[fileTabVaue]?.treeContent;
+      setIsReading(isContentExist);
+
+      const currentEachTabContent = new Map(eachTabContent);
+
+      if (!currentEachTabContent.get(targetTreeId)) {
+        currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
+        setEachTabContent(currentEachTabContent);
+      }
     } else {
       setIsReading(false);
     }
@@ -59,7 +71,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         onKeyPress={handleKeyPress}
       >
         <MDEditor
-          value={content}
+          value={eachTabContent.get(currentTabTreeId)}
           onChange={handlChangeContent}
           preview={isReading ? 'preview' : 'live'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
