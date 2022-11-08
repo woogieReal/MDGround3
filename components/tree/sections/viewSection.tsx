@@ -1,5 +1,5 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { useEffect, useState } from 'react';
+import { Dispatch, useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
@@ -13,6 +13,8 @@ import { ApiName } from '@/src/apis/apiInfo';
 import { isCtrlEnter } from '@/src/scripts/common/keyPress';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
+import * as commands from '@uiw/react-md-editor/lib/commands';
+import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -27,8 +29,8 @@ interface Props {
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
-  const [isReading, setIsReading] = useState<boolean>(true);
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
+  const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
   const [currentTabTreeId, setTreeId] = useState<number>(0);
 
   const handlChangeContent = (e: any) => {
@@ -43,22 +45,28 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
+  const executeExtraCommands = (preview: PreviewType) => {
+    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(localStorage.getItem('currentTabTreeId')), preview));
+  }
+
   useEffect(() => {
     if (files[fileTabVaue]) {
       const targetTreeId = files[fileTabVaue].treeId;
       setTreeId(targetTreeId);
 
       const currentEachTabContent = new Map(eachTabContent);
+      const currentEachTabPreview = new Map(eachTabPreview);
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
         setEachTabContent(currentEachTabContent);
 
         const isContentExist = !!files[fileTabVaue].treeContent;
-        setIsReading(isContentExist);
+        currentEachTabPreview.set(targetTreeId, isContentExist ? 'preview' : 'live');
+        setEachTabPreview(currentEachTabPreview);
       }
-    } else {
-      setIsReading(false);
+
+      localStorage.setItem('currentTabTreeId', String(targetTreeId));
     }
   }, [files[fileTabVaue]]);
 
@@ -73,11 +81,16 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         <MDEditor
           value={eachTabContent.get(currentTabTreeId)}
           onChange={handlChangeContent}
-          preview={isReading ? 'preview' : 'live'}
+          preview={eachTabPreview.get(currentTabTreeId) || 'preview'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
           previewOptions={{
             remarkPlugins: [[remarkBreaks]]
           }}
+          extraCommands={[
+            { ...commands.codeEdit, execute: function execute(state, api) { executeExtraCommands('edit') } },
+            { ...commands.codeLive, execute: function execute(state, api) { executeExtraCommands('live') } },
+            { ...commands.codePreview, execute: function execute(state, api) { executeExtraCommands('preview') } },
+          ]}
         />
       </Box>
       <LodingBackDrop isOpen={updateTree.isLoading} />
