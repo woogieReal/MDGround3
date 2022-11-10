@@ -10,7 +10,7 @@ import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
-import { isCtrlEnter } from '@/src/scripts/common/keyPress';
+import { isCtrlEnter } from '@/src/utils/common/keyPressUtil';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';
@@ -33,6 +33,12 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
   const [currentTabTreeId, setTreeId] = useState<number>(0);
 
+  const cleanAllState = () => {
+    setEachTabContent(new Map());
+    setEachTabPreview(new Map());
+    setTreeId(0);
+  }
+
   const handlChangeContent = (e: any) => {
     const currentEachTabContent = new Map(eachTabContent);
     currentEachTabContent.set(currentTabTreeId, e as string);
@@ -46,7 +52,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
   const executeExtraCommands = (preview: PreviewType) => {
-    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(localStorage.getItem('currentTabTreeId')), preview));
+    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(sessionStorage.getItem('currentTabTreeId')), preview));
   }
 
   useEffect(() => {
@@ -66,7 +72,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         setEachTabPreview(currentEachTabPreview);
       }
 
-      localStorage.setItem('currentTabTreeId', String(targetTreeId));
+      sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
+    } else {
+      cleanAllState();
     }
   }, [files[fileTabVaue]]);
 

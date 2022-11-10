@@ -42,6 +42,10 @@ $resizeButtonWidhthPX: 12px;
   border-radius: 3px;
 }
 
+.fileTabBox {
+  margin-top: 5px;
+}
+
 :export {
   verticalTabWidth: $verticalTabWidth;
   verticalTabWidthPX: $verticalTabWidthPX;
