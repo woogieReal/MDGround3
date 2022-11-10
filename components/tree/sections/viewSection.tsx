@@ -10,7 +10,7 @@ import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
-import { isCtrlEnter } from '@/src/scripts/common/keyPress';
+import { isCtrlEnter } from '@/src/utils/common/keyPressUtil';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';

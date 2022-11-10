@@ -15,8 +15,8 @@ import { AxiosResponse } from 'axios'
 import { useEffect } from 'react'
 import { CommonQueryOptions } from '@/src/apis/reactQuery'
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { removeTargetIndexDataFromArray } from '@/src/scripts/common/arrayUtil'
-import { oneMinusUnlessZero } from '@/src/scripts/common/numberUtil'
+import { removeTargetIndexDataFromArray } from '@/src/utils/common/arrayUtil'
+import { oneMinusUnlessZero } from '@/src/utils/common/numberUtil'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);

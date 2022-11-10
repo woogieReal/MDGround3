@@ -11,9 +11,9 @@ import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { validateCreateTree } from "@/src/scripts/tree/validation";
+import { validateCreateTree } from "@/src/utils/tree/validation";
 import { AxiosResponse } from "axios";
-import { isEnter } from "@/src/scripts/common/keyPress";
+import { isEnter } from "@/src/utils/common/keyPressUtil";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 
 const iconStyle = { marginRight: '10px' };
