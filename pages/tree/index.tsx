@@ -1,6 +1,6 @@
 import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar } from '@mui/material'
+import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar, IconButton } from '@mui/material'
 import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
@@ -14,6 +14,9 @@ import ApiHandler from '@/src/apis/apiHandler'
 import { AxiosResponse } from 'axios'
 import { useEffect } from 'react'
 import { CommonQueryOptions } from '@/src/apis/reactQuery'
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { removeTargetIndexDataFromArray } from '@/src/scripts/common/arrayUtil'
+import { oneMinusUnlessZero } from '@/src/scripts/common/numberUtil'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -81,6 +84,11 @@ const Home: NextPage = () => {
     }
   }
 
+  const handleClickDeleteTab = (targetTabNum: number) => {
+    targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
+    setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
+  }
+
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
@@ -145,7 +153,16 @@ const Home: NextPage = () => {
           textColor="inherit"
         >
           {files?.map((file: Tree, index: number) => (
-            <Tab key={`${index}-${file.treeId}`} label={file.treeName} {...a11yProps(index)} />
+            <Tab key={`${index}-${file.treeId}`} {...a11yProps(index)} component={() => (
+              <Box className={styles.fileTabBox}>
+                <Button sx={{ color: 'inherit', font: 'inherit' }} onClick={() => setFileTabVaue(index)}>
+                  {file.treeName}
+                </Button>
+                <IconButton size="small" onClick={() => handleClickDeleteTab(index)} >
+                  <ClearOutlinedIcon fontSize="inherit" />
+                </IconButton>
+              </Box>
+            )} />
           ))}
         </Tabs>
       </AppBar>
