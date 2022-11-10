@@ -52,7 +52,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
 
   const executeExtraCommands = (preview: PreviewType) => {
-    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(localStorage.getItem('currentTabTreeId')), preview));
+    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(sessionStorage.getItem('currentTabTreeId')), preview));
   }
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         setEachTabPreview(currentEachTabPreview);
       }
 
-      localStorage.setItem('currentTabTreeId', String(targetTreeId));
+      sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
     } else {
       cleanAllState();
     }
