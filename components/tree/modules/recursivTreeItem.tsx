@@ -2,17 +2,17 @@ import { TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
-import TreeNameInput from "./treeNameInput";
+import TreeNameInput from '@/components/tree/modules/treeNameInput';
 
 const iconStyle = { marginRight: '10px' };
 
