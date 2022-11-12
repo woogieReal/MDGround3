@@ -1,4 +1,4 @@
-import { InitialTree, TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
+import { TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from "@mui/material";
@@ -10,11 +10,9 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
-import { ValidationResponse } from "@/src/models/validation.model";
-import { validateCreateTree } from "@/src/utils/tree/validation";
 import { AxiosResponse } from "axios";
-import { isEnter } from "@/src/utils/common/keyPressUtil";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
+import TreeNameInput from "./treeNameInput";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -28,36 +26,15 @@ interface Props {
 const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleClickHandler }: Props) => {
   const [tree, setTree] = useState<Tree>(data);
 
-  const inputEl = useRef<HTMLInputElement>(null);
-  const treeFullPath = tree.treePath ? tree.treePath + '|' + tree.treeId : String(tree.treeId);
-
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   // 새로운 트리 생성
-  const [newTreeInputOpen, setNewTreeInputOpen] = useState<boolean>(false);
-  const [newTree, setNewTree] = useState<Tree>(InitialTree);
-  const [isReadyToCreate, setIsReadyToCreate] = useState<boolean>(false);
-  const [isInputed, setIsInputed] = useState<boolean>(false);
+  const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
+  const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
 
   const hasChildren = tree.treeChildren?.length! > 0 ? true : false;
-
-  const createTree = useMutation(async () => await ApiHandler.callApi(ApiName.CREATE_TREE, null, { ...newTree, userId: TEST_USER_ID }), {
-    onSuccess(res: AxiosResponse) {
-      setNewTreeInputOpen(false);
-      setNewTree(InitialTree);
-      setIsReadyToCreate(false);
-      setIsInputed(false);
-
-      const newTree: Tree = res.data as Tree;
-      const treeChildren: Tree[] = tree.treeChildren || [];
-      treeChildren.push(newTree);
-
-      setTree(currentTree => { return { ...currentTree, treeChildren } });
-      onDoubleClickHandler(newTree);
-    },
-  });
 
   const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, tree.treeId), {
     onSuccess(res: AxiosResponse) {
@@ -75,34 +52,17 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
     setAnchorEl(null);
   };
 
-  // 생성
+  const handleAfterCreate = (upperTree: Tree) => {
+    setIsOpenNewTree(false);
+    setTree(upperTree);
+  }
+
   const handleClickCreate = (treeType: TreeType) => {
-    setNewTreeInputOpen(true);
-    setNewTree({ ...newTree, treeType, treePath: treeFullPath });
+    setIsOpenNewTree(true);
+    setNewTreeType(treeType);
     setAnchorEl(null);
   }
 
-  const handlBlurNewTreeInput = () => {
-    isInputed && checkReadyToCreate();
-  }
-
-  const handleChangeNewTreeInput = (e: React.BaseSyntheticEvent) => {
-    !isInputed && setIsInputed(true);
-    setNewTree({ ...newTree, treeName: e.target.value });
-  }
-
-  const handleKeyPressNewTreeInput = (e: any) => {
-    isEnter(e) && checkReadyToCreate();
-  }
-
-  const checkReadyToCreate = () => {
-    const response: ValidationResponse = validateCreateTree(newTree);
-    setNewTree(response.processedData);
-    setIsReadyToCreate(response.isValid);
-  }
-  // -- 생성
-
-  // 삭제
   const handlClickDelte = () => {
     setAnchorEl(null);
     deleteTree.mutate();
@@ -111,14 +71,6 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
   useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
-
-  useEffect(() => {
-    newTreeInputOpen && inputEl.current?.focus();
-  }, [newTreeInputOpen])
-
-  useEffect(() => {
-    isReadyToCreate && createTree.mutate();
-  }, [isReadyToCreate])
 
   return (
     <Box>
@@ -142,20 +94,12 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
             onDoubleClickHandler={onDoubleClickHandler}
           />
         ))}
-        {newTreeInputOpen &&
-          <Box>
-            {newTree.treeType === TreeType.FORDER ? <FolderOutlinedIcon className={styles.newTreeInputIcon} /> : <DescriptionOutlinedIcon className={styles.newTreeInputIcon} />}
-            <input
-              ref={inputEl}
-              id={styles.newTreeInput}
-              type='text'
-              value={newTree.treeName}
-              onBlur={handlBlurNewTreeInput}
-              onChange={handleChangeNewTreeInput}
-              onKeyUp={handleKeyPressNewTreeInput}
-            />
-          </Box>
-        }
+        <TreeNameInput
+          isShow={isOpenNewTree}
+          uppertree={tree}
+          treeType={newTreeType}
+          handleAfterCreate={handleAfterCreate}
+        />
       </TreeItem>
       <Popover
         id={String(tree.treeId)}
@@ -194,7 +138,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, onClickHandler, onDoubleCli
           </List>
         </Box>
       </Popover>
-      <LodingBackDrop isOpen={createTree.isLoading} />
+      <LodingBackDrop isOpen={deleteTree.isLoading} />
     </Box>
   )
 }
