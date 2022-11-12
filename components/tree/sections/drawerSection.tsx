@@ -73,7 +73,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               depth={1}
               fetchDatas={getTrees.refetch}
               handleClickItem={handleTreeClick}
-              onDoubleClickHandler={handleTreeDoubleClick}
+              handleDoubleClickItem={handleTreeDoubleClick}
             />
           ))}
         </TreeView>

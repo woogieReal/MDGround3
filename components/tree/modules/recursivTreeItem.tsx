@@ -21,9 +21,9 @@ interface Props {
   depth: number;
   fetchDatas: Function;
   handleClickItem: Function;
-  onDoubleClickHandler: Function;
+  handleDoubleClickItem: Function;
 }
-const RecursivTreeItem = ({ data, depth, fetchDatas, handleClickItem, onDoubleClickHandler }: Props) => {
+const RecursivTreeItem = ({ data, depth, fetchDatas, handleClickItem, handleDoubleClickItem }: Props) => {
   const [tree, setTree] = useState<Tree>(data);
 
   // 트리 우클릭 팝업
@@ -81,7 +81,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, handleClickItem, onDoubleCl
         className={styles.treeItem}
         icon={tree.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
         onClick={() => handleClickItem(tree)}
-        onDoubleClick={() => onDoubleClickHandler(tree)}
+        onDoubleClick={() => handleDoubleClickItem(tree)}
         onContextMenu={handleContextMenu}
       >
         {hasChildren && tree.treeChildren?.map((item: Tree) => (
@@ -91,7 +91,7 @@ const RecursivTreeItem = ({ data, depth, fetchDatas, handleClickItem, onDoubleCl
             depth={depth + 1}
             fetchDatas={fetchDatas}
             handleClickItem={handleClickItem}
-            onDoubleClickHandler={onDoubleClickHandler}
+            handleDoubleClickItem={handleDoubleClickItem}
           />
         ))}
         <TreeNameInput
