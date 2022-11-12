@@ -16,7 +16,7 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 
 interface Props {
   isShow: boolean;
-  uppertree: Tree;
+  uppertree?: Tree;
   treeType: TreeType;
   handleAfterCreate: (uppertree: Tree) => void;
 }
@@ -31,10 +31,14 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
       cleanAllState();
 
       const newTree: Tree = res.data as Tree;
-      const treeChildren: Tree[] = uppertree.treeChildren || [];
-      treeChildren.push(newTree);
 
-      handleAfterCreate({ ...uppertree, treeChildren });
+      if (uppertree) {
+        const treeChildren: Tree[] = uppertree.treeChildren || [];
+        treeChildren.push(newTree);
+        handleAfterCreate({ ...uppertree, treeChildren });
+      } else {
+        handleAfterCreate(newTree);
+      }
     },
   });
 

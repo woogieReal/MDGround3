@@ -2,18 +2,23 @@ import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, initialFileTree, TEST_USER_ID } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, InitialTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box } from '@mui/material';
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from '@mui/material';
+import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import TreeNameInput from '@/components/tree/modules/treeNameInput';
+
+const iconStyle = { marginRight: '10px' };
 
 interface Props {
   open: boolean;
@@ -24,12 +29,61 @@ interface Props {
 }
 const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
+
+  // 트리 우클릭 팝업
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [contextTargetTree, setContextTargetTree] = useState<Tree>(InitialTree);
+
+  // 새로운 트리 생성
+  const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
+  const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
+
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
       setTrees(res.data);
     },
   });
+
+  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, contextTargetTree.treeId), {
+    onSuccess(res: AxiosResponse) {
+      getTrees.refetch();
+    },
+  });
+
+  const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+    setContextTargetTree(targetTree ? targetTree : { ...InitialTree, treeType: TreeType.FORDER });
+  }
+
+  const handleClosePopup = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClickCreate = (treeType: TreeType) => {
+    setIsOpenNewTree(true);
+    setNewTreeType(treeType);
+    setAnchorEl(null);
+  }
+
+  const handlClickDelte = () => {
+    setAnchorEl(null);
+    deleteTree.mutate();
+  }
+
+  const handleAfterCreate = (upperTree: Tree) => {
+    setIsOpenNewTree(false);
+    const currentTrees = trees || [];
+    currentTrees.push(upperTree);
+    setTrees(currentTrees);
+  }
+
+  useEffect(() => {
+    setIsPopupOpen(Boolean(anchorEl));
+  }, [anchorEl])
 
   return (
     <Box
@@ -49,6 +103,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
         anchor="left"
         transitionDuration={0}
         open={open}
+        onContextMenu={handleContextMenu}
       >
         <Box sx={{ height: styles.appHeaderHeightPX }}>
 
@@ -71,14 +126,56 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               key={`${index}-${data.treeId}`}
               data={data}
               depth={1}
-              fetchDatas={getTrees.refetch}
               handleClickItem={handleTreeClick}
               handleDoubleClickItem={handleTreeDoubleClick}
+              handleContextMenu={handleContextMenu}
             />
           ))}
+          <TreeNameInput
+            isShow={isOpenNewTree}
+            treeType={newTreeType}
+            handleAfterCreate={handleAfterCreate}
+          />
         </TreeView>
       </Drawer>
-      <LodingBackDrop isOpen={getTrees.isLoading} />
+      <Popover
+        id={String(contextTargetTree.treeId)}
+        open={isPopupOpen}
+        anchorEl={anchorEl}
+        onClose={handleClosePopup}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Box>
+          <List>
+            {contextTargetTree.treeType === TreeType.FORDER &&
+              <>
+                <ListItem disablePadding onClick={() => handleClickCreate(TreeType.FILE)}>
+                  <ListItemButton>
+                    <AddBoxOutlinedIcon sx={iconStyle} />
+                    <ListItemText primary="New File" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding onClick={() => handleClickCreate(TreeType.FORDER)}>
+                  <ListItemButton>
+                    <AddBoxOutlinedIcon sx={iconStyle} />
+                    <ListItemText primary="New Folder" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            }
+            <ListItem disablePadding onClick={() => handlClickDelte()} >
+              <ListItemButton>
+                <DeleteOutlineOutlinedIcon sx={iconStyle} />
+                <ListItemText primary="delete" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
+      </Popover>
+      <LodingBackDrop isOpen={deleteTree.isLoading || getTrees.isLoading} />
     </Box>
   )
 }
