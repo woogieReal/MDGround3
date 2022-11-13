@@ -13,14 +13,6 @@ export enum TreeType {
   FILE = 20,
 }
 
-export const initialFileTree = {
-  treeId: 'initial',
-  treeType: TreeType.FILE,
-  treeName: 'initial file',
-  treeContent: 'initial content',
-  treePath: '',
-}
-
 export const InitialTree: Tree = {
   treeId: 0,
   treeType: TreeType.FILE,
