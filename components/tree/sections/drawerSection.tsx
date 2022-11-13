@@ -6,7 +6,7 @@ import { Tree, TreeType, TEST_USER_ID, InitialTree } from '@/src/models/tree.mod
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from '@mui/material';
+import { Box } from '@mui/material';
 import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo';
 import { useEffect, useState } from 'react';
@@ -14,9 +14,8 @@ import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
+import TreeContext from '@/components/tree/modules/treeContext';
 
 const iconStyle = { marginRight: '10px' };
 
@@ -33,7 +32,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [contextTargetTree, setContextTargetTree] = useState<Tree>(InitialTree);
 
   // 새로운 트리 생성
   const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
@@ -46,17 +44,10 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     },
   });
 
-  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, contextTargetTree.treeId), {
-    onSuccess(res: AxiosResponse) {
-      getTrees.refetch();
-    },
-  });
-
   const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
-    setContextTargetTree(targetTree ? targetTree : { ...InitialTree, treeType: TreeType.FORDER });
   }
 
   const handleClosePopup = () => {
@@ -67,11 +58,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setIsOpenNewTree(true);
     setNewTreeType(treeType);
     setAnchorEl(null);
-  }
-
-  const handlClickDelte = () => {
-    setAnchorEl(null);
-    deleteTree.mutate();
   }
 
   const handleAfterCreate = (upperTree: Tree) => {
@@ -128,7 +114,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               depth={1}
               handleClickItem={handleTreeClick}
               handleDoubleClickItem={handleTreeDoubleClick}
-              handleContextMenu={handleContextMenu}
             />
           ))}
           <TreeNameInput
@@ -138,44 +123,13 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           />
         </TreeView>
       </Drawer>
-      <Popover
-        id={String(contextTargetTree.treeId)}
-        open={isPopupOpen}
+      <TreeContext
         anchorEl={anchorEl}
-        onClose={handleClosePopup}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Box>
-          <List>
-            {contextTargetTree.treeType === TreeType.FORDER &&
-              <>
-                <ListItem disablePadding onClick={() => handleClickCreate(TreeType.FILE)}>
-                  <ListItemButton>
-                    <AddBoxOutlinedIcon sx={iconStyle} />
-                    <ListItemText primary="New File" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding onClick={() => handleClickCreate(TreeType.FORDER)}>
-                  <ListItemButton>
-                    <AddBoxOutlinedIcon sx={iconStyle} />
-                    <ListItemText primary="New Folder" />
-                  </ListItemButton>
-                </ListItem>
-              </>
-            }
-            <ListItem disablePadding onClick={() => handlClickDelte()} >
-              <ListItemButton>
-                <DeleteOutlineOutlinedIcon sx={iconStyle} />
-                <ListItemText primary="delete" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Box>
-      </Popover>
-      <LodingBackDrop isOpen={deleteTree.isLoading || getTrees.isLoading} />
+        isShow={isPopupOpen}
+        hide={handleClosePopup}
+        handleClickCreate={handleClickCreate}
+      />
+      <LodingBackDrop isOpen={getTrees.isLoading} />
     </Box>
   )
 }
