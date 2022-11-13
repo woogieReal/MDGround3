@@ -11,10 +11,10 @@ import TreeContext from '@/components/tree/modules/treeContext';
 interface Props {
   data: Tree;
   depth: number;
-  handleClickItem: Function;
-  handleDoubleClickItem: Function;
+  handleTreeClick(data: Tree): void;
+  handleTreeDoubleClick(data: Tree): void;
 }
-const RecursivTreeItem = ({ data, depth, handleClickItem, handleDoubleClickItem }: Props) => {
+const RecursivTreeItem = ({ data, depth, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [tree, setTree] = useState<Tree | null>(data);
 
   // 트리 우클릭 팝업
@@ -46,7 +46,7 @@ const RecursivTreeItem = ({ data, depth, handleClickItem, handleDoubleClickItem 
   const handleAfterCreate = (newTree: Tree, upperTree: Tree) => {
     setIsOpenNewTree(false);
     setTree(upperTree);
-    handleDoubleClickItem(newTree);
+    handleTreeDoubleClick(newTree);
   }
 
   useEffect(() => {
@@ -62,8 +62,8 @@ const RecursivTreeItem = ({ data, depth, handleClickItem, handleDoubleClickItem 
           label={tree.treeName}
           className={styles.treeItem}
           icon={tree.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
-          onClick={() => handleClickItem(tree)}
-          onDoubleClick={() => handleDoubleClickItem(tree)}
+          onClick={() => handleTreeClick(tree)}
+          onDoubleClick={() => handleTreeDoubleClick(tree)}
           onContextMenu={(e: React.BaseSyntheticEvent) => handleContextMenu(e, tree)}
         >
           {hasChildren && tree.treeChildren?.map((item: Tree) => (
@@ -71,8 +71,8 @@ const RecursivTreeItem = ({ data, depth, handleClickItem, handleDoubleClickItem 
               key={item.treeId}
               data={item}
               depth={depth + 1}
-              handleClickItem={handleClickItem}
-              handleDoubleClickItem={handleDoubleClickItem}
+              handleTreeClick={handleTreeClick}
+              handleTreeDoubleClick={handleTreeDoubleClick}
             />
           ))}
           <TreeNameInput

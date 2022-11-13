@@ -21,8 +21,8 @@ interface Props {
   open: boolean;
   drawerWidth: number;
   verticalTabVaue: number;
-  handleTreeClick: Function;
-  handleTreeDoubleClick: Function;
+  handleTreeClick(data: Tree): void;
+  handleTreeDoubleClick(data: Tree): void;
 }
 const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
@@ -111,8 +111,8 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               key={`${index}-${data.treeId}`}
               data={data}
               depth={1}
-              handleClickItem={handleTreeClick}
-              handleDoubleClickItem={handleTreeDoubleClick}
+              handleTreeClick={handleTreeClick}
+              handleTreeDoubleClick={handleTreeDoubleClick}
             />
           ))}
           <TreeNameInput
