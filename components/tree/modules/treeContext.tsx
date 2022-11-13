@@ -64,41 +64,45 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, setTargetTree, handle
   }
 
   return (
-    <Popover
-      id={String(targetTree?.treeId)}
-      open={isShow}
-      anchorEl={anchorEl}
-      onClose={hide}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left',
-      }}
-    >
-      <Box>
-        <List>
-          {targetTree ?
-            <>
-              {
-                targetTree.treeType === TreeType.FORDER ?
-                  <>
-                    {renderCreateFile()}
-                    {renderCreateForder()}
-                    {renderDeleteTree()}
-                  </>
-                  :
-                  renderDeleteTree()
+    <>
+      {anchorEl &&
+        <Popover
+          id={String(targetTree?.treeId)}
+          open={isShow}
+          anchorEl={anchorEl}
+          onClose={hide}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <Box>
+            <List>
+              {targetTree ?
+                <>
+                  {
+                    targetTree.treeType === TreeType.FORDER ?
+                      <>
+                        {renderCreateFile()}
+                        {renderCreateForder()}
+                        {renderDeleteTree()}
+                      </>
+                      :
+                      renderDeleteTree()
+                  }
+                </>
+                :
+                <>
+                  {renderCreateFile()}
+                  {renderCreateForder()}
+                </>
               }
-            </>
-            :
-            <>
-              {renderCreateFile()}
-              {renderCreateForder()}
-            </>
-          }
-        </List>
-      </Box>
-      <LodingBackDrop isOpen={deleteTree.isLoading} />
-    </Popover>
+            </List>
+          </Box>
+          <LodingBackDrop isOpen={deleteTree.isLoading} />
+        </Popover>
+      }
+    </>
   )
 }
 
