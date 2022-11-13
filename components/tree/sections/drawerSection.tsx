@@ -17,8 +17,6 @@ import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
 
-const iconStyle = { marginRight: '10px' };
-
 interface Props {
   open: boolean;
   drawerWidth: number;
@@ -60,11 +58,12 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setAnchorEl(null);
   }
 
-  const handleAfterCreate = (upperTree: Tree) => {
+  const handleAfterCreate = (newTree: Tree) => {
     setIsOpenNewTree(false);
     const currentTrees = trees || [];
-    currentTrees.push(upperTree);
+    currentTrees.push(newTree);
     setTrees(currentTrees);
+    handleTreeDoubleClick(newTree);
   }
 
   useEffect(() => {

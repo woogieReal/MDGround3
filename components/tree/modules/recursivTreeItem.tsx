@@ -43,9 +43,10 @@ const RecursivTreeItem = ({ data, depth, handleClickItem, handleDoubleClickItem 
     setAnchorEl(null);
   }
 
-  const handleAfterCreate = (upperTree: Tree) => {
+  const handleAfterCreate = (newTree: Tree, upperTree: Tree) => {
     setIsOpenNewTree(false);
     setTree(upperTree);
+    handleDoubleClickItem(newTree);
   }
 
   useEffect(() => {

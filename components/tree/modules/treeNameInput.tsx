@@ -18,7 +18,7 @@ interface Props {
   isShow: boolean;
   uppertree?: Tree;
   treeType: TreeType;
-  handleAfterCreate: (uppertree: Tree) => void;
+  handleAfterCreate(newTree: Tree, uppertree?: Tree): void;
 }
 
 const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props) => {
@@ -35,7 +35,7 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
       if (uppertree) {
         const treeChildren: Tree[] = uppertree.treeChildren || [];
         treeChildren.push(newTree);
-        handleAfterCreate({ ...uppertree, treeChildren });
+        handleAfterCreate(newTree, { ...uppertree, treeChildren });
       } else {
         handleAfterCreate(newTree);
       }
