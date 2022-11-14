@@ -7,6 +7,9 @@ import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
+import { useEffect, useState } from "react";
+import { validateDeleteTree } from "@/src/utils/tree/validation";
+import { ValidationResponse } from "@/src/models/validation.model";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -19,7 +22,10 @@ interface Props {
   handleClickCreate(treeType: TreeType): void;
 }
 const TreeContext = ({ anchorEl, isShow, hide, targetTree, setTargetTree, handleClickCreate }: Props) => {
-  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { userId: TEST_USER_ID }, targetTree?.treeId!), {
+  const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
+  const [isReadyToDelete, setIsReadyToDelete] = useState<boolean>(false);
+
+  const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { ...deleteTargetTree, userId: TEST_USER_ID }, deleteTargetTree?.treeId!), {
     onSuccess(res: AxiosResponse) {
       setTargetTree && setTargetTree(null);
     },
@@ -27,8 +33,18 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, setTargetTree, handle
 
   const handlClickDelte = () => {
     hide();
-    deleteTree.mutate();
+    checkReadyToDelete();
   }
+
+  const checkReadyToDelete = () => {
+    const response: ValidationResponse = validateDeleteTree(targetTree!);
+    setDeleteTargetTree(response.processedData);
+    setIsReadyToDelete(response.isValid);
+  }
+
+  useEffect(() => {
+    isReadyToDelete && deleteTree.mutate();
+  }, [isReadyToDelete])
 
   const renderCreateFile = () => {
     return (

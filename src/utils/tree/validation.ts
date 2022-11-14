@@ -20,3 +20,25 @@ export const validateCreateTree = (tree: Tree): ValidationResponse => {
 
   return response;
 };
+
+export const validateDeleteTree = (tree: Tree): ValidationResponse => {
+  const response: ValidationResponse = {
+    isValid: false,
+    processedData: tree,
+  };
+  validating: try {
+    const processedTree: Tree = { ...tree };
+    delete processedTree.treeContent;
+    delete processedTree.treeChildren;
+
+    if (processedTree.treeId <= 0) break validating;
+    if (![...Object.values(TreeType)].includes(processedTree.treeType)) break validating;
+
+    response.isValid = true;
+    response.processedData = processedTree;
+  } catch (err) {
+    throw err;
+  }
+
+  return response;
+};
