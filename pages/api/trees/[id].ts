@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import DBConnection from "@/src/apis/dbConnection";
 import { Connection, RowDataPacket } from "mysql2/promise";
+import { Tree, TreeType } from "@/src/models/tree.model";
+import { createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -77,7 +79,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       break;
     case "DELETE":
       DBConnection.transactionExecutor(async (connection: Connection) => {
-        const request = body;
+        const request: Tree = body;
         let query = '';
         let params: any[] = [];
 
@@ -92,7 +94,24 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         params.push(request.userId);
         params.push(id);
 
-        const result = await connection.execute(query, params);
+        if (request.treeType === TreeType.FORDER) {
+          const treeFullPath = createTreeFullPath(request);
+
+          query += ';';
+
+          query += `
+            UPDATE tree 
+            SET delete_yn = 'Y'
+              , deleted_datetime = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+            AND tree_path LIKE CONCAT(?, '%')
+            AND delete_yn <> 'Y'
+          `;
+          params.push(request.userId);
+          params.push(treeFullPath);
+        }
+
+        const result = await connection.query(query, params);
         res.status(200).json(result[0]);
       });
       break;
