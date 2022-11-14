@@ -10,11 +10,10 @@ import TreeContext from '@/components/tree/modules/treeContext';
 
 interface Props {
   data: Tree;
-  depth: number;
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
 }
-const RecursivTreeItem = ({ data, depth, handleTreeClick, handleTreeDoubleClick }: Props) => {
+const RecursivTreeItem = ({ data, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [tree, setTree] = useState<Tree | null>(data);
 
   // 트리 우클릭 팝업
@@ -70,7 +69,6 @@ const RecursivTreeItem = ({ data, depth, handleTreeClick, handleTreeDoubleClick 
             <RecursivTreeItem
               key={item.treeId}
               data={item}
-              depth={depth + 1}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
             />

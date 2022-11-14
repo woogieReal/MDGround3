@@ -110,7 +110,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
               data={data}
-              depth={1}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
             />
