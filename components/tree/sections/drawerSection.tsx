@@ -17,6 +17,7 @@ import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
 import { addTreeToTrees } from '@/src/utils/tree/treeUtil';
+import _ from "lodash";
 
 interface Props {
   open: boolean;
@@ -68,6 +69,17 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
+
+  // root에서 트리 생성시 state에 2개 추가되는 에러 fix를 위해 추가 (현재 원인불명)
+  useEffect(() => {
+    if (Array.isArray(trees) && trees.length > 0) {
+      const processedTrees: Tree[] = _.unionBy(trees, 'treeId');
+
+      if (processedTrees.length !== trees.length) {
+        setTrees(processedTrees);
+      }
+    }
+  }, [trees])
 
   return (
     <Box
