@@ -43,7 +43,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     },
   });
 
-  const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
+  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.currentTarget);

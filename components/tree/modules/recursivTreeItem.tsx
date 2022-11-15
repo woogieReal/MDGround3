@@ -26,7 +26,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   const hasChildren = treeItem && treeItem.treeChildren?.length! > 0 ? true : false;
 
-  const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
+  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
@@ -66,7 +66,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
         icon={treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
         onClick={() => handleTreeClick(treeItem)}
         onDoubleClick={() => handleTreeDoubleClick(treeItem)}
-        onContextMenu={(e: React.BaseSyntheticEvent) => handleContextMenu(e, treeItem)}
+        onContextMenu={handleContextMenu}
       >
         {hasChildren && treeItem.treeChildren?.map((item: Tree) => (
           <RecursivTreeItem
