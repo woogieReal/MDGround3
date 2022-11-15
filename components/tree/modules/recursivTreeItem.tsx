@@ -1,19 +1,21 @@
-import { Tree, TreeType } from "@/src/models/tree.model";
+import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
+import { deleteTreeFromTrees } from "@/src/utils/tree/treeUtil";
 
 interface Props {
   data: Tree;
+  setTrees: Dispatch<SetStateAction<Tree[]>>
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
 }
-const RecursivTreeItem = ({ data, handleTreeClick, handleTreeDoubleClick }: Props) => {
+const RecursivTreeItem = ({ data, setTrees, handleTreeClick, handleTreeDoubleClick }: Props) => {
   const [tree, setTree] = useState<Tree | null>(data);
 
   // 트리 우클릭 팝업
@@ -48,6 +50,10 @@ const RecursivTreeItem = ({ data, handleTreeClick, handleTreeDoubleClick }: Prop
     handleTreeDoubleClick(newTree);
   }
 
+  const handleAfterDelete = (deletedTree: Tree) => {
+    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
+  }
+
   useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
@@ -69,6 +75,7 @@ const RecursivTreeItem = ({ data, handleTreeClick, handleTreeDoubleClick }: Prop
             <RecursivTreeItem
               key={item.treeId}
               data={item}
+              setTrees={setTrees}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
             />
@@ -84,7 +91,7 @@ const RecursivTreeItem = ({ data, handleTreeClick, handleTreeDoubleClick }: Prop
             isShow={isPopupOpen}
             hide={handleClosePopup}
             targetTree={tree}
-            setTargetTree={setTree}
+            handleAfterDelete={handleAfterDelete}
             handleClickCreate={handleClickCreate}
           />
         </TreeItem>

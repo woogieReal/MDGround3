@@ -70,6 +70,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
+  
   return (
     <Box
       id={styles.resizableContainer}
@@ -110,6 +111,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
               data={data}
+              setTrees={setTrees}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
             />
