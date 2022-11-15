@@ -18,7 +18,7 @@ interface Props {
   isShow: boolean;
   uppertree?: Tree;
   treeType: TreeType;
-  handleAfterCreate(newTree: Tree, uppertree?: Tree): void;
+  handleAfterCreate(newTree: Tree): void;
 }
 
 const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props) => {
@@ -31,14 +31,7 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
       cleanAllState();
 
       const newTree: Tree = res.data as Tree;
-
-      if (uppertree) {
-        const treeChildren: Tree[] = uppertree.treeChildren || [];
-        treeChildren.push(newTree);
-        handleAfterCreate(newTree, { ...uppertree, treeChildren });
-      } else {
-        handleAfterCreate(newTree);
-      }
+      handleAfterCreate(newTree);
     },
   });
 
@@ -79,7 +72,7 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
         treePath: createTreeFullPath(uppertree)
       }
     });
-  }, [uppertree, treeType])
+  }, [isShow, uppertree, treeType])
 
   return (
     <Box {...(!isShow && { hidden: true })}>

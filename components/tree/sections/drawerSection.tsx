@@ -16,6 +16,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
+import { addTreeToTrees } from '@/src/utils/tree/treeUtil';
 
 interface Props {
   open: boolean;
@@ -60,9 +61,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
 
   const handleAfterCreate = (newTree: Tree) => {
     setIsOpenNewTree(false);
-    const currentTrees = trees || [];
-    currentTrees.push(newTree);
-    setTrees(currentTrees);
+    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
     handleTreeDoubleClick(newTree);
   }
 
@@ -70,7 +69,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
-  
   return (
     <Box
       id={styles.resizableContainer}
@@ -110,7 +108,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           {trees.map((data: Tree, index: number) => (
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
-              data={data}
+              treeItem={data}
               setTrees={setTrees}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}

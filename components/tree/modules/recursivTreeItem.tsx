@@ -7,17 +7,15 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { deleteTreeFromTrees } from "@/src/utils/tree/treeUtil";
+import { addTreeToTrees, deleteTreeFromTrees } from "@/src/utils/tree/treeUtil";
 
 interface Props {
-  data: Tree;
+  treeItem: Tree;
   setTrees: Dispatch<SetStateAction<Tree[]>>
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
 }
-const RecursivTreeItem = ({ data, setTrees, handleTreeClick, handleTreeDoubleClick }: Props) => {
-  const [tree, setTree] = useState<Tree | null>(data);
-
+const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubleClick }: Props) => {
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
@@ -26,7 +24,7 @@ const RecursivTreeItem = ({ data, setTrees, handleTreeClick, handleTreeDoubleCli
   const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
   const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
 
-  const hasChildren = tree && tree.treeChildren?.length! > 0 ? true : false;
+  const hasChildren = treeItem && treeItem.treeChildren?.length! > 0 ? true : false;
 
   const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
     e.preventDefault();
@@ -44,9 +42,9 @@ const RecursivTreeItem = ({ data, setTrees, handleTreeClick, handleTreeDoubleCli
     setAnchorEl(null);
   }
 
-  const handleAfterCreate = (newTree: Tree, upperTree: Tree) => {
+  const handleAfterCreate = (newTree: Tree) => {
     setIsOpenNewTree(false);
-    setTree(upperTree);
+    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
     handleTreeDoubleClick(newTree);
   }
 
@@ -60,42 +58,40 @@ const RecursivTreeItem = ({ data, setTrees, handleTreeClick, handleTreeDoubleCli
 
   return (
     <Box>
-      {tree &&
-        <TreeItem
-          id={String(tree.treeId)}
-          nodeId={String(tree.treeId)}
-          label={tree.treeName}
-          className={styles.treeItem}
-          icon={tree.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
-          onClick={() => handleTreeClick(tree)}
-          onDoubleClick={() => handleTreeDoubleClick(tree)}
-          onContextMenu={(e: React.BaseSyntheticEvent) => handleContextMenu(e, tree)}
-        >
-          {hasChildren && tree.treeChildren?.map((item: Tree) => (
-            <RecursivTreeItem
-              key={item.treeId}
-              data={item}
-              setTrees={setTrees}
-              handleTreeClick={handleTreeClick}
-              handleTreeDoubleClick={handleTreeDoubleClick}
-            />
-          ))}
-          <TreeNameInput
-            isShow={isOpenNewTree}
-            uppertree={tree}
-            treeType={newTreeType}
-            handleAfterCreate={handleAfterCreate}
+      <TreeItem
+        id={String(treeItem.treeId)}
+        nodeId={String(treeItem.treeId)}
+        label={treeItem.treeName}
+        className={styles.treeItem}
+        icon={treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
+        onClick={() => handleTreeClick(treeItem)}
+        onDoubleClick={() => handleTreeDoubleClick(treeItem)}
+        onContextMenu={(e: React.BaseSyntheticEvent) => handleContextMenu(e, treeItem)}
+      >
+        {hasChildren && treeItem.treeChildren?.map((item: Tree) => (
+          <RecursivTreeItem
+            key={item.treeId}
+            treeItem={item}
+            setTrees={setTrees}
+            handleTreeClick={handleTreeClick}
+            handleTreeDoubleClick={handleTreeDoubleClick}
           />
-          <TreeContext
-            anchorEl={anchorEl}
-            isShow={isPopupOpen}
-            hide={handleClosePopup}
-            targetTree={tree}
-            handleAfterDelete={handleAfterDelete}
-            handleClickCreate={handleClickCreate}
-          />
-        </TreeItem>
-      }
+        ))}
+        <TreeNameInput
+          isShow={isOpenNewTree}
+          uppertree={treeItem}
+          treeType={newTreeType}
+          handleAfterCreate={handleAfterCreate}
+        />
+        <TreeContext
+          anchorEl={anchorEl}
+          isShow={isPopupOpen}
+          hide={handleClosePopup}
+          targetTree={treeItem}
+          handleAfterDelete={handleAfterDelete}
+          handleClickCreate={handleClickCreate}
+        />
+      </TreeItem>
     </Box>
   )
 }
