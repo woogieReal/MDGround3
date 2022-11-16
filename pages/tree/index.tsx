@@ -89,6 +89,15 @@ const Home: NextPage = () => {
     setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
   }
 
+  const deleteTabByTreeId = (data: Tree) => {
+    if (data.treeType === TreeType.FILE) {
+      const targetTabNum = files.findIndex((file: Tree) => file.treeId === data.treeId);
+      if (targetTabNum >= 0) {
+        handleClickDeleteTab(targetTabNum)
+      }
+    }
+  }
+
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
@@ -172,6 +181,7 @@ const Home: NextPage = () => {
         verticalTabVaue={verticalTabVaue}
         handleTreeClick={handleTreeClick}
         handleTreeDoubleClick={handleTreeDoubleClick}
+        deleteTabByTreeId={deleteTabByTreeId}
       />
       {drawerOpen && <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />}
       <TabPanel value={verticalTabVaue} index={0}>

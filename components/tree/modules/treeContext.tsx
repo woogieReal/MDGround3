@@ -18,16 +18,16 @@ interface Props {
   isShow: boolean;
   hide(): void;
   targetTree?: Tree
-  setTargetTree?(targetTree: Tree | null): void;
+  handleAfterDelete?(deletedTree: Tree): void;
   handleClickCreate(treeType: TreeType): void;
 }
-const TreeContext = ({ anchorEl, isShow, hide, targetTree, setTargetTree, handleClickCreate }: Props) => {
+const TreeContext = ({ anchorEl, isShow, hide, targetTree, handleAfterDelete, handleClickCreate }: Props) => {
   const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
   const [isReadyToDelete, setIsReadyToDelete] = useState<boolean>(false);
 
   const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { ...deleteTargetTree, userId: TEST_USER_ID }, deleteTargetTree?.treeId!), {
     onSuccess(res: AxiosResponse) {
-      setTargetTree && setTargetTree(null);
+      handleAfterDelete && handleAfterDelete(deleteTargetTree!);
     },
   });
 

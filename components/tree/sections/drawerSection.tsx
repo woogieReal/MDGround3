@@ -16,6 +16,8 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
+import { addTreeToTrees } from '@/src/utils/tree/treeUtil';
+import _ from "lodash";
 
 interface Props {
   open: boolean;
@@ -23,8 +25,9 @@ interface Props {
   verticalTabVaue: number;
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
+  deleteTabByTreeId(data: Tree): void;
 }
-const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick }: Props) => {
+const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
 
   // 트리 우클릭 팝업
@@ -42,7 +45,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     },
   });
 
-  const handleContextMenu = (e: React.BaseSyntheticEvent, targetTree?: Tree) => {
+  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
@@ -60,15 +63,24 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
 
   const handleAfterCreate = (newTree: Tree) => {
     setIsOpenNewTree(false);
-    const currentTrees = trees || [];
-    currentTrees.push(newTree);
-    setTrees(currentTrees);
+    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
     handleTreeDoubleClick(newTree);
   }
 
   useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
+
+  // root에서 트리 생성시 state에 2개 추가되는 에러 fix를 위해 추가 (현재 원인불명)
+  useEffect(() => {
+    if (Array.isArray(trees) && trees.length > 0) {
+      const processedTrees: Tree[] = _.unionBy(trees, 'treeId');
+
+      if (processedTrees.length !== trees.length) {
+        setTrees(processedTrees);
+      }
+    }
+  }, [trees])
 
   return (
     <Box
@@ -109,9 +121,11 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           {trees.map((data: Tree, index: number) => (
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
-              data={data}
+              treeItem={data}
+              setTrees={setTrees}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
+              deleteTabByTreeId={deleteTabByTreeId}
             />
           ))}
           <TreeNameInput
