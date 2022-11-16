@@ -43,16 +43,18 @@ const TreeNameInput = ({ isShow, setIsShow, uppertree, sameDepthTreeNames, treeT
     setIsShow(false);
   }
 
+  const checkEmptyTreeName = () => !newTree.treeName.trim();
+  const checkDuplicateTreeName = () => sameDepthTreeNames.includes(newTree.treeName);
+
   const checkValidTreeName = () => {
-    const treeName = newTree.treeName.trim();
-    return !!treeName && !sameDepthTreeNames.includes(treeName);
+    return !checkEmptyTreeName() && !checkDuplicateTreeName();
   }
 
   const handlBlurNewTreeInput = () => {
-    if (isValidTreeName) {
-      checkReadyToCreate();
-    } else {
+    if (checkEmptyTreeName()) {
       cleanAllState();
+    } else if (checkValidTreeName()) {
+      checkReadyToCreate();
     }
   }
 
