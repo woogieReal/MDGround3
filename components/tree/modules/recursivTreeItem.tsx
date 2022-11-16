@@ -14,8 +14,9 @@ interface Props {
   setTrees: Dispatch<SetStateAction<Tree[]>>
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
+  deleteTabByTreeId(data: Tree): void;
 }
-const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubleClick }: Props) => {
+const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
@@ -50,6 +51,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   const handleAfterDelete = (deletedTree: Tree) => {
     setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
+    deleteTabByTreeId(deletedTree);
   }
 
   useEffect(() => {
@@ -75,6 +77,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
             setTrees={setTrees}
             handleTreeClick={handleTreeClick}
             handleTreeDoubleClick={handleTreeDoubleClick}
+            deleteTabByTreeId={deleteTabByTreeId}
           />
         ))}
         <TreeNameInput

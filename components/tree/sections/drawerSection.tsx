@@ -25,8 +25,9 @@ interface Props {
   verticalTabVaue: number;
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
+  deleteTabByTreeId(data: Tree): void;
 }
-const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick }: Props) => {
+const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
 
   // 트리 우클릭 팝업
@@ -124,6 +125,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               setTrees={setTrees}
               handleTreeClick={handleTreeClick}
               handleTreeDoubleClick={handleTreeDoubleClick}
+              deleteTabByTreeId={deleteTabByTreeId}
             />
           ))}
           <TreeNameInput
