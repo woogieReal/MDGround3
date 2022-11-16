@@ -40,10 +40,19 @@ $resizeButtonWidhthPX: 12px;
 #newTreeInput {
   border: 0.5px solid gray;
   border-radius: 3px;
+  outline: 0;
 }
 
 .fileTabBox {
   margin-top: 5px;
+}
+
+.notReadyToCreateInput {
+  border: 1.5px solid red !important;
+}
+
+.readyToCreateInput {
+  border: 1px solid green !important;
 }
 
 :export {
