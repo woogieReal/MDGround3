@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { InitialTree, TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import styles from '@/styles/tree.module.scss'
 import { isEnter } from "@/src/utils/common/keyPressUtil";
 import { validateCreateTree } from "@/src/utils/tree/validation";
@@ -16,15 +16,17 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 
 interface Props {
   isShow: boolean;
+  setIsShow: Dispatch<SetStateAction<boolean>> 
   uppertree?: Tree;
+  sameDepthTreeNames: string[];
   treeType: TreeType;
   handleAfterCreate(newTree: Tree): void;
 }
 
-const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props) => {
+const TreeNameInput = ({ isShow, setIsShow, uppertree, sameDepthTreeNames, treeType, handleAfterCreate }: Props) => {
   const [newTree, setNewTree] = useState<Tree>(InitialTree);
+  const [isValidTreeName, setIsValidTreeName] = useState<boolean>(false);
   const [isReadyToCreate, setIsReadyToCreate] = useState<boolean>(false);
-  const [isInputed, setIsInputed] = useState<boolean>(false);
 
   const createTree = useMutation(async () => await ApiHandler.callApi(ApiName.CREATE_TREE, null, { ...newTree, userId: TEST_USER_ID }), {
     onSuccess(res: AxiosResponse) {
@@ -38,20 +40,30 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
   const cleanAllState = () => {
     setNewTree(InitialTree);
     setIsReadyToCreate(false);
-    setIsInputed(false);
+    setIsShow(false);
+  }
+
+  const checkEmptyTreeName = () => !newTree.treeName.trim();
+  const checkDuplicateTreeName = () => sameDepthTreeNames.includes(newTree.treeName);
+
+  const checkValidTreeName = () => {
+    return !checkEmptyTreeName() && !checkDuplicateTreeName();
   }
 
   const handlBlurNewTreeInput = () => {
-    isInputed && checkReadyToCreate();
+    if (checkEmptyTreeName()) {
+      cleanAllState();
+    } else if (checkValidTreeName()) {
+      checkReadyToCreate();
+    }
   }
 
   const handleChangeNewTreeInput = (e: React.BaseSyntheticEvent) => {
-    !isInputed && setIsInputed(true);
     setNewTree({ ...newTree, treeName: e.target.value });
   }
 
   const handleKeyPressNewTreeInput = (e: any) => {
-    isEnter(e) && checkReadyToCreate();
+    isEnter(e) && isValidTreeName && checkReadyToCreate();
   }
 
   const checkReadyToCreate = () => {
@@ -59,6 +71,10 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
   }
+
+  useEffect(() => {
+    setIsValidTreeName(checkValidTreeName());
+  }, [newTree.treeName])
 
   useEffect(() => {
     isReadyToCreate && createTree.mutate();
@@ -79,6 +95,7 @@ const TreeNameInput = ({ isShow, uppertree, treeType, handleAfterCreate }: Props
       {newTree.treeType === TreeType.FORDER ? <FolderOutlinedIcon className={styles.newTreeInputIcon} /> : <DescriptionOutlinedIcon className={styles.newTreeInputIcon} />}
       <input
         id={styles.newTreeInput}
+        className={isValidTreeName ? styles.readyToCreateInput : styles.notReadyToCreateInput}
         type='text'
         value={newTree.treeName}
         onBlur={handlBlurNewTreeInput}

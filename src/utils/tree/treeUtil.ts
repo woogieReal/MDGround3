@@ -1,4 +1,4 @@
-import { InitialTree, Tree } from "@/src/models/tree.model";
+import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
 import { cloneDeep } from "lodash";
 import { getEmptyArrayIfNotArray } from "../common/arrayUtil";
 
@@ -13,11 +13,13 @@ export const createTreeFullPath = (tree?: Tree): string => {
 };
 
 export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
+  let cloneTrees = cloneDeep(trees);
+
   if (targetTree.treePath.length === 0) {
-    trees = trees.filter((child: Tree) => child.treeId !== targetTree.treeId);
+    cloneTrees = cloneTrees.filter((child: Tree) => child.treeId !== targetTree.treeId);
   } else {
     const upperTreeIds = targetTree.treePath.split("|");
-    let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
+    let targetUpperTree: Tree = { ...InitialTree, treeChildren: cloneTrees };
 
     upperTreeIds.forEach((id: string) => {
       targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
@@ -26,16 +28,18 @@ export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
     targetUpperTree.treeChildren = targetUpperTree.treeChildren?.filter((child: Tree) => child.treeId !== targetTree.treeId);
   }
 
-  return cloneDeep(trees);
+  return cloneTrees;
 }
 
 export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
+  let cloneTrees = cloneDeep(trees);
+
   if (targetTree.treePath.length === 0) {
-    trees = getEmptyArrayIfNotArray(trees);
-    trees.push(targetTree);
+    cloneTrees = getEmptyArrayIfNotArray(cloneTrees);
+    cloneTrees.push(targetTree);
   } else {
     const upperTreeIds = targetTree.treePath.split("|");
-    let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
+    let targetUpperTree: Tree = { ...InitialTree, treeChildren: cloneTrees };
 
     upperTreeIds.forEach((id: string) => {
       targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
@@ -45,5 +49,24 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
     targetUpperTree.treeChildren.push(targetTree);
   }
   
-  return cloneDeep(trees);
+  return cloneTrees;
+}
+
+export const getTreeChildrenNames = (trees: Tree | Tree[], treeType?: TreeType): string[] => {
+  let cloneTrees = cloneDeep(trees);
+
+  let targetUpperTree: Tree;
+
+  if (Array.isArray(cloneTrees)) {
+    targetUpperTree = { ...InitialTree, treeChildren: cloneTrees as Tree[] };
+  } else {
+    targetUpperTree = cloneTrees as Tree;
+  }
+
+  targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
+  if (treeType) {
+    targetUpperTree.treeChildren = targetUpperTree.treeChildren.filter((treeChild: Tree) => treeChild.treeType === treeType);
+  }
+
+  return targetUpperTree.treeChildren.map((treeChild: Tree) => treeChild.treeName);
 }
