@@ -30,12 +30,14 @@ export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
 }
 
 export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
+  let newTrees = cloneDeep(trees);
+
   if (targetTree.treePath.length === 0) {
-    trees = getEmptyArrayIfNotArray(trees);
-    trees.push(targetTree);
+    newTrees = getEmptyArrayIfNotArray(newTrees);
+    newTrees.push(targetTree);
   } else {
     const upperTreeIds = targetTree.treePath.split("|");
-    let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
+    let targetUpperTree: Tree = { ...InitialTree, treeChildren: newTrees };
 
     upperTreeIds.forEach((id: string) => {
       targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
@@ -45,7 +47,7 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
     targetUpperTree.treeChildren.push(targetTree);
   }
   
-  return cloneDeep(trees);
+  return newTrees;
 }
 
 export const getTreeChildrenNames = (targetTree: Tree | Tree[], treeType?: TreeType): string[] => {

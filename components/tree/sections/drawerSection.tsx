@@ -71,17 +71,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
-  // root에서 트리 생성시 state에 2개 추가되는 에러 fix를 위해 추가 (현재 원인불명)
-  useEffect(() => {
-    if (Array.isArray(trees) && trees.length > 0) {
-      const processedTrees: Tree[] = _.unionBy(trees, 'treeId');
-
-      if (processedTrees.length !== trees.length) {
-        setTrees(processedTrees);
-      }
-    }
-  }, [trees])
-
   return (
     <Box
       id={styles.resizableContainer}
