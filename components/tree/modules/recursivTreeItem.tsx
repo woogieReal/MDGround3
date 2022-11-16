@@ -7,7 +7,7 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, deleteTreeFromTrees } from "@/src/utils/tree/treeUtil";
+import { addTreeToTrees, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 
 interface Props {
   treeItem: Tree;
@@ -82,7 +82,9 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
         ))}
         <TreeNameInput
           isShow={isOpenNewTree}
+          setIsShow={setIsOpenNewTree}
           uppertree={treeItem}
+          sameDepthTreeNames={getTreeChildrenNames(treeItem, newTreeType)}
           treeType={newTreeType}
           handleAfterCreate={handleAfterCreate}
         />

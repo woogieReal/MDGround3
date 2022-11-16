@@ -16,7 +16,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
 import _ from "lodash";
 
 interface Props {
@@ -130,7 +130,9 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           ))}
           <TreeNameInput
             isShow={isOpenNewTree}
+            setIsShow={setIsOpenNewTree}
             treeType={newTreeType}
+            sameDepthTreeNames={getTreeChildrenNames(trees, newTreeType)}
             handleAfterCreate={handleAfterCreate}
           />
         </TreeView>
