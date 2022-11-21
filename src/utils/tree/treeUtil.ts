@@ -37,6 +37,7 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
   if (targetTree.treePath.length === 0) {
     cloneTrees = getEmptyArrayIfNotArray(cloneTrees);
     cloneTrees.push(targetTree);
+    cloneTrees.sort(sortingTreeByTreeName)
   } else {
     const upperTreeIds = targetTree.treePath.split("|");
     let targetUpperTree: Tree = { ...InitialTree, treeChildren: cloneTrees };
@@ -47,6 +48,7 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
 
     targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
     targetUpperTree.treeChildren.push(targetTree);
+    targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
   }
   
   return cloneTrees;
@@ -69,4 +71,23 @@ export const getTreeChildrenNames = (trees: Tree | Tree[], treeType?: TreeType):
   }
 
   return targetUpperTree.treeChildren.map((treeChild: Tree) => treeChild.treeName);
+}
+
+const sortingTreeByTreeName = (a: Tree, b: Tree) => {
+  if (a.treeType < b.treeType) {
+    return -1;
+  } else if (a.treeType > b.treeType) {
+    return 1;
+  } else {
+    const nameA = a.treeName;
+    const nameB = b.treeName;
+
+    if (nameA < nameB) {
+      return -1;
+    } else if (nameA > nameB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
 }
