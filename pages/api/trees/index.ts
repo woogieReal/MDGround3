@@ -37,8 +37,9 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
           params.push(treePath);
         }
 
+        // 아래에서 트리구조를 만들 때 pop()으로 마지막부터 꺼내기 때문에 ORDER BY를 역순으로 사용한다.
         query += `
-          ORDER BY tree_path, FIELD(tree_type, 20, 10)
+          ORDER BY tree_type DESC, tree_name DESC
         `;
 
         const [rows, fields] = await connection.query(query, params);

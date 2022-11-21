@@ -1,0 +1,1 @@
+CREATE INDEX tree_type_name_IDX USING BTREE ON tree (user_id,tree_type,tree_name);
