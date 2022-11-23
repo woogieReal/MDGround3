@@ -1,6 +1,7 @@
 import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from "@mui/material";
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.model";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
@@ -8,7 +9,7 @@ import { AxiosResponse } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
-import { validateDeleteTree } from "@/src/utils/tree/validation";
+import { validateDeleteTree, validateRenameTree } from "@/src/utils/tree/validation";
 import { ValidationResponse } from "@/src/models/validation.model";
 
 const iconStyle = { marginRight: '10px' };
@@ -18,18 +19,24 @@ interface Props {
   isShow: boolean;
   hide(): void;
   targetTree?: Tree
-  handleAfterDelete?(deletedTree: Tree): void;
   handleClickCreate(treeType: TreeType): void;
+  handleClickRename?(tree: Tree): void;
+  handleAfterDelete?(tree: Tree): void;
 }
-const TreeContext = ({ anchorEl, isShow, hide, targetTree, handleAfterDelete, handleClickCreate }: Props) => {
+const TreeContext = ({ anchorEl, isShow, hide, targetTree, handleAfterDelete, handleClickCreate, handleClickRename }: Props) => {
   const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
   const [isReadyToDelete, setIsReadyToDelete] = useState<boolean>(false);
 
   const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { ...deleteTargetTree, userId: TEST_USER_ID }, deleteTargetTree?.treeId!), {
     onSuccess(res: AxiosResponse) {
-      handleAfterDelete && handleAfterDelete(deleteTargetTree!);
+      handleAfterDelete!(deleteTargetTree!);
     },
   });
+
+  const handlClickRename = () => {
+    handleClickRename!(targetTree!);
+    hide();
+  }
 
   const handlClickDelte = () => {
     hide();
@@ -68,6 +75,17 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, handleAfterDelete, ha
     )
   }
 
+  const renderRenameTree = () => {
+    return (
+      <ListItem disablePadding onClick={() => handlClickRename()} >
+        <ListItemButton>
+          <ModeEditOutlineOutlinedIcon sx={iconStyle} />
+          <ListItemText primary="rename" />
+        </ListItemButton>
+      </ListItem>
+    )
+  }
+
   const renderDeleteTree = () => {
     return (
       <ListItem disablePadding onClick={() => handlClickDelte()} >
@@ -101,10 +119,14 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, handleAfterDelete, ha
                       <>
                         {renderCreateFile()}
                         {renderCreateForder()}
+                        {renderRenameTree()}
                         {renderDeleteTree()}
                       </>
                       :
-                      renderDeleteTree()
+                      <>
+                        {renderRenameTree()}
+                        {renderDeleteTree()}
+                      </>
                   }
                 </>
                 :

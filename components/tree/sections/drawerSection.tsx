@@ -125,13 +125,13 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             handleAfterCreate={handleAfterCreate}
           />
         </TreeView>
+        <TreeContext
+          anchorEl={anchorEl}
+          isShow={isPopupOpen}
+          hide={handleClosePopup}
+          handleClickCreate={handleClickCreate}
+        />
       </Drawer>
-      <TreeContext
-        anchorEl={anchorEl}
-        isShow={isPopupOpen}
-        hide={handleClosePopup}
-        handleClickCreate={handleClickCreate}
-      />
       <LodingBackDrop isOpen={getTrees.isLoading} />
     </Box>
   )

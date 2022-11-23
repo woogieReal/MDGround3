@@ -25,6 +25,9 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
   const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
   const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
 
+  // 기존 트리 이름 변경
+  const [renameTargetTree, setRenameTargetTree] = useState<Tree>();
+
   const hasChildren = treeItem && treeItem.treeChildren?.length! > 0 ? true : false;
 
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
@@ -47,6 +50,10 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
     setIsOpenNewTree(false);
     setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
     handleTreeDoubleClick(newTree);
+  }
+
+  const handleClickRename = (tree: Tree) => {
+    setRenameTargetTree(tree);
   }
 
   const handleAfterDelete = (deletedTree: Tree) => {
@@ -88,15 +95,16 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
           treeType={newTreeType}
           handleAfterCreate={handleAfterCreate}
         />
-        <TreeContext
-          anchorEl={anchorEl}
-          isShow={isPopupOpen}
-          hide={handleClosePopup}
-          targetTree={treeItem}
-          handleAfterDelete={handleAfterDelete}
-          handleClickCreate={handleClickCreate}
-        />
       </TreeItem>
+      <TreeContext
+        anchorEl={anchorEl}
+        isShow={isPopupOpen}
+        hide={handleClosePopup}
+        targetTree={treeItem}
+        handleAfterDelete={handleAfterDelete}
+        handleClickCreate={handleClickCreate}
+        handleClickRename={handleClickRename}
+      />
     </Box>
   )
 }
