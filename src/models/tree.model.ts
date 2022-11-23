@@ -6,11 +6,17 @@ export interface Tree {
   treePath: string;
   treeChildren?: Tree[];
   userId?: string;
+  extraInfo?: TreeApiExtraInfo;
 }
 
 export enum TreeType {
   FORDER = 10,
   FILE = 20,
+}
+
+export enum TreeApiExtraInfo {
+  EDIT_CONTENT = 'editContent',
+  RENAME = 'rename',
 }
 
 export const InitialTree: Tree = {

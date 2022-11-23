@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import DBConnection from "@/src/apis/dbConnection";
 import { Connection, RowDataPacket } from "mysql2/promise";
-import { Tree, TreeType } from "@/src/models/tree.model";
+import { Tree, TreeApiExtraInfo, TreeType } from "@/src/models/tree.model";
 import { createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
@@ -48,22 +48,19 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         let query = '';
         let params: any[] = [];
 
+        console.log(request);
+
         query += `
           UPDATE tree 
           SET updated_datetime = CURRENT_TIMESTAMP
         `;
 
-        if (request.treeName) {
+        if (request.extraInfo === TreeApiExtraInfo.EDIT_CONTENT) {
+            query += ` , tree_content = ? `;
+            params.push(request.treeContent);
+        } else if (request.extraInfo === TreeApiExtraInfo.RENAME) {
           query += ` , tree_name = ? `;
           params.push(request.treeName);
-        }
-        if (request.treeContent) {
-          query += ` , tree_content = ? `;
-          params.push(request.treeContent);
-        }
-        if (request.treePath) {
-          query += ` , tree_path = ? `;
-          params.push(request.treePath);
         }
 
         query += `
