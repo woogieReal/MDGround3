@@ -15,6 +15,7 @@ export enum TreeType {
 }
 
 export enum TreeApiExtraInfo {
+  CREATE = 'create',
   EDIT_CONTENT = 'editContent',
   RENAME = 'rename',
 }

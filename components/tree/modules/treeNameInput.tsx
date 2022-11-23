@@ -17,13 +17,14 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 interface Props {
   isShow: boolean;
   setIsShow: Dispatch<SetStateAction<boolean>> 
+  targetTree?: Tree;
   uppertree?: Tree;
   sameDepthTreeNames: string[];
   treeType: TreeType;
   handleAfterCreate(newTree: Tree): void;
 }
 
-const TreeNameInput = ({ isShow, setIsShow, uppertree, sameDepthTreeNames, treeType, handleAfterCreate }: Props) => {
+const TreeNameInput = ({ isShow, setIsShow, targetTree, uppertree, sameDepthTreeNames, treeType, handleAfterCreate }: Props) => {
   const [newTree, setNewTree] = useState<Tree>(InitialTree);
   const [isValidTreeName, setIsValidTreeName] = useState<boolean>(false);
   const [isReadyToCreate, setIsReadyToCreate] = useState<boolean>(false);

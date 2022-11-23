@@ -28,8 +28,6 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
   // 기존 트리 이름 변경
   const [renameTargetTree, setRenameTargetTree] = useState<Tree>();
 
-  const hasChildren = treeItem && treeItem.treeChildren?.length! > 0 ? true : false;
-
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -77,7 +75,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
         onDoubleClick={() => handleTreeDoubleClick(treeItem)}
         onContextMenu={handleContextMenu}
       >
-        {hasChildren && treeItem.treeChildren?.map((item: Tree) => (
+        {treeItem.treeChildren?.map((item: Tree) => (
           <RecursivTreeItem
             key={item.treeId}
             treeItem={item}
@@ -90,6 +88,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
         <TreeNameInput
           isShow={isOpenNewTree}
           setIsShow={setIsOpenNewTree}
+          targetTree={renameTargetTree}
           uppertree={treeItem}
           sameDepthTreeNames={getTreeChildrenNames(treeItem, newTreeType)}
           treeType={newTreeType}
