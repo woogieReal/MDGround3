@@ -17,6 +17,7 @@ import * as commands from '@uiw/react-md-editor/lib/commands';
 import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/validation';
+import { AxiosResponse } from 'axios';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -53,7 +54,11 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     isCtrlEnter(e) && checkReadyToEditContent();
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId));
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
+    onSuccess(res: AxiosResponse) {
+      setIsReadyToContentTree(false);
+    },
+  });
 
   const executeExtraCommands = (preview: PreviewType) => {
     setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(sessionStorage.getItem('currentTabTreeId')), preview));
