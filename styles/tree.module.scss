@@ -61,24 +61,36 @@ $resizeButtonWidhthPX: 12px;
 .treeItemBox {
   // margin: 0px 10px;
   
-  &:hover {
+  &.readOnly:hover {
     background-color: #EEE7E5;
   }
 
   div {
     vertical-align: text-bottom;
-    div {
-      border: none;
-      
-      input[type="text"] {
-        cursor: pointer;
-        padding: 0px 5px;
-        -webkit-text-fill-color: black
-      }
-      
-      fieldset {
-        color: black !important;
+
+    &.readOnly {
+      div {
         border: none;
+        
+        input[type="text"] {
+          cursor: pointer;
+          padding: 0px 5px;
+          -webkit-text-fill-color: black
+        }
+        
+        fieldset {
+          color: black !important;
+          border: none;
+        }
+      }
+    }
+
+    &.editable {
+      div {
+        
+        input[type="text"] {
+          padding: 0px 5px;
+        }
       }
     }
   }
