@@ -62,7 +62,7 @@ $resizeButtonWidhthPX: 12px;
   // margin: 0px 10px;
   
   &:hover {
-    background-color: #F9F4F3;
+    background-color: #EEE7E5;
   }
 
   div {
@@ -73,6 +73,7 @@ $resizeButtonWidhthPX: 12px;
       input[type="text"] {
         cursor: pointer;
         padding: 0px 5px;
+        -webkit-text-fill-color: black
       }
       
       fieldset {
