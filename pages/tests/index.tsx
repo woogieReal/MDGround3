@@ -1,15 +1,25 @@
-import * as React from 'react';
+import { Box, makeStyles, TextField } from "@mui/material";
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import styles from '@/styles/tree.module.scss'
 
-export default function TextInputWithFocusButton() {
-  const inputEl = React.useRef<HTMLInputElement>(null);
-  const onButtonClick = () => {
-    // `current` points to the mounted text input element
-    inputEl.current?.focus();
-  };
+const Home = () => {
+  
   return (
-    <>
-      <input ref={inputEl} type="text" />
-      <button onClick={onButtonClick}>Focus the input</button>
-    </>
-  );
+    <Box>
+      <Box>
+        <Box className={styles.treeItemBox} sx={{ display: 'inline-block' }}>
+          <FolderOutlinedIcon sx={{ mr: 1, }} />
+          <TextField size="small" variant="outlined" disabled value={'아 뭐'} />
+        </Box>
+      </Box>
+      <Box>
+        <Box className={styles.treeItemBox} sx={{ display: 'inline-block' }}>
+          <FolderOutlinedIcon sx={{ mr: 1, }} />
+          <TextField size="small" variant="outlined" disabled value={'아 뭐'} />
+        </Box>
+      </Box>
+    </Box>
+  )
 }
+
+export default Home;

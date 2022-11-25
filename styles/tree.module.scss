@@ -55,6 +55,39 @@ $resizeButtonWidhthPX: 12px;
   border: 1px solid green !important;
 }
 
+
+
+
+.treeItemBox {
+  // margin: 0px 10px;
+  
+  &:hover {
+    background-color: #F9F4F3;
+  }
+
+  div {
+    vertical-align: text-bottom;
+    div {
+      border: none;
+      
+      input[type="text"] {
+        cursor: pointer;
+        padding: 0px 5px;
+      }
+      
+      fieldset {
+        color: black !important;
+        border: none;
+      }
+    }
+  }
+
+  svg {
+    vertical-align: text-bottom;
+  }
+}
+
+
 :export {
   verticalTabWidth: $verticalTabWidth;
   verticalTabWidthPX: $verticalTabWidthPX;
@@ -63,3 +96,4 @@ $resizeButtonWidhthPX: 12px;
   resizeButtonWidhth: $resizeButtonWidhth;
   resizeButtonWidhthPX: $resizeButtonWidhthPX;
 }
+
