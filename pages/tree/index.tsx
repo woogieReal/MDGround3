@@ -58,13 +58,7 @@ const Home: NextPage = () => {
     }
   };
 
-  /**
-   * RecursivTreeItem props
-   * 현재 컴포넌트 rerender 시 아래 함수들을 props로 넘겨 받는 재귀함수로 생성된 모든 RecursivTreeItem가 rerender 됨
-   * 함수도 객체로 취급이 되기 때문에 메모리 주소에 의한 참조 비교가 일어나기 때문
-   * 성능문제를 해결하기 위해 useCallback 사용
-   */
-  const handleTreeClick = useCallback((data: Tree) => {
+  const handleTreeClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       setTimeout(() => {
         const tabValue = selectedFileIds.indexOf(data.treeId);
@@ -75,9 +69,9 @@ const Home: NextPage = () => {
         }
       }, 150)
     }
-  }, [selectedFileIds]);
+  };
 
-  const handleTreeDoubleClick = useCallback((data: Tree) => {
+  const handleTreeDoubleClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       if (files.length === 0) {
         handleTreeClick(data);
@@ -88,17 +82,16 @@ const Home: NextPage = () => {
         }
       }
     }
-  }, [files, selectedFileIds]);
+  };
 
-  const deleteTabByTreeId = useCallback((data: Tree) => {
+  const deleteTabByTreeId = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       const targetTabNum = files.findIndex((file: Tree) => file.treeId === data.treeId);
       if (targetTabNum >= 0) {
         handleClickDeleteTab(targetTabNum)
       }
     }
-  }, [files]);
-  // -- 끝
+  };
 
   const handleClickDeleteTab = (targetTabNum: number) => {
     targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);

@@ -28,4 +28,10 @@ export const InitialTree: Tree = {
   treePath: ''
 }
 
+export enum MethodTypeForRecursivTreeItem {
+  CLICK = 'click',
+  DOUBLE_CLICK = 'doubleClick',
+  DELETE_TAB = 'deleteTab',
+}
+
 export const TEST_USER_ID = '92aa8f60-51e2-11ed-bf27-0242ac140002';

@@ -1,4 +1,4 @@
-import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
+import { InitialTree, MethodTypeForRecursivTreeItem, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
 import { Box, InputAdornment, TextField } from "@mui/material";
@@ -9,15 +9,15 @@ import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
 import { addTreeToTrees, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
+import { cloneDeep } from "lodash";
 
 interface Props {
   treeItem: Tree;
   setTrees: Dispatch<SetStateAction<Tree[]>>
-  handleTreeClick(data: Tree): void;
-  handleTreeDoubleClick(data: Tree): void;
-  deleteTabByTreeId(data: Tree): void;
+  setMethodType: Dispatch<SetStateAction<MethodTypeForRecursivTreeItem>>
+  setMethodTargetTree: Dispatch<SetStateAction<Tree>>
 }
-const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
+const RecursivTreeItem = ({ treeItem, setTrees, setMethodType, setMethodTargetTree }: Props) => {
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
@@ -31,6 +31,20 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   // 하위 트리 노출여부
   const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
+
+  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
+    setMethodType(methodType);
+    setMethodTargetTree(methodTargetTree);
+  }
+
+  const handleTreeClickItem = () => {
+    treeItem.treeType === TreeType.FORDER && setIsShowChildrenTree(show => !show);
+    setMethod(MethodTypeForRecursivTreeItem.CLICK, treeItem);
+  }
+
+  const handleTreeDoubleClickItem = () => {
+    setMethod(MethodTypeForRecursivTreeItem.DOUBLE_CLICK, treeItem);
+  }
 
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
@@ -51,7 +65,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
   const handleAfterCreate = (newTree: Tree) => {
     setIsOpenNewTree(false);
     setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
-    handleTreeDoubleClick(newTree);
+    setMethod(MethodTypeForRecursivTreeItem.DOUBLE_CLICK, newTree);
   }
 
   const handleClickRename = (tree: Tree) => {
@@ -60,7 +74,7 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   const handleAfterDelete = (deletedTree: Tree) => {
     setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
-    deleteTabByTreeId(deletedTree);
+    setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
 
   useEffect(() => {
@@ -86,13 +100,8 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
           disabled
           value={treeItem.treeName}
           className={styles.readOnly}
-          onClick={() => {
-            if (treeItem.treeType === TreeType.FORDER) {
-              setIsShowChildrenTree(show => !show);
-            }
-            handleTreeClick(treeItem)
-          }}
-          onDoubleClick={() => handleTreeDoubleClick(treeItem)}
+          onClick={handleTreeClickItem}
+          onDoubleClick={handleTreeDoubleClickItem}
           onContextMenu={handleContextMenu}
         />
         {isShowChildrenTree && treeItem.treeChildren?.map((item: Tree) => (
@@ -101,9 +110,8 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
               key={item.treeId}
               treeItem={item}
               setTrees={setTrees}
-              handleTreeClick={handleTreeClick}
-              handleTreeDoubleClick={handleTreeDoubleClick}
-              deleteTabByTreeId={deleteTabByTreeId}
+              setMethodType={setMethodType}
+              setMethodTargetTree={setMethodTargetTree}
             />
           </Box>
         ))}
@@ -125,9 +133,7 @@ const isEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
   const isEqualProps = (
     prev.treeItem === next.treeItem
     && prev.setTrees === next.setTrees
-    && prev.handleTreeClick === next.handleTreeClick
-    && prev.handleTreeDoubleClick === next.handleTreeDoubleClick
-    && prev.deleteTabByTreeId === next.deleteTabByTreeId
+    && prev.setMethodType === next.setMethodType
   );
   return isEqualProps;
 }

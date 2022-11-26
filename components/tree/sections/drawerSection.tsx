@@ -2,7 +2,7 @@ import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, InitialTree } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem, InitalMethodMapping } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import TreeView from '@mui/lab/TreeView';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -38,6 +38,11 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
   const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
 
+  // RecursivTreeItem의 메소드 호출 타입
+  // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
+  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.CLICK);
+  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
+
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
@@ -71,6 +76,16 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
+  useEffect(() => {
+    if (methodTargetTree.treeId !== InitialTree.treeId) {
+      switch(methodType) {
+        case MethodTypeForRecursivTreeItem.CLICK: handleTreeClick(methodTargetTree); break;
+        case MethodTypeForRecursivTreeItem.DOUBLE_CLICK: handleTreeDoubleClick(methodTargetTree); break;
+        case MethodTypeForRecursivTreeItem.DELETE_TAB: deleteTabByTreeId(methodTargetTree); break;
+      }
+    }
+  }, [methodType, methodTargetTree])
+
   return (
     <Box
       id={styles.resizableContainer}
@@ -101,9 +116,8 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               key={`${index}-${data.treeId}`}
               treeItem={data}
               setTrees={setTrees}
-              handleTreeClick={handleTreeClick}
-              handleTreeDoubleClick={handleTreeDoubleClick}
-              deleteTabByTreeId={deleteTabByTreeId}
+              setMethodType={setMethodType}
+              setMethodTargetTree={setMethodTargetTree}
             />
           ))}
           <TreeNameInput
