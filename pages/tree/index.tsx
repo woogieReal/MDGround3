@@ -2,7 +2,7 @@ import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
 import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar, IconButton } from '@mui/material'
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -58,7 +58,11 @@ const Home: NextPage = () => {
     }
   };
 
-  const handleTreeClick = (data: Tree) => {
+  // RecursivTreeItem에 props로 넘길 함수는 아래 사항을 주의
+  // 현재 컴포넌트 rerender 시 아래 함수들을 props로 넘겨 받는 재귀함수로 생성괸 RecursivTreeItem 전체가  rerender 됨
+  // 함수도 객체로 취급이 되기 때문에 메모리 주소에 의한 참조 비교가 일어나기 때문
+  // 성능문제를 해결하기 위해 useCallback을 사용
+  const handleTreeClick = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       setTimeout(() => {
         const tabValue = selectedFileIds.indexOf(data.treeId);
@@ -69,9 +73,9 @@ const Home: NextPage = () => {
         }
       }, 150)
     }
-  }
+  }, []);
 
-  const handleTreeDoubleClick = (data: Tree) => {
+  const handleTreeDoubleClick = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       if (files.length === 0) {
         handleTreeClick(data);
@@ -82,20 +86,21 @@ const Home: NextPage = () => {
         }
       }
     }
-  }
+  }, []);
 
-  const handleClickDeleteTab = (targetTabNum: number) => {
-    targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
-    setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
-  }
-
-  const deleteTabByTreeId = (data: Tree) => {
+  const deleteTabByTreeId = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       const targetTabNum = files.findIndex((file: Tree) => file.treeId === data.treeId);
       if (targetTabNum >= 0) {
         handleClickDeleteTab(targetTabNum)
       }
     }
+  }, []);
+  // -- 끝
+
+  const handleClickDeleteTab = (targetTabNum: number) => {
+    targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
+    setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
   }
 
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
