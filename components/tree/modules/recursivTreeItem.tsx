@@ -1,7 +1,7 @@
 import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
-import { Box, TextField } from "@mui/material";
+import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -69,40 +69,44 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   return (
     <Box>
-      <Box>
-        <Box
-          className={`${styles.treeItemBox}`}
-          sx={{ display: 'inline-block' }}
-        >
-          {/* {treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon sx={{ mr: 1, }} /> : <DescriptionOutlinedIcon sx={{ mr: 1, }} />} */}
-          <TextField
-            size="small"
-            variant="outlined"
-            disabled
-            value={treeItem.treeName}
-            className={styles.readOnly}
-            onClick={() => {
-              if (treeItem.treeType === TreeType.FORDER) {
-                setIsShowChildrenTree(show => !show);
-              }
-              handleTreeClick(treeItem)
-            }}
-            onDoubleClick={() => handleTreeDoubleClick(treeItem)}
-            onContextMenu={handleContextMenu}
-          />
-          {isShowChildrenTree && treeItem.treeChildren?.map((item: Tree) => (
-            <Box style={{ marginLeft: '15px' }}>
-              <RecursivTreeItem
-                key={item.treeId}
-                treeItem={item}
-                setTrees={setTrees}
-                handleTreeClick={handleTreeClick}
-                handleTreeDoubleClick={handleTreeDoubleClick}
-                deleteTabByTreeId={deleteTabByTreeId}
-              />
-            </Box>
-          ))}
-        </Box>
+      <Box
+        className={`${styles.treeItemBox}`}
+        sx={{ display: 'inline-block' }}
+      >
+        <TextField
+          size="small"
+          variant="outlined"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                {treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} /> : <DescriptionOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} />}
+              </InputAdornment>
+            ),
+          }}
+          disabled
+          value={treeItem.treeName}
+          className={styles.readOnly}
+          onClick={() => {
+            if (treeItem.treeType === TreeType.FORDER) {
+              setIsShowChildrenTree(show => !show);
+            }
+            handleTreeClick(treeItem)
+          }}
+          onDoubleClick={() => handleTreeDoubleClick(treeItem)}
+          onContextMenu={handleContextMenu}
+        />
+        {isShowChildrenTree && treeItem.treeChildren?.map((item: Tree) => (
+          <Box style={{ marginLeft: '15px' }}>
+            <RecursivTreeItem
+              key={item.treeId}
+              treeItem={item}
+              setTrees={setTrees}
+              handleTreeClick={handleTreeClick}
+              handleTreeDoubleClick={handleTreeDoubleClick}
+              deleteTabByTreeId={deleteTabByTreeId}
+            />
+          </Box>
+        ))}
       </Box>
       <TreeContext
         anchorEl={anchorEl}

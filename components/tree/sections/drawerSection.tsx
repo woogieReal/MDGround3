@@ -95,18 +95,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
 
         </Box>
         <Divider />
-        <TreeView
-          aria-label="multi-select"
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
-          multiSelect
-          sx={{
-            height: 216,
-            flexGrow: 1,
-            overflowY: 'auto',
-            display: verticalTabVaue === 0 ? 'block' : 'none'
-          }}
-        >
+        <Box id={styles.treeSection}>
           {trees.map((data: Tree, index: number) => (
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
@@ -124,7 +113,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             sameDepthTreeNames={getTreeChildrenNames(trees, newTreeType)}
             handleAfterCreate={handleAfterCreate}
           />
-        </TreeView>
+        </Box>
         <TreeContext
           anchorEl={anchorEl}
           isShow={isPopupOpen}

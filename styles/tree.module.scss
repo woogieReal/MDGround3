@@ -51,47 +51,51 @@ $resizeButtonWidhthPX: 12px;
   border: 1px solid green !important;
 }
 
+#treeSection {
+  margin-top: 7px;
 
-.treeItemBox {
+  .treeItemBox {
+    
+    div {
+      vertical-align: text-bottom;
   
-  div {
-    vertical-align: text-bottom;
-
-    &.readOnly {
-      &:hover {
-        background-color: #EEE7E5;
-      }
-
-      div {
-        border: none;
-        
-        input[type="text"] {
-          cursor: pointer;
-          padding: 0px 5px;
-          -webkit-text-fill-color: black
+      &.readOnly {
+        &:hover {
+          background-color: #EEE7E5;
         }
-        
-        fieldset {
-          color: black !important;
+  
+        div {
           border: none;
+          
+          input[type="text"] {
+            cursor: pointer;
+            padding: 0px 5px;
+            -webkit-text-fill-color: black
+          }
+          
+          fieldset {
+            color: black !important;
+            border: none;
+          }
+        }
+      }
+  
+      &.editable {
+        div {
+          
+          input[type="text"] {
+            padding: 0px 5px;
+          }
         }
       }
     }
-
-    &.editable {
-      div {
-        
-        input[type="text"] {
-          padding: 0px 5px;
-        }
-      }
+  
+    svg {
+      vertical-align: text-bottom;
     }
-  }
-
-  svg {
-    vertical-align: text-bottom;
   }
 }
+
 
 
 :export {
