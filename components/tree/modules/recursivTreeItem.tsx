@@ -1,15 +1,12 @@
-import { InitialTree, MethodTypeForRecursivTreeItem, Tree, TreeType } from "@/src/models/tree.model";
-import TreeItem from "@mui/lab/TreeItem";
+import { MethodTypeForRecursivTreeItem, Tree, TreeType } from "@/src/models/tree.model";
 import styles from '@/styles/tree.module.scss'
 import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
 import { addTreeToTrees, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
-import { cloneDeep } from "lodash";
 
 interface Props {
   treeItem: Tree;

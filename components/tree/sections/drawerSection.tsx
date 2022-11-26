@@ -1,13 +1,10 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import styles from '@/styles/tree.module.scss'
 import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
-import TreeView from '@mui/lab/TreeView';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box } from '@mui/material';
-import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo';
 import { useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
@@ -16,7 +13,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, checkInitalTree, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
 import _ from "lodash";
 
 interface Props {
@@ -77,7 +74,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   }, [anchorEl])
 
   useEffect(() => {
-    if (methodTargetTree.treeId !== InitialTree.treeId) {
+    if (!checkInitalTree(methodTargetTree)) {
       switch(methodType) {
         case MethodTypeForRecursivTreeItem.CLICK: handleTreeClick(methodTargetTree); break;
         case MethodTypeForRecursivTreeItem.DOUBLE_CLICK: handleTreeDoubleClick(methodTargetTree); break;

@@ -2,6 +2,10 @@ import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
 import { cloneDeep } from "lodash";
 import { getEmptyArrayIfNotArray } from "../common/arrayUtil";
 
+export const checkInitalTree = (tree: Tree): boolean => {
+  return tree.treeId === InitialTree.treeId;
+}
+
 export const createTreeFullPath = (tree?: Tree): string => {
   if (tree) {
     return tree.treePath

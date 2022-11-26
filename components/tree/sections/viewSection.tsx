@@ -1,5 +1,5 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { Dispatch, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { InitialTree, TEST_USER_ID, Tree } from '@/src/models/tree.model';

@@ -1,11 +1,10 @@
 import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar, IconButton } from '@mui/material'
+import { Box, Button, Tabs, Tab, AppBar, IconButton } from '@mui/material'
 import type { NextPage } from 'next'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
 import { TEST_USER_ID, Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
