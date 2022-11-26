@@ -58,10 +58,12 @@ const Home: NextPage = () => {
     }
   };
 
-  // RecursivTreeItem에 props로 넘길 함수는 아래 사항을 주의
-  // 현재 컴포넌트 rerender 시 아래 함수들을 props로 넘겨 받는 재귀함수로 생성괸 RecursivTreeItem 전체가  rerender 됨
-  // 함수도 객체로 취급이 되기 때문에 메모리 주소에 의한 참조 비교가 일어나기 때문
-  // 성능문제를 해결하기 위해 useCallback을 사용
+  /**
+   * RecursivTreeItem props
+   * 현재 컴포넌트 rerender 시 아래 함수들을 props로 넘겨 받는 재귀함수로 생성된 모든 RecursivTreeItem가 rerender 됨
+   * 함수도 객체로 취급이 되기 때문에 메모리 주소에 의한 참조 비교가 일어나기 때문
+   * 성능문제를 해결하기 위해 useCallback 사용
+   */
   const handleTreeClick = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
       setTimeout(() => {
