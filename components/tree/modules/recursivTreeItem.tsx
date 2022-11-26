@@ -1,7 +1,7 @@
 import { InitialTree, Tree, TreeType } from "@/src/models/tree.model";
 import TreeItem from "@mui/lab/TreeItem";
 import styles from '@/styles/tree.module.scss'
-import { Box } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -27,6 +27,9 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   // 기존 트리 이름 변경
   const [renameTargetTree, setRenameTargetTree] = useState<Tree>();
+
+  // 하위 트리 노출여부
+  const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
 
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
@@ -65,36 +68,41 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
 
   return (
     <Box>
-      <TreeItem
-        id={String(treeItem.treeId)}
-        nodeId={String(treeItem.treeId)}
-        label={treeItem.treeName}
-        className={styles.treeItem}
-        icon={treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon /> : <DescriptionOutlinedIcon />}
-        onClick={() => handleTreeClick(treeItem)}
-        onDoubleClick={() => handleTreeDoubleClick(treeItem)}
-        onContextMenu={handleContextMenu}
-      >
-        {treeItem.treeChildren?.map((item: Tree) => (
-          <RecursivTreeItem
-            key={item.treeId}
-            treeItem={item}
-            setTrees={setTrees}
-            handleTreeClick={handleTreeClick}
-            handleTreeDoubleClick={handleTreeDoubleClick}
-            deleteTabByTreeId={deleteTabByTreeId}
+      <Box>
+        <Box 
+          className={`${styles.treeItemBox}`} 
+          sx={{ display: 'inline-block' }}
+        >
+          {/* {treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon sx={{ mr: 1, }} /> : <DescriptionOutlinedIcon sx={{ mr: 1, }} />} */}
+          <TextField 
+            size="small" 
+            variant="outlined" 
+            disabled 
+            value={treeItem.treeName} 
+            className={styles.readOnly} 
+            onClick={() => {
+              if (treeItem.treeType === TreeType.FORDER) {
+                setIsShowChildrenTree(show => !show);
+              }
+              handleTreeClick(treeItem)
+            }}
+            onDoubleClick={() => handleTreeDoubleClick(treeItem)}
+            onContextMenu={handleContextMenu}
           />
-        ))}
-        <TreeNameInput
-          isShow={isOpenNewTree}
-          setIsShow={setIsOpenNewTree}
-          targetTree={renameTargetTree}
-          uppertree={treeItem}
-          sameDepthTreeNames={getTreeChildrenNames(treeItem, newTreeType)}
-          treeType={newTreeType}
-          handleAfterCreate={handleAfterCreate}
-        />
-      </TreeItem>
+          {isShowChildrenTree && treeItem.treeChildren?.map((item: Tree) => (
+            <Box style={{ marginLeft: '15px' }}>
+              <RecursivTreeItem
+                key={item.treeId}
+                treeItem={item}
+                setTrees={setTrees}
+                handleTreeClick={handleTreeClick}
+                handleTreeDoubleClick={handleTreeDoubleClick}
+                deleteTabByTreeId={deleteTabByTreeId}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
       <TreeContext
         anchorEl={anchorEl}
         isShow={isPopupOpen}

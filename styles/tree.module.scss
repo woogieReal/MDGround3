@@ -28,10 +28,6 @@ $resizeButtonWidhthPX: 12px;
   padding-right: $resizeButtonWidhthPX;
 }
 
-.treeItem {
-  white-space: nowrap;
-}
-
 .newTreeInputIcon {
   font-size: large !important;
   margin: 0px 6px;
@@ -56,19 +52,16 @@ $resizeButtonWidhthPX: 12px;
 }
 
 
-
-
 .treeItemBox {
-  // margin: 0px 10px;
   
-  &.readOnly:hover {
-    background-color: #EEE7E5;
-  }
-
   div {
     vertical-align: text-bottom;
 
     &.readOnly {
+      &:hover {
+        background-color: #EEE7E5;
+      }
+
       div {
         border: none;
         
