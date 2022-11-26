@@ -75,7 +75,7 @@ const Home: NextPage = () => {
         }
       }, 150)
     }
-  }, []);
+  }, [selectedFileIds]);
 
   const handleTreeDoubleClick = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
@@ -88,7 +88,7 @@ const Home: NextPage = () => {
         }
       }
     }
-  }, []);
+  }, [files, selectedFileIds]);
 
   const deleteTabByTreeId = useCallback((data: Tree) => {
     if (data.treeType === TreeType.FILE) {
@@ -97,7 +97,7 @@ const Home: NextPage = () => {
         handleClickDeleteTab(targetTabNum)
       }
     }
-  }, []);
+  }, [files]);
   // -- 끝
 
   const handleClickDeleteTab = (targetTabNum: number) => {
