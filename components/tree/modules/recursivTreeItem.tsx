@@ -8,6 +8,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
 import { addTreeToTrees, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
+import React from "react";
 
 interface Props {
   treeItem: Tree;
@@ -69,17 +70,17 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
   return (
     <Box>
       <Box>
-        <Box 
-          className={`${styles.treeItemBox}`} 
+        <Box
+          className={`${styles.treeItemBox}`}
           sx={{ display: 'inline-block' }}
         >
           {/* {treeItem.treeType === TreeType.FORDER ? <FolderOutlinedIcon sx={{ mr: 1, }} /> : <DescriptionOutlinedIcon sx={{ mr: 1, }} />} */}
-          <TextField 
-            size="small" 
-            variant="outlined" 
-            disabled 
-            value={treeItem.treeName} 
-            className={styles.readOnly} 
+          <TextField
+            size="small"
+            variant="outlined"
+            disabled
+            value={treeItem.treeName}
+            className={styles.readOnly}
             onClick={() => {
               if (treeItem.treeType === TreeType.FORDER) {
                 setIsShowChildrenTree(show => !show);
@@ -116,4 +117,19 @@ const RecursivTreeItem = ({ treeItem, setTrees, handleTreeClick, handleTreeDoubl
   )
 }
 
-export default RecursivTreeItem;
+const isEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
+  const isEqualProps = (
+    prev.treeItem === next.treeItem
+    && prev.setTrees === next.setTrees
+    && prev.handleTreeClick === next.handleTreeClick
+    && prev.handleTreeDoubleClick === next.handleTreeDoubleClick
+    && prev.deleteTabByTreeId === next.deleteTabByTreeId
+  );
+  return isEqualProps;
+}
+
+/**
+ * drawer 너비 조정 시 재귀함수로 생성된 모든 RecursivTreeItem가 rerender됨
+ * 성능문제를 해결하기 위해 React.memo 사용 
+ */
+export default React.memo(RecursivTreeItem, isEqual)
