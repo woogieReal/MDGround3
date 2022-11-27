@@ -1,4 +1,4 @@
-import { Tree, TreeApiExtraInfo, TreeType } from "@/src/models/tree.model";
+import { Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import { ValidationResponse } from "@/src/models/validation.model";
 
 export const validateCreateTree = (tree: Tree): ValidationResponse => {
@@ -33,7 +33,7 @@ export const validateEditContentTree = (tree: Tree): ValidationResponse => {
     if (processedTree.treeId <= 0) break validating;
     if (!processedTree.hasOwnProperty('treeContent')) break validating;
 
-    processedTree.extraInfo = TreeApiExtraInfo.EDIT_CONTENT;
+    processedTree.treeStatus = TreeStatusInfo.EDIT_CONTENT;
 
     response.isValid = true;
     response.processedData = processedTree;
@@ -80,7 +80,7 @@ export const validateRenameTree = (tree: Tree): ValidationResponse => {
     if (!processedTree.treeName) break validating;
     if (![...Object.values(TreeType)].includes(processedTree.treeType)) break validating;
 
-    processedTree.extraInfo = TreeApiExtraInfo.RENAME;
+    processedTree.treeStatus = TreeStatusInfo.RENAME;
 
     response.isValid = true;
     response.processedData = processedTree;

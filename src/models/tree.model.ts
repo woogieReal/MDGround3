@@ -6,7 +6,7 @@ export interface Tree {
   treePath: string;
   treeChildren?: Tree[];
   userId?: string;
-  extraInfo?: TreeApiExtraInfo;
+  treeStatus?: TreeStatusInfo;
 }
 
 export enum TreeType {
@@ -14,7 +14,7 @@ export enum TreeType {
   FILE = 20,
 }
 
-export enum TreeApiExtraInfo {
+export enum TreeStatusInfo {
   CREATE = 'create',
   EDIT_CONTENT = 'editContent',
   RENAME = 'rename',
