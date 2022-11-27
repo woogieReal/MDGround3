@@ -43,14 +43,6 @@ $resizeButtonWidhthPX: 12px;
   margin-top: 5px;
 }
 
-.notReadyToCreateInput {
-  border: 1.5px solid red !important;
-}
-
-.readyToCreateInput {
-  border: 1px solid green !important;
-}
-
 #treeSection {
   margin-top: 7px;
 
@@ -64,7 +56,7 @@ $resizeButtonWidhthPX: 12px;
           background-color: #EEE7E5;
         }
   
-        div {
+        & > div {
           border: none;
           
           input[type="text"] {
@@ -74,20 +66,40 @@ $resizeButtonWidhthPX: 12px;
           }
           
           fieldset {
-            color: black !important;
+            color: black;
             border: none;
           }
         }
       }
-  
+
       &.editable {
-        div {
-          
+
+        & > div {
+
           input[type="text"] {
             padding: 0px 5px;
           }
+
+          fieldset {
+            border: none;
+          }
+        }
+
+        &.readyToCreateInput {
+          
+          & > div {
+            border: 1px solid green;
+          }
+        }
+  
+        &.notReadyToCreateInput {
+          
+          & > div {
+            border: 1.5px solid red !important;
+          }
         }
       }
+  
     }
   
     svg {

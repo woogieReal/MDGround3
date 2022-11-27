@@ -112,18 +112,12 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
               treeItem={data}
+              sameDepthTreeNames={getTreeChildrenNames(trees)}
               setTrees={setTrees}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
             />
           ))}
-          <TreeNameInput
-            isShow={isOpenNewTree}
-            setIsShow={setIsOpenNewTree}
-            treeType={newTreeType}
-            sameDepthTreeNames={getTreeChildrenNames(trees, newTreeType)}
-            handleAfterCreate={handleAfterCreate}
-          />
         </Box>
         <TreeContext
           anchorEl={anchorEl}
