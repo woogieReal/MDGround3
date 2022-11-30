@@ -13,7 +13,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, checkInitalTree, createTreeStructure, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, changeStatusReRenderFromRootToNode, checkInitalTree, createTreeStructure, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
 import _ from "lodash";
 
 interface Props {
@@ -38,13 +38,14 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
 
   // RecursivTreeItem의 메소드 호출 타입
   // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
-  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.CLICK);
+  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
   const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
 
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
       setTrees(createTreeStructure(res.data));
+      setSameDepthTreeNames(getTreeChildrenNames(res.data));
     },
   });
 
@@ -71,16 +72,17 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   }
 
   useEffect(() => {
-    setSameDepthTreeNames(getTreeChildrenNames(trees));
-  }, [trees])
-
-  useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
   useEffect(() => {
     if (!checkInitalTree(methodTargetTree)) {
-      switch(methodType) {
+      switch (methodType) {
+        case MethodTypeForRecursivTreeItem.CREATE:
+          const changedTrees = addTreeToTrees(trees, methodTargetTree, false);
+          setTrees(changeStatusReRenderFromRootToNode(changedTrees, methodTargetTree, false));
+          handleTreeDoubleClick(methodTargetTree);
+          break;
         case MethodTypeForRecursivTreeItem.CLICK: handleTreeClick(methodTargetTree); break;
         case MethodTypeForRecursivTreeItem.DOUBLE_CLICK: handleTreeDoubleClick(methodTargetTree); break;
         case MethodTypeForRecursivTreeItem.DELETE_TAB: deleteTabByTreeId(methodTargetTree); break;

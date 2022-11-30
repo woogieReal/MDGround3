@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, changeTreeFromTrees, checkEditableTreeNameStatus, createTreeFullPath, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
+import { addTreeToTrees, changeStatusReRenderFromRootToNode, changeTreeFromTrees, checkEditableTreeNameStatus, createTreeFullPath, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
@@ -26,6 +26,11 @@ interface Props {
 }
 const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
+  useEffect(() => setTreeData(treeItem), [treeItem])
+  useEffect(() => {
+    treeItem.treeStatus === TreeStatusInfo.RE_RENDER && setTreeData({ ...treeItem, treeStatus: TreeStatusInfo.DEFAULT });
+  }, [treeItem.treeStatus])
+
   const childSameDepthTreeNames = getTreeChildrenNames(treeData);
 
   // 트리 클릭
@@ -43,7 +48,6 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
   // 컨텍스트
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
@@ -79,10 +83,6 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
     setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
-
-  useEffect(() => {
-    setIsPopupOpen(Boolean(anchorEl));
-  }, [anchorEl])
   // -- 컨텍스트
 
   // 트리 이름 수정
@@ -117,8 +117,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
     setTreeData(createdTree);
-    setMethod(MethodTypeForRecursivTreeItem.DOUBLE_CLICK, createdTree);
-    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, createdTree));
+    setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
   }
 
   const cleanCreateTreeAllState = () => {
@@ -193,22 +192,23 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
           onBlur={handlBlurNewTreeInput}
           onKeyUp={handleKeyPressNewTreeInput}
         />
-        {isShowChildrenTree && treeData.treeChildren?.map((item: Tree) => (
-          <Box style={{ marginLeft: '15px' }}>
-            <RecursivTreeItem
-              key={item.treeId}
-              treeItem={item}
-              sameDepthTreeNames={childSameDepthTreeNames}
-              setTrees={setTrees}
-              setMethodType={setMethodType}
-              setMethodTargetTree={setMethodTargetTree}
-            />
-          </Box>
-        ))}
+        {isShowChildrenTree && treeData.treeChildren?.map((item: Tree) => {
+          return (
+            <Box style={{ marginLeft: '15px' }}>
+              <RecursivTreeItem
+                key={item.treeId}
+                treeItem={item}
+                sameDepthTreeNames={childSameDepthTreeNames}
+                setTrees={setTrees}
+                setMethodType={setMethodType}
+                setMethodTargetTree={setMethodTargetTree} />
+            </Box>
+          );
+        })}
       </Box>
       <TreeContext
         anchorEl={anchorEl}
-        isShow={isPopupOpen}
+        isShow={Boolean(anchorEl)}
         hide={handleClosePopup}
         targetTree={treeData}
         handleAfterDelete={handleAfterDelete}
@@ -219,19 +219,21 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   )
 }
 
-const isEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
-  const isEqualProps = (
-    prev.treeItem === next.treeItem
+const checkIsEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
+  const isEqual = (
+    next.treeItem.treeStatus !== TreeStatusInfo.RE_RENDER
+    && prev.treeItem === next.treeItem
     && prev.sameDepthTreeNames === next.sameDepthTreeNames
     && prev.setTrees === next.setTrees
     && prev.setMethodType === next.setMethodType
     && prev.setMethodTargetTree === next.setMethodTargetTree
   );
-  return isEqualProps;
+  next.treeItem.treeStatus = TreeStatusInfo.DEFAULT;
+  return isEqual;
 }
 
 /**
  * drawer 너비 조정 시 재귀함수로 생성된 모든 RecursivTreeItem가 rerender됨
  * 성능문제를 해결하기 위해 React.memo 사용 
  */
-export default React.memo(RecursivTreeItem, isEqual)
+export default React.memo(RecursivTreeItem, checkIsEqual)

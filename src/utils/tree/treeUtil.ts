@@ -54,8 +54,8 @@ export const createTreeStructure = (trees: Tree[]) => {
   return depthToTree.get(minDepth);
 }
 
-export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
-  let cloneTrees = cloneDeep(trees);
+export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
+  let cloneTrees = isCloneDeep ? cloneDeep(trees) : trees;
 
   if (targetTree.treePath.length === 0) {
     cloneTrees = cloneTrees.filter((child: Tree) => child.treeId !== targetTree.treeId);
@@ -73,8 +73,8 @@ export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
   return cloneTrees;
 }
 
-export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
-  let cloneTrees = cloneDeep(trees);
+export const addTreeToTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
+  let cloneTrees = isCloneDeep ? cloneDeep(trees) : trees;
 
   if (targetTree.treePath.length === 0) {
     cloneTrees = getEmptyArrayIfNotArray(cloneTrees);
@@ -96,8 +96,8 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree) => {
   return cloneTrees;
 }
 
-export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
-  let cloneTrees = cloneDeep(trees);
+export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
+  let cloneTrees = isCloneDeep ? cloneDeep(trees) : trees;
 
   if (targetTree.treePath.length === 0) {
     const index = cloneTrees.findIndex((tree: Tree) => tree.treeId === targetTree.treeId);
@@ -124,14 +124,12 @@ export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
 }
 
 export const getTreeChildrenNames = (trees: Tree | Tree[]): Map<TreeType, string[]> => {
-  let cloneTrees = cloneDeep(trees);
-
   let targetUpperTree: Tree;
 
-  if (Array.isArray(cloneTrees)) {
-    targetUpperTree = { ...InitialTree, treeChildren: cloneTrees as Tree[] };
+  if (Array.isArray(trees)) {
+    targetUpperTree = { ...InitialTree, treeChildren: trees as Tree[] };
   } else {
-    targetUpperTree = cloneTrees as Tree;
+    targetUpperTree = trees as Tree;
   }
 
   targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
@@ -166,4 +164,18 @@ const sortingTreeByTreeName = (a: Tree, b: Tree) => {
 
 export const checkEditableTreeNameStatus = (tree: Tree): boolean => {
   return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!)
+}
+
+export const changeStatusReRenderFromRootToNode = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
+  let cloneTrees = isCloneDeep ? cloneDeep(trees) : trees;
+
+  const treeFullPath = createTreeFullPath(targetTree).split('|');
+  let targetUpperTree: Tree = { ...InitialTree, treeChildren: cloneTrees };
+
+  treeFullPath.forEach((id: string) => {
+    targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
+    targetUpperTree.treeStatus = TreeStatusInfo.RE_RENDER
+  })
+
+  return cloneTrees;
 }

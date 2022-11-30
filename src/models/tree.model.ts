@@ -15,6 +15,8 @@ export enum TreeType {
 }
 
 export enum TreeStatusInfo {
+  DEFAULT = 'default',
+  RE_RENDER = 'reRender',
   CREATE = 'create',
   EDIT_CONTENT = 'editContent',
   RENAME = 'rename',
@@ -29,6 +31,8 @@ export const InitialTree: Tree = {
 }
 
 export enum MethodTypeForRecursivTreeItem {
+  DEFAULT = 'default',
+  CREATE = 'create',
   CLICK = 'click',
   DOUBLE_CLICK = 'doubleClick',
   DELETE_TAB = 'deleteTab',
