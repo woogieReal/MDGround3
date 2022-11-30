@@ -1,11 +1,11 @@
-import { InitialTree, MethodTypeForRecursivTreeItem, TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
+import { MethodTypeForRecursivTreeItem, TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import styles from '@/styles/tree.module.scss'
 import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, changeStatusReRenderFromRootToNode, changeTreeFromTrees, checkEditableTreeNameStatus, createTreeFullPath, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
+import { checkEditableTreeNameStatus, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
@@ -14,8 +14,6 @@ import { AxiosResponse } from "axios";
 import { isEnter } from "@/src/utils/common/keyPressUtil";
 import { validateCreateTree } from "@/src/utils/tree/validation";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { getEmptyArrayIfNotArray } from "@/src/utils/common/arrayUtil";
-import { cloneDeep } from "lodash";
 
 interface Props {
   treeItem: Tree;
@@ -23,15 +21,24 @@ interface Props {
   setTrees: Dispatch<SetStateAction<Tree[]>>
   setMethodType: Dispatch<SetStateAction<MethodTypeForRecursivTreeItem>>
   setMethodTargetTree: Dispatch<SetStateAction<Tree>>
+  setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent | null>>
 }
-const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree }: Props) => {
+const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
   useEffect(() => setTreeData(treeItem), [treeItem])
   useEffect(() => {
-    treeItem.treeStatus === TreeStatusInfo.RE_RENDER && setTreeData({ ...treeItem, treeStatus: TreeStatusInfo.DEFAULT });
+    if (treeItem.treeStatus) {
+      const statusProcessedTree = { ...treeItem, treeStatus: treeItem.treeStatus === TreeStatusInfo.RE_RENDER ? TreeStatusInfo.DEFAULT : treeItem.treeStatus };
+      setTreeData(statusProcessedTree);
+    }
   }, [treeItem.treeStatus])
 
   const childSameDepthTreeNames = getTreeChildrenNames(treeData);
+
+  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
+    setMethodType(methodType);
+    setMethodTargetTree(methodTargetTree);
+  }
 
   // 트리 클릭
   const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
@@ -46,44 +53,12 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
   // -- 트리 클릭
 
-  // 컨텍스트
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
+  // 트리 우클릭
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setAnchorEl(e.currentTarget);
+    setContextEvent(e);
+    setMethod(MethodTypeForRecursivTreeItem.OPEN_CONTEXT, treeData)
   }
-
-  const handleClosePopup = () => {
-    setAnchorEl(null);
-  };
-
-  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
-    setMethodType(methodType);
-    setMethodTargetTree(methodTargetTree);
-  }
-
-  const handleClickCreate = (treeType: TreeType) => {
-    setAnchorEl(null);
-    const newTree: Tree = { ...InitialTree, treeType: treeType, treePath: createTreeFullPath(treeData), treeStatus: TreeStatusInfo.CREATE };
-    setTreeData((currTree: Tree) => {
-      const copy: Tree = cloneDeep(currTree);
-      copy.treeChildren = getEmptyArrayIfNotArray(copy.treeChildren);
-      copy.treeChildren.push(newTree);
-      return copy;
-    });
-  }
-
-  const handleClickRename = (tree: Tree) => {
-    setTreeData((currTree: Tree) => { return { ...currTree, treeStatus: TreeStatusInfo.RENAME } });
-  }
-
-  const handleAfterDelete = (deletedTree: Tree) => {
-    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
-    setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
-  }
-  // -- 컨텍스트
+  // -- 트리 우클릭
 
   // 트리 이름 수정
   const isTreeNameEditable = checkEditableTreeNameStatus(treeData);
@@ -116,7 +91,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
-    setTreeData(createdTree);
+    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
     setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
   }
 
@@ -167,54 +142,45 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   // -- 새로운 트리 생성
 
   return (
-    <Box>
-      <Box
-        className={`${styles.treeItemBox}`}
-        sx={{ display: 'inline-block' }}
-      >
-        <TextField
-          size="small"
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                {treeData.treeType === TreeType.FORDER ? <FolderOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} /> : <DescriptionOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} />}
-              </InputAdornment>
-            ),
-          }}
-          disabled={!isTreeNameEditable}
-          value={treeData.treeName}
-          className={textFieldClassName}
-          onClick={handleTreeClickItem}
-          onDoubleClick={handleTreeDoubleClickItem}
-          onContextMenu={handleContextMenu}
-          onChange={handleChangeName}
-          onBlur={handlBlurNewTreeInput}
-          onKeyUp={handleKeyPressNewTreeInput}
-        />
-        {isShowChildrenTree && treeData.treeChildren?.map((item: Tree) => {
-          return (
-            <Box style={{ marginLeft: '15px' }}>
-              <RecursivTreeItem
-                key={item.treeId}
-                treeItem={item}
-                sameDepthTreeNames={childSameDepthTreeNames}
-                setTrees={setTrees}
-                setMethodType={setMethodType}
-                setMethodTargetTree={setMethodTargetTree} />
-            </Box>
-          );
-        })}
-      </Box>
-      <TreeContext
-        anchorEl={anchorEl}
-        isShow={Boolean(anchorEl)}
-        hide={handleClosePopup}
-        targetTree={treeData}
-        handleAfterDelete={handleAfterDelete}
-        handleClickCreate={handleClickCreate}
-        handleClickRename={handleClickRename}
+    <Box
+      className={`${styles.treeItemBox}`}
+      sx={{ display: 'inline-block' }}
+    >
+      <TextField
+        size="small"
+        variant="outlined"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              {treeData.treeType === TreeType.FORDER ? <FolderOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} /> : <DescriptionOutlinedIcon fontSize="small" sx={{ mr: -0.7, }} />}
+            </InputAdornment>
+          ),
+        }}
+        disabled={!isTreeNameEditable}
+        value={treeData.treeName}
+        className={textFieldClassName}
+        onClick={handleTreeClickItem}
+        onDoubleClick={handleTreeDoubleClickItem}
+        onContextMenu={handleContextMenu}
+        onChange={handleChangeName}
+        onBlur={handlBlurNewTreeInput}
+        onKeyUp={handleKeyPressNewTreeInput}
       />
+      {isShowChildrenTree && treeData.treeChildren?.map((item: Tree) => {
+        return (
+          <Box style={{ marginLeft: '15px' }}>
+            <RecursivTreeItem
+              key={item.treeId}
+              treeItem={item}
+              sameDepthTreeNames={childSameDepthTreeNames}
+              setTrees={setTrees}
+              setMethodType={setMethodType}
+              setMethodTargetTree={setMethodTargetTree}
+              setContextEvent={setContextEvent}
+            />
+          </Box>
+        );
+      })}
     </Box>
   )
 }
@@ -227,8 +193,12 @@ const checkIsEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => 
     && prev.setTrees === next.setTrees
     && prev.setMethodType === next.setMethodType
     && prev.setMethodTargetTree === next.setMethodTargetTree
+    && prev.setContextEvent === next.setContextEvent
   );
-  next.treeItem.treeStatus = TreeStatusInfo.DEFAULT;
+  if (next.treeItem.treeStatus === TreeStatusInfo.RE_RENDER) {
+    // console.log(next.treeItem);
+    next.treeItem.treeStatus = TreeStatusInfo.DEFAULT;
+  }
   return isEqual;
 }
 

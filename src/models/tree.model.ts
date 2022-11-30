@@ -32,6 +32,7 @@ export const InitialTree: Tree = {
 
 export enum MethodTypeForRecursivTreeItem {
   DEFAULT = 'default',
+  OPEN_CONTEXT = 'openContext',
   CREATE = 'create',
   CLICK = 'click',
   DOUBLE_CLICK = 'doubleClick',

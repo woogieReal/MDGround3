@@ -70,7 +70,7 @@ export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep
     targetUpperTree.treeChildren = targetUpperTree.treeChildren?.filter((child: Tree) => child.treeId !== targetTree.treeId);
   }
 
-  return cloneTrees;
+  return isCloneDeep ? cloneTrees : changeStatusReRenderFromRoot(cloneTrees, targetTree, false);
 }
 
 export const addTreeToTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
@@ -93,7 +93,7 @@ export const addTreeToTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = tr
     targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
   }
   
-  return cloneTrees;
+  return isCloneDeep ? cloneTrees : changeStatusReRenderFromRoot(cloneTrees, targetTree, false);
 }
 
 export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
@@ -120,7 +120,7 @@ export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep
     targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
   }
 
-  return cloneTrees;
+  return isCloneDeep ? cloneTrees : changeStatusReRenderFromRoot(cloneTrees, targetTree, false);
 }
 
 export const getTreeChildrenNames = (trees: Tree | Tree[]): Map<TreeType, string[]> => {
@@ -143,6 +143,10 @@ export const getTreeChildrenNames = (trees: Tree | Tree[]): Map<TreeType, string
   ;
 }
 
+export const checkEditableTreeNameStatus = (tree: Tree): boolean => {
+  return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!)
+}
+
 const sortingTreeByTreeName = (a: Tree, b: Tree) => {
   if (a.treeType < b.treeType) {
     return -1;
@@ -162,20 +166,14 @@ const sortingTreeByTreeName = (a: Tree, b: Tree) => {
   }
 }
 
-export const checkEditableTreeNameStatus = (tree: Tree): boolean => {
-  return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!)
-}
-
-export const changeStatusReRenderFromRootToNode = (trees: Tree[], targetTree: Tree, isCloneDeep = true) => {
-  let cloneTrees = isCloneDeep ? cloneDeep(trees) : trees;
-
-  const treeFullPath = createTreeFullPath(targetTree).split('|');
-  let targetUpperTree: Tree = { ...InitialTree, treeChildren: cloneTrees };
+const changeStatusReRenderFromRoot = (trees: Tree[], targetTree: Tree, isIncludeNode: boolean) => {
+  const treeFullPath = (isIncludeNode ? createTreeFullPath(targetTree) : targetTree.treePath).split('|');
+  let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
 
   treeFullPath.forEach((id: string) => {
     targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
     targetUpperTree.treeStatus = TreeStatusInfo.RE_RENDER
   })
 
-  return cloneTrees;
+  return trees;
 }

@@ -11,10 +11,10 @@ import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
-import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, changeStatusReRenderFromRootToNode, checkInitalTree, createTreeStructure, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, changeTreeFromTrees, checkInitalTree, createTreeStructure, deleteTreeFromTrees, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
 import _ from "lodash";
+import React from "react";
 
 interface Props {
   open: boolean;
@@ -28,19 +28,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   const [trees, setTrees] = useState<Tree[]>([]);
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
 
-  // 트리 우클릭 팝업
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-
-  // 새로운 트리 생성
-  const [isOpenNewTree, setIsOpenNewTree] = useState<boolean>(false);
-  const [newTreeType, setNewTreeType] = useState<TreeType>(TreeType.FILE);
-
-  // RecursivTreeItem의 메소드 호출 타입
-  // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
-  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
-  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
-
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
@@ -49,46 +36,68 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
     },
   });
 
+  // RecursivTreeItem의 메소드 호출 타입
+  // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
+  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
+  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
+
+  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
+    setMethodType(methodType);
+    setMethodTargetTree(methodTargetTree);
+  }
+
+  // 컨텍스트
+  const [contextEvent, setContextEvent] = useState<React.BaseSyntheticEvent | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setAnchorEl(e.currentTarget);
+    setAnchorEl(e.target);
   }
 
   const handleClosePopup = () => {
     setAnchorEl(null);
   };
 
-  const handleClickCreate = (treeType: TreeType) => {
-    setIsOpenNewTree(true);
-    setNewTreeType(treeType);
+  const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
+    setTrees(addTreeToTrees(trees, tree, false));
   }
 
-  const handleAfterCreate = (newTree: Tree) => {
-    setIsOpenNewTree(false);
-    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, newTree));
-    handleTreeDoubleClick(newTree);
+  const clickRenameForContext = (tree: Tree) => {
+    setTrees(changeTreeFromTrees(trees, tree, false));
   }
 
-  useEffect(() => {
-    setIsPopupOpen(Boolean(anchorEl));
-  }, [anchorEl])
+  const afterDeleteForContext = (deletedTree: Tree) => {
+    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
+    setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
+  }
+  // -- 컨텍스트
 
   useEffect(() => {
     if (!checkInitalTree(methodTargetTree)) {
       switch (methodType) {
+        case MethodTypeForRecursivTreeItem.OPEN_CONTEXT:
+          handleContextMenu(contextEvent!);
+          break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          const changedTrees = addTreeToTrees(trees, methodTargetTree, false);
-          setTrees(changeStatusReRenderFromRootToNode(changedTrees, methodTargetTree, false));
+          setTrees(addTreeToTrees(trees, methodTargetTree, false));
           handleTreeDoubleClick(methodTargetTree);
           break;
-        case MethodTypeForRecursivTreeItem.CLICK: handleTreeClick(methodTargetTree); break;
-        case MethodTypeForRecursivTreeItem.DOUBLE_CLICK: handleTreeDoubleClick(methodTargetTree); break;
-        case MethodTypeForRecursivTreeItem.DELETE_TAB: deleteTabByTreeId(methodTargetTree); break;
+        case MethodTypeForRecursivTreeItem.CLICK:
+          handleTreeClick(methodTargetTree);
+          break;
+        case MethodTypeForRecursivTreeItem.DOUBLE_CLICK:
+          handleTreeDoubleClick(methodTargetTree);
+          break;
+        case MethodTypeForRecursivTreeItem.DELETE_TAB:
+          deleteTabByTreeId(methodTargetTree);
+          break;
       }
     }
-  }, [methodType, methodTargetTree])
+  }, [methodType, methodTargetTree, contextEvent])
 
   return (
     <Box
@@ -108,7 +117,6 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
         anchor="left"
         transitionDuration={0}
         open={open}
-        onContextMenu={handleContextMenu}
       >
         <Box sx={{ height: styles.appHeaderHeightPX }}>
 
@@ -123,14 +131,18 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
               setTrees={setTrees}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
+              setContextEvent={setContextEvent}
             />
           ))}
         </Box>
         <TreeContext
           anchorEl={anchorEl}
-          isShow={isPopupOpen}
+          isShow={Boolean(anchorEl)}
           hide={handleClosePopup}
-          handleClickCreate={handleClickCreate}
+          targetTree={methodTargetTree}
+          clickCreate={clickCreateForContext}
+          clickRename={clickRenameForContext}
+          afterDelete={afterDeleteForContext}
         />
       </Drawer>
       <LodingBackDrop isOpen={getTrees.isLoading} />
