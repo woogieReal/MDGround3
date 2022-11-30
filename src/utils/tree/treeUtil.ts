@@ -16,6 +16,44 @@ export const createTreeFullPath = (tree?: Tree): string => {
   }
 };
 
+export const createTreeStructure = (trees: Tree[]) => {
+  const depthToTree = new Map();
+
+  while (trees.length > 0) {
+    const tree: Tree = trees.pop()!;
+    const treeDepth = !!tree!.treePath
+      ? tree!.treePath.split("|").length
+      : 0;
+    const depthTrees: Tree[] = depthToTree.get(treeDepth) || [];
+    depthTrees.push(tree);
+    depthToTree.set(treeDepth, depthTrees);
+  }
+
+  let depths: number[] = Array.from(depthToTree.keys());
+  let maxDepth = Math.max(...depths);
+  let minDepth = Math.min(...depths);
+
+  while (maxDepth > minDepth) {
+    const childTrees: Tree[] = depthToTree.get(maxDepth);
+    const parentTrees: Tree[] = depthToTree.get(maxDepth - 1);
+
+    childTrees.forEach((child: Tree) => {
+      const parentTreeId = Number(child.treePath.split("|").pop());
+      const parentTreeIndex = parentTrees.findIndex(
+        (parent) => parent.treeId === parentTreeId
+      );
+      parentTrees[parentTreeIndex].treeChildren
+        ? parentTrees[parentTreeIndex].treeChildren!.push(child)
+        : (parentTrees[parentTreeIndex].treeChildren = [child]);
+    });
+
+    depthToTree.set(maxDepth - 1, parentTrees);
+    maxDepth -= 1;
+  }
+
+  return depthToTree.get(minDepth);
+}
+
 export const deleteTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
   let cloneTrees = cloneDeep(trees);
 
@@ -78,7 +116,6 @@ export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree) => {
 
     targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
     const index = targetUpperTree.treeChildren.findIndex((tree: Tree) => tree.treeId === targetTree.treeId);
-    console.log(index);
     targetUpperTree.treeChildren[index] = targetTree;
     targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
   }

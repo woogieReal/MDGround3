@@ -44,7 +44,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
-      setTrees(res.data);
+      setTrees(createTreeStructure(res.data));
     },
   });
 
