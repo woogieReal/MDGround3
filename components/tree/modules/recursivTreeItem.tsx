@@ -26,6 +26,7 @@ interface Props {
 }
 const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
+  const childSameDepthTreeNames = getTreeChildrenNames(treeData);
 
   // 트리 클릭
   const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
@@ -101,7 +102,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
     } else {
       setTextFieldClassName(styles.readOnly);
     }
-  },[isTreeNameEditable, isValidTreeName])
+  }, [isTreeNameEditable, isValidTreeName])
   // -- 트리 이름 수정
 
   // 새로운 트리 생성
@@ -117,6 +118,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
     cleanCreateTreeAllState();
     setTreeData(createdTree);
     setMethod(MethodTypeForRecursivTreeItem.DOUBLE_CLICK, createdTree);
+    setTrees((currTrees: Tree[]) => addTreeToTrees(currTrees, createdTree));
   }
 
   const cleanCreateTreeAllState = () => {
@@ -136,7 +138,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   const handlBlurNewTreeInput = () => {
     if (checkEmptyTreeName()) {
       cleanCreateTreeAllState();
-      
+
       if (treeData.treeStatus === TreeStatusInfo.CREATE) {
         setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
       }
@@ -196,7 +198,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
             <RecursivTreeItem
               key={item.treeId}
               treeItem={item}
-              sameDepthTreeNames={getTreeChildrenNames(treeData)}
+              sameDepthTreeNames={childSameDepthTreeNames}
               setTrees={setTrees}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
@@ -220,6 +222,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 const isEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
   const isEqualProps = (
     prev.treeItem === next.treeItem
+    && prev.sameDepthTreeNames === next.sameDepthTreeNames
     && prev.setTrees === next.setTrees
     && prev.setMethodType === next.setMethodType
     && prev.setMethodTargetTree === next.setMethodTargetTree

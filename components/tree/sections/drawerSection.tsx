@@ -13,7 +13,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeNameInput from '@/components/tree/modules/treeNameInput';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, checkInitalTree, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, checkInitalTree, createTreeStructure, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
 import _ from "lodash";
 
 interface Props {
@@ -26,6 +26,7 @@ interface Props {
 }
 const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
+  const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
 
   // 트리 우클릭 팝업
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -70,6 +71,10 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
   }
 
   useEffect(() => {
+    setSameDepthTreeNames(getTreeChildrenNames(trees));
+  }, [trees])
+
+  useEffect(() => {
     setIsPopupOpen(Boolean(anchorEl));
   }, [anchorEl])
 
@@ -112,7 +117,7 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
               treeItem={data}
-              sameDepthTreeNames={getTreeChildrenNames(trees)}
+              sameDepthTreeNames={sameDepthTreeNames}
               setTrees={setTrees}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
