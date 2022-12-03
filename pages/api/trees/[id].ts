@@ -48,8 +48,6 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         let query = '';
         let params: any[] = [];
 
-        console.log(request);
-
         query += `
           UPDATE tree 
           SET updated_datetime = CURRENT_TIMESTAMP
