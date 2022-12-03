@@ -116,8 +116,11 @@ export const changeTreeFromTrees = (trees: Tree[], targetTree: Tree, isCloneDeep
 
     targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
     const index = targetUpperTree.treeChildren.findIndex((tree: Tree) => tree.treeId === targetTree.treeId);
-    targetUpperTree.treeChildren[index] = targetTree;
-    targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
+
+    if (index >= 0) {
+      targetUpperTree.treeChildren[index] = targetTree;
+      targetUpperTree.treeChildren.sort(sortingTreeByTreeName);
+    }
   }
 
   return isCloneDeep ? cloneTrees : changeStatusReRenderFromRoot(cloneTrees, targetTree, false);
