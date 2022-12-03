@@ -6,25 +6,25 @@ import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
 import { addTreeToTrees, changeTreeFromTrees, checkInitalTree, createTreeStructure, deleteTreeFromTrees, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
-import _ from "lodash";
+import { cloneDeep } from "lodash";
 import React from "react";
 
 interface Props {
   open: boolean;
   drawerWidth: number;
-  verticalTabVaue: number;
+  setFiles: Dispatch<SetStateAction<Tree[]>>
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
   deleteTabByTreeId(data: Tree): void;
 }
-const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
+const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
   const [trees, setTrees] = useState<Tree[]>([]);
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
 
@@ -88,6 +88,14 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
           setTrees(changeTreeFromTrees(trees, methodTargetTree, false));
+          setFiles((currFiles: Tree[]) => {
+            const cloneFiles = cloneDeep(currFiles);
+            const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
+            if (targetIndex >= 0) {
+              cloneFiles[targetIndex].treeName = methodTargetTree.treeName;
+            }
+            return cloneFiles;
+          })
           break;
         case MethodTypeForRecursivTreeItem.CLICK:
           handleTreeClick(methodTargetTree);

@@ -177,7 +177,7 @@ const Home: NextPage = () => {
       <DrawerSection
         open={drawerOpen}
         drawerWidth={drawerWidth}
-        verticalTabVaue={verticalTabVaue}
+        setFiles={setFiles}
         handleTreeClick={handleTreeClick}
         handleTreeDoubleClick={handleTreeDoubleClick}
         deleteTabByTreeId={deleteTabByTreeId}
