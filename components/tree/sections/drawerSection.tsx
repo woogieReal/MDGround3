@@ -86,6 +86,9 @@ const DrawerSection = ({ open, drawerWidth, verticalTabVaue, handleTreeClick, ha
           setTrees(addTreeToTrees(trees, methodTargetTree, false));
           handleTreeDoubleClick(methodTargetTree);
           break;
+        case MethodTypeForRecursivTreeItem.RENAME:
+          setTrees(changeTreeFromTrees(trees, methodTargetTree, false));
+          break;
         case MethodTypeForRecursivTreeItem.CLICK:
           handleTreeClick(methodTargetTree);
           break;

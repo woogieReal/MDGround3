@@ -34,6 +34,7 @@ export enum MethodTypeForRecursivTreeItem {
   DEFAULT = 'default',
   OPEN_CONTEXT = 'openContext',
   CREATE = 'create',
+  RENAME = 'rename',
   CLICK = 'click',
   DOUBLE_CLICK = 'doubleClick',
   DELETE_TAB = 'deleteTab',
