@@ -78,7 +78,6 @@ export const validateRenameTree = (tree: Tree): ValidationResponse => {
 
     if (processedTree.treeId <= 0) break validating;
     if (!processedTree.treeName) break validating;
-    if (![...Object.values(TreeType)].includes(processedTree.treeType)) break validating;
 
     processedTree.treeStatus = TreeStatusInfo.RENAME;
 
