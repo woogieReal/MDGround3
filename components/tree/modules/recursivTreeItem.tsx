@@ -4,7 +4,6 @@ import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import TreeContext from '@/components/tree/modules/treeContext';
 import { checkEditableTreeNameStatus, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -12,8 +11,9 @@ import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
 import { isEnter } from "@/src/utils/common/keyPressUtil";
-import { validateCreateTree } from "@/src/utils/tree/validation";
+import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/validation";
 import { ValidationResponse } from "@/src/models/validation.model";
+import { cloneDeep } from "lodash";
 
 interface Props {
   treeItem: Tree;
@@ -60,7 +60,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
   // -- 트리 우클릭
 
-  // 트리 이름 수정
+  // 트리 이름 관련 공통
   const isTreeNameEditable = checkEditableTreeNameStatus(treeData);
   const [isValidTreeName, setIsValidTreeName] = useState<boolean>(false);
   const [textFieldClassName, setTextFieldClassName] = useState<string>(styles.readOnly);
@@ -68,6 +68,70 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   const handleChangeName = (e: React.BaseSyntheticEvent) => {
     setTreeData((currTree: Tree) => { return { ...currTree, treeName: e.target.value } })
   }
+
+  const checkEmptyTreeName = () => !treeData.treeName.trim();
+  const checkDuplicateTreeName = () => {
+    let isDuplicated = true;
+    const alreadyExistTreeNames = cloneDeep(sameDepthTreeNames.get(treeData.treeType)) || [];
+
+    if (treeData.treeStatus === TreeStatusInfo.CREATE) {
+      isDuplicated = alreadyExistTreeNames.includes(treeData.treeName);
+    } else if (treeData.treeStatus === TreeStatusInfo.RENAME) {
+      // 기존 트리 이름은 중복항목에서 제거
+      alreadyExistTreeNames.splice(alreadyExistTreeNames.indexOf(treeItem.treeName), 1);
+      isDuplicated = alreadyExistTreeNames.includes(treeData.treeName);
+    }
+
+    return isDuplicated;
+  }
+
+  const checkValidTreeName = () => {
+    return !checkEmptyTreeName() && !checkDuplicateTreeName();
+  }
+
+  const handlBlurNewTreeInput = () => {
+    if (treeData.treeStatus === TreeStatusInfo.CREATE) {
+      if (checkEmptyTreeName()) {
+        cleanCreateTreeAllState();
+        setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
+      } else if (checkValidTreeName()) {
+        checkReadyToCreate();
+      }
+
+    } else if (treeData.treeStatus === TreeStatusInfo.RENAME) {
+      if (checkEmptyTreeName()) {
+        cleanRenameTreeAllState();
+
+        setTreeData((currTree: Tree) => {
+          return {
+            ...currTree,
+            treeName: treeItem.treeName,
+            treeStatus: TreeStatusInfo.DEFAULT
+          }
+        });
+      } else if (checkValidTreeName()) {
+        checkReadyToRename();
+      }
+    }
+  }
+
+  const handleKeyPressTreeInput = (e: any) => {
+    if (isEnter(e) && isValidTreeName) {
+      if (treeData.treeStatus === TreeStatusInfo.CREATE) {
+        checkReadyToCreate();
+      } else if (treeData.treeStatus === TreeStatusInfo.RENAME) {
+        checkReadyToRename();
+      }
+    }
+  }
+
+  useEffect(() => {
+    treeData.treeStatus === TreeStatusInfo.RENAME && setIsValidTreeName(true);
+  }, [treeData.treeStatus])
+
+  useEffect(() => {
+    isTreeNameEditable && setIsValidTreeName(checkValidTreeName());
+  }, [treeData.treeName])
 
   useEffect(() => {
     if (isTreeNameEditable) {
@@ -78,7 +142,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
       setTextFieldClassName(styles.readOnly);
     }
   }, [isTreeNameEditable, isValidTreeName])
-  // -- 트리 이름 수정
+  // -- 트리 이름 관련 공통
 
   // 새로운 트리 생성
   const [isReadyToCreate, setIsReadyToCreate] = useState<boolean>(false);
@@ -100,31 +164,6 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
     setIsReadyToCreate(false);
   }
 
-  const checkEmptyTreeName = () => !treeData.treeName.trim();
-  const checkDuplicateTreeName = () => {
-    return sameDepthTreeNames.get(treeData.treeType)!.includes(treeData.treeName);
-  }
-
-  const checkValidTreeName = () => {
-    return !checkEmptyTreeName() && !checkDuplicateTreeName();
-  }
-
-  const handlBlurNewTreeInput = () => {
-    if (checkEmptyTreeName()) {
-      cleanCreateTreeAllState();
-
-      if (treeData.treeStatus === TreeStatusInfo.CREATE) {
-        setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
-      }
-    } else if (checkValidTreeName()) {
-      checkReadyToCreate();
-    }
-  }
-
-  const handleKeyPressNewTreeInput = (e: any) => {
-    isEnter(e) && isValidTreeName && checkReadyToCreate();
-  }
-
   const checkReadyToCreate = () => {
     const response: ValidationResponse = validateCreateTree(treeData);
     setTreeData(response.processedData)
@@ -132,14 +171,39 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
 
   useEffect(() => {
-    isTreeNameEditable && setIsValidTreeName(checkValidTreeName());
-  }, [treeData.treeName])
-
-  useEffect(() => {
     isReadyToCreate && createTree.mutate();
   }, [isReadyToCreate])
-
   // -- 새로운 트리 생성
+
+  // 기존 트리 이름 수정
+  const [isReadyToRename, setIsReadyToRename] = useState<boolean>(false);
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...treeData, userId: TEST_USER_ID, }, treeData.treeId), {
+    onSuccess(res: AxiosResponse) {
+      handleAfterRename();
+    },
+  });
+
+  const handleAfterRename = () => {
+    cleanRenameTreeAllState();
+    setTreeData((currTree: Tree) => { return { ...currTree, treeStatus: TreeStatusInfo.DEFAULT } });
+    setMethod(MethodTypeForRecursivTreeItem.RENAME, { ...treeData, treeStatus: TreeStatusInfo.DEFAULT });
+  }
+
+  const cleanRenameTreeAllState = () => {
+    setIsValidTreeName(false);
+    setIsReadyToRename(false);
+  }
+
+  const checkReadyToRename = () => {
+    const response: ValidationResponse = validateRenameTree(treeData);
+    setTreeData(response.processedData)
+    setIsReadyToRename(response.isValid);
+  }
+
+  useEffect(() => {
+    isReadyToRename && updateTree.mutate();
+  }, [isReadyToRename])
+  // -- 기존 트리 이름 수정
 
   return (
     <Box
@@ -164,7 +228,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
         onContextMenu={handleContextMenu}
         onChange={handleChangeName}
         onBlur={handlBlurNewTreeInput}
-        onKeyUp={handleKeyPressNewTreeInput}
+        onKeyUp={handleKeyPressTreeInput}
       />
       {isShowChildrenTree && treeData.treeChildren?.map((item: Tree) => {
         return (
