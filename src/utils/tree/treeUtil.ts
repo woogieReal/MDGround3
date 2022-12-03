@@ -167,13 +167,19 @@ const sortingTreeByTreeName = (a: Tree, b: Tree) => {
 }
 
 const changeStatusReRenderFromRoot = (trees: Tree[], targetTree: Tree, isIncludeNode: boolean) => {
-  const treeFullPath = (isIncludeNode ? createTreeFullPath(targetTree) : targetTree.treePath).split('|');
-  let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
-
-  treeFullPath.forEach((id: string) => {
-    targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
-    targetUpperTree.treeStatus = TreeStatusInfo.RE_RENDER
-  })
-
+  if (targetTree.treePath === '' && isIncludeNode) {
+    const targetIndex = trees.findIndex((tree: Tree) => tree.treeId === targetTree.treeId);
+    trees[targetIndex].treeStatus = TreeStatusInfo.RE_RENDER;
+  } else {
+    const treeFullPath = isIncludeNode ? createTreeFullPath(targetTree) : targetTree.treePath;
+    const treePaths = treeFullPath ? treeFullPath.split('|') : [];
+    let targetUpperTree: Tree = { ...InitialTree, treeChildren: trees };
+  
+    treePaths.forEach((id: string) => {
+      targetUpperTree = targetUpperTree?.treeChildren?.find((upperTree: Tree) => upperTree.treeId === Number(id))!;
+      targetUpperTree.treeStatus = TreeStatusInfo.RE_RENDER
+    })
+  }
+  
   return trees;
 }
