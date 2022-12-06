@@ -1,8 +1,8 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { Dispatch, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
-import { TEST_USER_ID, Tree } from '@/src/models/tree.model';
+import { InitialTree, TEST_USER_ID, Tree } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import dynamic from "next/dynamic";
@@ -15,6 +15,9 @@ import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';
 import { PreviewType } from '@uiw/react-md-editor/lib/Context';
+import { ValidationResponse } from '@/src/models/validation.model';
+import { validateEditContentTree } from '@/src/utils/tree/validation';
+import { AxiosResponse } from 'axios';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -32,6 +35,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
   const [currentTabTreeId, setTreeId] = useState<number>(0);
+  const [editContentTree, setEditContentTree] = useState<Tree>(InitialTree);
+  const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
   const cleanAllState = () => {
     setEachTabContent(new Map());
@@ -46,14 +51,28 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }
 
   const handleKeyPress = (e: any) => {
-    isCtrlEnter(e) && updateTree.mutate();
+    isCtrlEnter(e) && checkReadyToEditContent();
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { treeContent: eachTabContent.get(currentTabTreeId), userId: TEST_USER_ID }, files[fileTabVaue]?.treeId));
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
+    onSuccess(res: AxiosResponse) {
+      setIsReadyToContentTree(false);
+    },
+  });
 
   const executeExtraCommands = (preview: PreviewType) => {
     setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(sessionStorage.getItem('currentTabTreeId')), preview));
   }
+
+  const checkReadyToEditContent = () => {
+    const response: ValidationResponse = validateEditContentTree({ ...files[fileTabVaue], treeContent: eachTabContent.get(currentTabTreeId) });
+    setEditContentTree(response.processedData);
+    setIsReadyToContentTree(response.isValid);
+  }
+
+  useEffect(() => {
+    isReadyToContentTree && updateTree.mutate();
+  }, [isReadyToContentTree])
 
   useEffect(() => {
     if (files[fileTabVaue]) {

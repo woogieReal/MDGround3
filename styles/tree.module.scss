@@ -28,10 +28,6 @@ $resizeButtonWidhthPX: 12px;
   padding-right: $resizeButtonWidhthPX;
 }
 
-.treeItem {
-  white-space: nowrap;
-}
-
 .newTreeInputIcon {
   font-size: large !important;
   margin: 0px 6px;
@@ -47,13 +43,72 @@ $resizeButtonWidhthPX: 12px;
   margin-top: 5px;
 }
 
-.notReadyToCreateInput {
-  border: 1.5px solid red !important;
+#treeSection {
+  margin-top: 7px;
+
+  .treeItemBox {
+    
+    div {
+      vertical-align: text-bottom;
+  
+      &.readOnly {
+        &:hover {
+          background-color: #EEE7E5;
+        }
+  
+        & > div {
+          border: none;
+          
+          input[type="text"] {
+            cursor: pointer;
+            padding: 0px 5px;
+            -webkit-text-fill-color: black
+          }
+          
+          fieldset {
+            color: black;
+            border: none;
+          }
+        }
+      }
+
+      &.editable {
+
+        & > div {
+
+          input[type="text"] {
+            padding: 0px 5px;
+          }
+
+          fieldset {
+            border: none;
+          }
+        }
+
+        &.readyToCreateInput {
+          
+          & > div {
+            border: 1px solid green;
+          }
+        }
+  
+        &.notReadyToCreateInput {
+          
+          & > div {
+            border: 1.5px solid red !important;
+          }
+        }
+      }
+  
+    }
+  
+    svg {
+      vertical-align: text-bottom;
+    }
+  }
 }
 
-.readyToCreateInput {
-  border: 1px solid green !important;
-}
+
 
 :export {
   verticalTabWidth: $verticalTabWidth;
@@ -63,3 +118,4 @@ $resizeButtonWidhthPX: 12px;
   resizeButtonWidhth: $resizeButtonWidhth;
   resizeButtonWidhthPX: $resizeButtonWidhthPX;
 }
+

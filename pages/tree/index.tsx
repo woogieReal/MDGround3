@@ -1,11 +1,10 @@
 import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
-import { Box, Button, Tabs, Tab, Typography, AppBar, Toolbar, IconButton } from '@mui/material'
+import { Box, Button, Tabs, Tab, AppBar, IconButton } from '@mui/material'
 import type { NextPage } from 'next'
 import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TabPanel from '@/components/common/atoms/tabPanel'
 import { TEST_USER_ID, Tree, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -69,7 +68,7 @@ const Home: NextPage = () => {
         }
       }, 150)
     }
-  }
+  };
 
   const handleTreeDoubleClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
@@ -82,12 +81,7 @@ const Home: NextPage = () => {
         }
       }
     }
-  }
-
-  const handleClickDeleteTab = (targetTabNum: number) => {
-    targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
-    setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
-  }
+  };
 
   const deleteTabByTreeId = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
@@ -96,6 +90,11 @@ const Home: NextPage = () => {
         handleClickDeleteTab(targetTabNum)
       }
     }
+  };
+
+  const handleClickDeleteTab = (targetTabNum: number) => {
+    targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
+    setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
   }
 
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
@@ -178,7 +177,7 @@ const Home: NextPage = () => {
       <DrawerSection
         open={drawerOpen}
         drawerWidth={drawerWidth}
-        verticalTabVaue={verticalTabVaue}
+        setFiles={setFiles}
         handleTreeClick={handleTreeClick}
         handleTreeDoubleClick={handleTreeDoubleClick}
         deleteTabByTreeId={deleteTabByTreeId}
