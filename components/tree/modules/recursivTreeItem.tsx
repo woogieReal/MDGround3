@@ -55,6 +55,8 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
   // 트리 우클릭
   const handleContextMenu = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setContextEvent(e);
     setMethod(MethodTypeForRecursivTreeItem.OPEN_CONTEXT, treeData)
   }

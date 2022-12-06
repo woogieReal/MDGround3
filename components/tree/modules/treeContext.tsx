@@ -11,7 +11,7 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
 import { validateDeleteTree, validateRenameTree } from "@/src/utils/tree/validation";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { createTreeFullPath } from "@/src/utils/tree/treeUtil";
+import { checkInitalTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -19,10 +19,10 @@ interface Props {
   anchorEl: HTMLElement | null;
   isShow: boolean;
   hide(): void;
-  targetTree?: Tree
+  targetTree: Tree
   clickCreate(tree: Tree): void;
-  clickRename?(tree: Tree): void;
-  afterDelete?(tree: Tree): void;
+  clickRename(tree: Tree): void;
+  afterDelete(tree: Tree): void;
 }
 const TreeContext = ({ anchorEl, isShow, hide, targetTree, afterDelete, clickCreate, clickRename }: Props) => {
   const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
@@ -30,17 +30,22 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, afterDelete, clickCre
 
   const deleteTree = useMutation(async () => await ApiHandler.callApi(ApiName.DELETE_TREE, null, { ...deleteTargetTree, userId: TEST_USER_ID }, deleteTargetTree?.treeId!), {
     onSuccess(res: AxiosResponse) {
-      afterDelete!(deleteTargetTree!);
+      afterDelete(deleteTargetTree!);
       setIsReadyToDelete(false);
     },
   });
 
   const handleClickCreate = (treeType: TreeType) => {
-    clickCreate({ ...InitialTree, treeType: treeType, treePath: createTreeFullPath(targetTree), treeStatus: TreeStatusInfo.CREATE });
+    clickCreate({
+      ...InitialTree,
+      treeType: treeType,
+      treePath: checkInitalTree(targetTree) ? '' : createTreeFullPath(targetTree),
+      treeStatus: TreeStatusInfo.CREATE
+    });
   }
 
   const handleClickRename = () => {
-    clickRename!({ ...targetTree!, treeStatus: TreeStatusInfo.RENAME });
+    clickRename({ ...targetTree!, treeStatus: TreeStatusInfo.RENAME });
     hide();
   }
 
@@ -118,7 +123,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, afterDelete, clickCre
         >
           <Box>
             <List>
-              {targetTree ?
+              {!checkInitalTree(targetTree) ?
                 <>
                   {
                     targetTree.treeType === TreeType.FORDER ?

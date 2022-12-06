@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem, TreeStatusInfo } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -41,17 +41,23 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
   const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
 
-  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
+  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree?: Tree) => {
     setMethodType(methodType);
-    setMethodTargetTree(methodTargetTree);
+    methodTargetTree && setMethodTargetTree(methodTargetTree);
   }
 
   // 컨텍스트
   const [contextEvent, setContextEvent] = useState<React.BaseSyntheticEvent | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
+  const handleContextMenuForDrawer = (e: React.BaseSyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAnchorEl(e.target);
+    setMethodTargetTree(InitialTree);
+  }
 
-  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
+  const handleContextMenuForTreeItem = (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.target);
@@ -80,10 +86,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
     if (!checkInitalTree(methodTargetTree)) {
       switch (methodType) {
         case MethodTypeForRecursivTreeItem.OPEN_CONTEXT:
-          handleContextMenu(contextEvent!);
+          handleContextMenuForTreeItem(contextEvent!);
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          setTrees(addTreeToTrees(trees, methodTargetTree, false));
+          const isRootFolderTree = methodTargetTree.treePath === '' && methodTargetTree.treeType === TreeType.FORDER && methodTargetTree.treeStatus !== TreeStatusInfo.CREATE;
+          setTrees(addTreeToTrees(trees, methodTargetTree, isRootFolderTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
@@ -111,9 +118,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   }, [methodType, methodTargetTree, contextEvent])
 
   return (
-    <Box
-      id={styles.resizableContainer}
-    >
+    <Box id={styles.resizableContainer}>
       <Drawer
         id={styles.resizableDrawer}
         sx={{
@@ -128,6 +133,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
         anchor="left"
         transitionDuration={0}
         open={open}
+        onContextMenu={handleContextMenuForDrawer}
       >
         <Box sx={{ height: styles.appHeaderHeightPX }}>
 
