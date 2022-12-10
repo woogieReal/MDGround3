@@ -34,14 +34,14 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
-  const [currentTabTreeId, setTreeId] = useState<number>(0);
+  const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
   const [editContentTree, setEditContentTree] = useState<Tree>(InitialTree);
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
   const cleanAllState = () => {
     setEachTabContent(new Map());
     setEachTabPreview(new Map());
-    setTreeId(0);
+    setCurrentTabTreeId(0);
   }
 
   const handlChangeContent = (e: any) => {
@@ -77,7 +77,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     if (files[fileTabVaue]) {
       const targetTreeId = files[fileTabVaue].treeId;
-      setTreeId(targetTreeId);
+      setCurrentTabTreeId(targetTreeId);
 
       const currentEachTabContent = new Map(eachTabContent);
       const currentEachTabPreview = new Map(eachTabPreview);
