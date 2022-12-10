@@ -18,6 +18,7 @@ import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/validation';
 import { AxiosResponse } from 'axios';
+import { cloneDeep } from "lodash";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -34,15 +35,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
-  const [currentTabTreeId, setTreeId] = useState<number>(0);
+  const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
   const [editContentTree, setEditContentTree] = useState<Tree>(InitialTree);
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
-
-  const cleanAllState = () => {
-    setEachTabContent(new Map());
-    setEachTabPreview(new Map());
-    setTreeId(0);
-  }
 
   const handlChangeContent = (e: any) => {
     const currentEachTabContent = new Map(eachTabContent);
@@ -77,10 +72,10 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     if (files[fileTabVaue]) {
       const targetTreeId = files[fileTabVaue].treeId;
-      setTreeId(targetTreeId);
+      setCurrentTabTreeId(targetTreeId);
 
-      const currentEachTabContent = new Map(eachTabContent);
-      const currentEachTabPreview = new Map(eachTabPreview);
+      const currentEachTabContent = cloneDeep(eachTabContent);
+      const currentEachTabPreview = cloneDeep(eachTabPreview);
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
@@ -92,10 +87,28 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       }
 
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
-    } else {
-      cleanAllState();
     }
   }, [files[fileTabVaue]]);
+
+  useEffect(() => {
+    const checkTabClosed = (): boolean => files.length < eachTabContent.size;
+
+    if (checkTabClosed()) {
+      const currentEachTabContent = cloneDeep(eachTabContent);
+      const currentEachTabPreview = cloneDeep(eachTabPreview);
+
+      const treeIdsBeforeTabClosed = Array.from(currentEachTabContent.keys());
+      const treeIdsAfterTabClosed = files.map((file: Tree) => file.treeId);
+
+      const tabClosedTreeId = treeIdsBeforeTabClosed.find((treeId: number) => !treeIdsAfterTabClosed.includes(treeId));
+
+      currentEachTabContent.delete(tabClosedTreeId!);
+      currentEachTabPreview.delete(tabClosedTreeId!);
+
+      setEachTabContent(currentEachTabContent);
+      setEachTabPreview(currentEachTabPreview);
+    }
+  }, [files]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
