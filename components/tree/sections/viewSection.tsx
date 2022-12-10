@@ -18,6 +18,7 @@ import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/validation';
 import { AxiosResponse } from 'axios';
+import { cloneDeep } from "lodash";
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -73,8 +74,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       const targetTreeId = files[fileTabVaue].treeId;
       setCurrentTabTreeId(targetTreeId);
 
-      const currentEachTabContent = new Map(eachTabContent);
-      const currentEachTabPreview = new Map(eachTabPreview);
+      const currentEachTabContent = cloneDeep(eachTabContent);
+      const currentEachTabPreview = cloneDeep(eachTabPreview);
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
@@ -88,6 +89,26 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
     }
   }, [files[fileTabVaue]]);
+
+  useEffect(() => {
+    const checkTabClosed = (): boolean => files.length < eachTabContent.size;
+
+    if (checkTabClosed()) {
+      const currentEachTabContent = cloneDeep(eachTabContent);
+      const currentEachTabPreview = cloneDeep(eachTabPreview);
+
+      const treeIdsBeforeTabClosed = Array.from(currentEachTabContent.keys());
+      const treeIdsAfterTabClosed = files.map((file: Tree) => file.treeId);
+
+      const tabClosedTreeId = treeIdsBeforeTabClosed.find((treeId: number) => !treeIdsAfterTabClosed.includes(treeId));
+
+      currentEachTabContent.delete(tabClosedTreeId!);
+      currentEachTabPreview.delete(tabClosedTreeId!);
+
+      setEachTabContent(currentEachTabContent);
+      setEachTabPreview(currentEachTabPreview);
+    }
+  }, [files]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
