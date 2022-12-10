@@ -38,12 +38,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [editContentTree, setEditContentTree] = useState<Tree>(InitialTree);
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
-  const cleanAllState = () => {
-    setEachTabContent(new Map());
-    setEachTabPreview(new Map());
-    setCurrentTabTreeId(0);
-  }
-
   const handlChangeContent = (e: any) => {
     const currentEachTabContent = new Map(eachTabContent);
     currentEachTabContent.set(currentTabTreeId, e as string);
@@ -92,8 +86,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       }
 
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
-    } else {
-      cleanAllState();
     }
   }, [files[fileTabVaue]]);
 
