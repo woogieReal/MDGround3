@@ -53,6 +53,7 @@ const Home: NextPage = () => {
 
   const handleDrawerShow = (tabNum: number) => {
     if (verticalTabVaue === tabNum) {
+      !drawerOpen && drawerWidth === 0 && setDrawerWidth(MIN_DRAWER_WIDTH);
       setDrawerOpen(!drawerOpen);
     }
   };
@@ -113,7 +114,14 @@ const Home: NextPage = () => {
     const startPosition = mouseDownEvent.pageX;
 
     const onMouseMove = (mouseMoveEvent: any) => {
-      setDrawerWidth(startSize - startPosition + mouseMoveEvent.pageX);
+      const width = startSize - startPosition + mouseMoveEvent.pageX;
+      if (width > 0) {
+        setDrawerOpen(true);
+        setDrawerWidth(width);
+      } else {
+        setDrawerOpen(false);
+        setDrawerWidth(0);
+      }
     }
     const onMouseUp = () => {
       document.body.removeEventListener("mousemove", onMouseMove);
@@ -182,7 +190,7 @@ const Home: NextPage = () => {
         handleTreeDoubleClick={handleTreeDoubleClick}
         deleteTabByTreeId={deleteTabByTreeId}
       />
-      {drawerOpen && <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />}
+      <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />
       <TabPanel value={verticalTabVaue} index={0}>
         <ViewSection
           open={drawerOpen}
