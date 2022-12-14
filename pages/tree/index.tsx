@@ -6,7 +6,7 @@ import { useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import TabPanel from '@/components/common/atoms/tabPanel'
-import { TEST_USER_ID, Tree, TreeType } from '@/src/models/tree.model'
+import { TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from '@/src/models/tree.model'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo'
 import ApiHandler from '@/src/apis/apiHandler'
@@ -16,6 +16,7 @@ import { CommonQueryOptions } from '@/src/apis/reactQuery'
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { removeTargetIndexDataFromArray } from '@/src/utils/common/arrayUtil'
 import { oneMinusUnlessZero } from '@/src/utils/common/numberUtil'
+import { cloneDeep } from 'lodash'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -43,6 +44,8 @@ const Home: NextPage = () => {
   const [files, setFiles] = useState<Tree[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
 
+  const [treeStatusInfo, setTreeStatusInfo] = useState<TreeStatusInfo>(TreeStatusInfo.DEFAULT);
+
   const handleVerticalTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setVerticalTabVaue(newValue);
   };
@@ -58,14 +61,30 @@ const Home: NextPage = () => {
     }
   };
 
-  const handleTreeClick = (data: Tree) => {
+  const openNewFile = (data: Tree) => {
+    const newFileTabValue = files[fileTabVaue]?.treeStatus === TreeStatusInfo.TEMP_READ ? fileTabVaue : files.length;
+    setFileTabVaue(newFileTabValue);
+    setSelectedFile(data);
+  }
+
+  const setTempReadFileToDefault = () => {
+    if (files[fileTabVaue].treeStatus === TreeStatusInfo.TEMP_READ) {
+      const copyFiles = cloneDeep(files);
+      copyFiles[fileTabVaue].treeStatus = TreeStatusInfo.DEFAULT;
+      setFiles(copyFiles);
+    }
+  }
+
+  const handleTreeClick = (data: Tree, isFromDoubleClick = false) => {
     if (data.treeType === TreeType.FILE) {
+      !isFromDoubleClick && setTreeStatusInfo(TreeStatusInfo.TEMP_READ);
       setTimeout(() => {
         const tabValue = selectedFileIds.indexOf(data.treeId);
         if (tabValue >= 0) {
           setFileTabVaue(tabValue);
+          isFromDoubleClick && setTempReadFileToDefault();
         } else {
-          setSelectedFile(data);
+          openNewFile(data);
         }
       }, 150)
     }
@@ -73,12 +92,14 @@ const Home: NextPage = () => {
 
   const handleTreeDoubleClick = (data: Tree) => {
     if (data.treeType === TreeType.FILE) {
+      setTreeStatusInfo(TreeStatusInfo.DEFAULT);
       if (files.length === 0) {
-        handleTreeClick(data);
+        handleTreeClick(data, true);
       } else {
-        if (!selectedFileIds.includes(data.treeId)) {
-          setSelectedFile(data);
-          setFileTabVaue(files.length);
+        if (selectedFileIds.includes(data.treeId)) {
+          handleTreeClick(data, true);
+        } else {
+          openNewFile(data);
         }
       }
     }
@@ -104,7 +125,7 @@ const Home: NextPage = () => {
     onSuccess(res: AxiosResponse) {
       if (res) {
         const updatedFiles = [...files];
-        updatedFiles[fileTabVaue] = res.data;
+        updatedFiles[fileTabVaue] = { ...res.data, treeStatus: treeStatusInfo };
         setFiles(updatedFiles);
       }
     },
@@ -174,7 +195,7 @@ const Home: NextPage = () => {
             <Tab key={`${index}-${file.treeId}`} {...a11yProps(index)} component={() => (
               <Box className={styles.fileTabBox}>
                 <Button
-                  className={styles.fileTabButton}
+                  className={`${styles.fileTabButton} ${file.treeStatus === TreeStatusInfo.TEMP_READ && styles.tempRead}`}
                   sx={{ color: 'inherit', font: 'inherit' }}
                   onClick={() => setFileTabVaue(index)}
                 >

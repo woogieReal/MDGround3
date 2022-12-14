@@ -20,6 +20,7 @@ export enum TreeStatusInfo {
   CREATE = 'create',
   EDIT_CONTENT = 'editContent',
   RENAME = 'rename',
+  TEMP_READ = 'tempRead'
 }
 
 export const InitialTree: Tree = {

@@ -45,6 +45,10 @@ $resizeButtonWidhthPX: 12px;
 
     .fileTabButton {
       text-transform: none;
+
+      &.tempRead {
+        font-style: italic;
+      }
     }
   }
 }
