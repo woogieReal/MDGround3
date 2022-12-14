@@ -23,7 +23,7 @@ export enum TreeStatusInfo {
 }
 
 export const InitialTree: Tree = {
-  treeId: 0,
+  treeId: -1,
   treeType: TreeType.FILE,
   treeName: '',
   treeContent: '',
