@@ -39,8 +39,14 @@ $resizeButtonWidhthPX: 12px;
   outline: 0;
 }
 
-.fileTabBox {
-  margin-top: 5px;
+#fileTabSection {
+  .fileTabBox {
+    margin-top: 5px;
+
+    .fileTabButton {
+      text-transform: none;
+    }
+  }
 }
 
 #treeSection {

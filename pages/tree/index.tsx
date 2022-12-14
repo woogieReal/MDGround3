@@ -154,6 +154,7 @@ const Home: NextPage = () => {
         {/* <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} /> */}
       </Tabs>
       <AppBar
+        id={styles.fileTabSection}
         component="nav"
         color='inherit'
         sx={{
@@ -172,7 +173,11 @@ const Home: NextPage = () => {
           {files?.map((file: Tree, index: number) => (
             <Tab key={`${index}-${file.treeId}`} {...a11yProps(index)} component={() => (
               <Box className={styles.fileTabBox}>
-                <Button sx={{ color: 'inherit', font: 'inherit' }} onClick={() => setFileTabVaue(index)}>
+                <Button
+                  className={styles.fileTabButton}
+                  sx={{ color: 'inherit', font: 'inherit' }}
+                  onClick={() => setFileTabVaue(index)}
+                >
                   {file.treeName}
                 </Button>
                 <IconButton size="small" onClick={() => handleClickDeleteTab(file, index)} >
