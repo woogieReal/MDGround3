@@ -106,6 +106,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           break;
         case MethodTypeForRecursivTreeItem.CLICK:
           handleTreeClick(methodTargetTree);
+          setMethodTargetTree(InitialTree);
           break;
         case MethodTypeForRecursivTreeItem.DOUBLE_CLICK:
           handleTreeDoubleClick(methodTargetTree);

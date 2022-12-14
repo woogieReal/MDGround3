@@ -88,13 +88,14 @@ const Home: NextPage = () => {
     if (data.treeType === TreeType.FILE) {
       const targetTabNum = files.findIndex((file: Tree) => file.treeId === data.treeId);
       if (targetTabNum >= 0) {
-        handleClickDeleteTab(targetTabNum)
+        handleClickDeleteTab(data, targetTabNum)
       }
     }
   };
 
-  const handleClickDeleteTab = (targetTabNum: number) => {
+  const handleClickDeleteTab = (data: Tree, targetTabNum: number) => {
     targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
+    data.treeId === selectedFile?.treeId && setSelectedFile(null);
     setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
   }
 
@@ -174,7 +175,7 @@ const Home: NextPage = () => {
                 <Button sx={{ color: 'inherit', font: 'inherit' }} onClick={() => setFileTabVaue(index)}>
                   {file.treeName}
                 </Button>
-                <IconButton size="small" onClick={() => handleClickDeleteTab(index)} >
+                <IconButton size="small" onClick={() => handleClickDeleteTab(file, index)} >
                   <ClearOutlinedIcon fontSize="inherit" />
                 </IconButton>
               </Box>
