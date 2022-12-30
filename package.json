@@ -6,9 +6,9 @@
     "dev": "next dev -p 3600",
     "build": "next build",
     "start": "next start",
-    "migrate:prod": "node src/sqls/index.mjs prod",
-    "migrate:dev": "node src/sqls/index.mjs dev",
-    "migrate:clean": "node src/sqls/index.mjs clean",
+    "migrate:init:prod": "docker exec MDGround3-service node src/sqls/index.mjs prod",
+    "migrate:init:dev": "docker exec MDGround3-service node src/sqls/index.mjs dev",
+    "migrate:clean": "docker exec MDGround3-service node src/sqls/index.mjs clean",
     "lint": "next lint"
   },
   "dependencies": {
