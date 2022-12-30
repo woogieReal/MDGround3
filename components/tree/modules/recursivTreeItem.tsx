@@ -208,10 +208,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   // -- 기존 트리 이름 수정
 
   return (
-    <Box
-      className={`${styles.treeItemBox}`}
-      sx={{ display: 'inline-block' }}
-    >
+    <Box className={`${styles.treeItemBox}`}>
       <TextField
         size="small"
         variant="outlined"
@@ -251,7 +248,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   )
 }
 
-const checkIsEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
+const checkEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
   const isEqual = (
     next.treeItem.treeStatus !== TreeStatusInfo.RE_RENDER
     && prev.treeItem === next.treeItem
@@ -272,4 +269,4 @@ const checkIsEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => 
  * drawer 너비 조정 시 재귀함수로 생성된 모든 RecursivTreeItem가 rerender됨
  * 성능문제를 해결하기 위해 React.memo 사용 
  */
-export default React.memo(RecursivTreeItem, checkIsEqual)
+export default React.memo(RecursivTreeItem, checkEqual)
