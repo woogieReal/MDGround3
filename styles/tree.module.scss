@@ -60,8 +60,10 @@ $resizeButtonWidhthPX: 12px;
     
     div {
       vertical-align: text-bottom;
-  
+
       &.readOnly {
+        width: 100%;
+
         &:hover {
           background-color: #EEE7E5;
         }
@@ -72,7 +74,8 @@ $resizeButtonWidhthPX: 12px;
           input[type="text"] {
             cursor: pointer;
             padding: 0px 5px;
-            -webkit-text-fill-color: black
+            -webkit-text-fill-color: black;
+            width: 100%;
           }
           
           fieldset {
@@ -83,6 +86,7 @@ $resizeButtonWidhthPX: 12px;
       }
 
       &.editable {
+        width: 100%;
 
         & > div {
 
