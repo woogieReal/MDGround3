@@ -9,6 +9,9 @@
     "migrate:prod": "node src/sqls/index.mjs prod",
     "migrate:dev": "node src/sqls/index.mjs dev",
     "migrate:clean": "node src/sqls/index.mjs clean",
+    "flyway:init:prod": "docker exec -it $(docker ps --filter 'name=MDGround3-service' --format '{{.ID}}') npm run migrate:prod",
+    "flyway:init:dev": "docker exec -it $(docker ps --filter 'name=MDGround3-service' --format '{{.ID}}') npm run migrate:dev",
+    "flyway:clean": "docker exec -it $(docker ps --filter 'name=MDGround3-service' --format '{{.ID}}') npm run migrate:clean",
     "lint": "next lint"
   },
   "dependencies": {
