@@ -21,7 +21,7 @@ interface Props {
   setTrees: Dispatch<SetStateAction<Tree[]>>
   setMethodType: Dispatch<SetStateAction<MethodTypeForRecursivTreeItem>>
   setMethodTargetTree: Dispatch<SetStateAction<Tree>>
-  setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent | null>>
+  setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent<MouseEvent> | null>>
 }
 const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
@@ -54,7 +54,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   // -- 트리 클릭
 
   // 트리 우클릭
-  const handleContextMenu = (e: React.BaseSyntheticEvent) => {
+  const handleContextMenu = (e: React.BaseSyntheticEvent<MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
     setContextEvent(e);
