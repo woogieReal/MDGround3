@@ -49,18 +49,21 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   // 컨텍스트
   const [contextEvent, setContextEvent] = useState<React.BaseSyntheticEvent<MouseEvent> | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [mousePosition, setMousePosition] = useState({ left: 0, top: 0 });
 
   const handleContextMenuForDrawer = (e: React.BaseSyntheticEvent<MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.target);
     setMethodTargetTree(InitialTree);
+    setMousePosition({ left: e.nativeEvent.clientX, top: e.nativeEvent.clientY });
   }
 
   const handleContextMenuForTreeItem = (e: React.BaseSyntheticEvent<MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.target);
+    setMousePosition({ left: 0, top: 0 });
   }
 
   const handleClosePopup = () => {
@@ -158,6 +161,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           isShow={Boolean(anchorEl)}
           hide={handleClosePopup}
           targetTree={methodTargetTree}
+          mousePosition={mousePosition}
           clickCreate={clickCreateForContext}
           clickRename={clickRenameForContext}
           afterDelete={afterDeleteForContext}

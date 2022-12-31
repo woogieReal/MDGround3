@@ -20,11 +20,12 @@ interface Props {
   isShow: boolean;
   hide(): void;
   targetTree: Tree
+  mousePosition: { left: number, top: number };
   clickCreate(tree: Tree): void;
   clickRename(tree: Tree): void;
   afterDelete(tree: Tree): void;
 }
-const TreeContext = ({ anchorEl, isShow, hide, targetTree, afterDelete, clickCreate, clickRename }: Props) => {
+const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterDelete, clickCreate, clickRename }: Props) => {
   const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
   const [isReadyToDelete, setIsReadyToDelete] = useState<boolean>(false);
 
@@ -114,6 +115,8 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, afterDelete, clickCre
         <Popover
           id={String(targetTree?.treeId)}
           open={isShow}
+          anchorReference={!checkInitalTree(targetTree) ? "anchorEl" : "anchorPosition"}
+          anchorPosition={{ left: mousePosition.left, top: mousePosition.top }}
           anchorEl={anchorEl}
           onClose={hide}
           anchorOrigin={{
