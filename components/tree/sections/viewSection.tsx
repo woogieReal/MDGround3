@@ -108,7 +108,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       setEachTabContent(currentEachTabContent);
       setEachTabPreview(currentEachTabPreview);
     }
-  }, [files]);
+  }, [files.length]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
