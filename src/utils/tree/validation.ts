@@ -73,8 +73,6 @@ export const validateRenameTree = (tree: Tree): ValidationResponse => {
   };
   validating: try {
     const processedTree: Tree = { ...tree, treeName: tree.treeName.trim() };
-    delete processedTree.treeContent;
-    delete processedTree.treeChildren;
 
     if (processedTree.treeId <= 0) break validating;
     if (!processedTree.treeName) break validating;
