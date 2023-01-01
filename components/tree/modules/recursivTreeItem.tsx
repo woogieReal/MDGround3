@@ -44,6 +44,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
 
   const handleTreeClickItem = () => {
+    if (isTreeNameEditable) return;
     treeData.treeType === TreeType.FORDER && setIsShowChildrenTree(show => !show);
     setMethod(MethodTypeForRecursivTreeItem.CLICK, treeData);
   }
