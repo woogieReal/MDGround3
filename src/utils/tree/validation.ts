@@ -1,89 +1,27 @@
 import { Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import { ValidationResponse } from "@/src/models/validation.model";
+import { validateExecutor } from "../common/commonValidation";
 
-export const validateCreateTree = (tree: Tree): ValidationResponse => {
-  const response: ValidationResponse = {
-    isValid: false,
-    processedData: tree,
-  };
-  validating: try {
-    const processedTree: Tree = { ...tree, treeName: tree.treeName.trim() };
+export const validateCreateTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
+  return validateExecutor(tree, ['treeName'], (processedData: T): Array<boolean> => {
+    return [!processedData.treeName, ![...Object.values(TreeType)].includes(processedData.treeType)];
+  })
+}
 
-    if (!processedTree.treeName) break validating;
-    if (![...Object.values(TreeType)].includes(processedTree.treeType)) break validating;
+export const validateEditContentTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
+  return validateExecutor(tree, [], (processedData: T): Array<boolean> => {
+    return [processedData.treeId <= 0, !processedData.hasOwnProperty('treeContent')];
+  })
+}
 
-    response.isValid = true;
-    response.processedData = processedTree;
-  } catch (err) {
-    throw err;
-  }
+export const validateDeleteTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
+  return validateExecutor(tree, [], (processedData: T): Array<boolean> => {
+    return [processedData.treeId <= 0, ![...Object.values(TreeType)].includes(processedData.treeType)];
+  })
+}
 
-  return response;
-};
-
-export const validateEditContentTree = (tree: Tree): ValidationResponse => {
-  const response: ValidationResponse = {
-    isValid: false,
-    processedData: tree,
-  };
-  validating: try {
-    const processedTree: Tree = { ...tree };
-    delete processedTree.treeChildren;
-
-    if (processedTree.treeId <= 0) break validating;
-    if (!processedTree.hasOwnProperty('treeContent')) break validating;
-
-    processedTree.treeStatus = TreeStatusInfo.EDIT_CONTENT;
-
-    response.isValid = true;
-    response.processedData = processedTree;
-  } catch (err) {
-    throw err;
-  }
-
-  return response;
-};
-
-export const validateDeleteTree = (tree: Tree): ValidationResponse => {
-  const response: ValidationResponse = {
-    isValid: false,
-    processedData: tree,
-  };
-  validating: try {
-    const processedTree: Tree = { ...tree };
-    delete processedTree.treeContent;
-    delete processedTree.treeChildren;
-
-    if (processedTree.treeId <= 0) break validating;
-    if (![...Object.values(TreeType)].includes(processedTree.treeType)) break validating;
-
-    response.isValid = true;
-    response.processedData = processedTree;
-  } catch (err) {
-    throw err;
-  }
-
-  return response;
-};
-
-export const validateRenameTree = (tree: Tree): ValidationResponse => {
-  const response: ValidationResponse = {
-    isValid: false,
-    processedData: tree,
-  };
-  validating: try {
-    const processedTree: Tree = { ...tree, treeName: tree.treeName.trim() };
-
-    if (processedTree.treeId <= 0) break validating;
-    if (!processedTree.treeName) break validating;
-
-    processedTree.treeStatus = TreeStatusInfo.RENAME;
-
-    response.isValid = true;
-    response.processedData = processedTree;
-  } catch (err) {
-    throw err;
-  }
-
-  return response;
+export const validateRenameTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
+  return validateExecutor(tree, ['treeName'], (processedData: T): Array<boolean> => {
+    return [processedData.treeId <= 0, !processedData.treeName];
+  })
 };
