@@ -56,7 +56,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
   }
 
   const checkReadyToDelete = () => {
-    const response: ValidationResponse = validateDeleteTree(targetTree!);
+    const response: ValidationResponse<Tree> = validateDeleteTree(targetTree!);
     setDeleteTargetTree(response.processedData);
     setIsReadyToDelete(response.isValid);
   }

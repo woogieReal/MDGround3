@@ -68,7 +68,7 @@ const TreeNameInput = ({ isShow, setIsShow, targetTree, uppertree, sameDepthTree
   }
 
   const checkReadyToCreate = () => {
-    const response: ValidationResponse = validateCreateTree(newTree);
+    const response: ValidationResponse<Tree> = validateCreateTree(newTree);
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
   }
