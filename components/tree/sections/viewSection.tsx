@@ -2,7 +2,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
-import { InitialTree, TEST_USER_ID, Tree } from '@/src/models/tree.model';
+import { InitialTree, TEST_USER_ID, Tree, TreeStatusInfo } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import dynamic from "next/dynamic";
@@ -16,7 +16,7 @@ import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';
 import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
-import { validateEditContentTree } from '@/src/utils/tree/validation';
+import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 
@@ -49,7 +49,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     isCtrlEnter(e) && checkReadyToEditContent();
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
     },
@@ -60,7 +60,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }
 
   const checkReadyToEditContent = () => {
-    const response: ValidationResponse = validateEditContentTree({ ...files[fileTabVaue], treeContent: eachTabContent.get(currentTabTreeId) });
+    const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: eachTabContent.get(currentTabTreeId) });
     setEditContentTree(response.processedData);
     setIsReadyToContentTree(response.isValid);
   }

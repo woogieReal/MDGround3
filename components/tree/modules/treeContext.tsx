@@ -9,7 +9,7 @@ import { AxiosResponse } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
-import { validateDeleteTree } from "@/src/utils/tree/validation";
+import { validateDeleteTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { checkInitalTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
@@ -56,7 +56,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
   }
 
   const checkReadyToDelete = () => {
-    const response: ValidationResponse = validateDeleteTree(targetTree!);
+    const response: ValidationResponse<Tree> = validateDeleteTree(targetTree!);
     setDeleteTargetTree(response.processedData);
     setIsReadyToDelete(response.isValid);
   }

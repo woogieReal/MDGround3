@@ -11,7 +11,7 @@ import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
 import { isEnter } from "@/src/utils/common/keyPressUtil";
-import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/validation";
+import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { cloneDeep } from "lodash";
 
@@ -168,7 +168,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
 
   const checkReadyToCreate = () => {
-    const response: ValidationResponse = validateCreateTree(treeData);
+    const response: ValidationResponse<Tree> = validateCreateTree(treeData);
     setTreeData(response.processedData)
     setIsReadyToCreate(response.isValid);
   }
@@ -180,7 +180,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
   // 기존 트리 이름 수정
   const [isReadyToRename, setIsReadyToRename] = useState<boolean>(false);
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...treeData, userId: TEST_USER_ID, }, treeData.treeId), {
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...treeData, treeStatus: TreeStatusInfo.RENAME, userId: TEST_USER_ID, }, treeData.treeId), {
     onSuccess(res: AxiosResponse) {
       handleAfterRename();
     },
@@ -198,7 +198,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
 
   const checkReadyToRename = () => {
-    const response: ValidationResponse = validateRenameTree(treeData);
+    const response: ValidationResponse<Tree> = validateRenameTree(treeData);
     setTreeData(response.processedData)
     setIsReadyToRename(response.isValid);
   }

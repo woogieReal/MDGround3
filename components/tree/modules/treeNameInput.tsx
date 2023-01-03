@@ -5,7 +5,7 @@ import { InitialTree, TEST_USER_ID, Tree, TreeType } from "@/src/models/tree.mod
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import styles from '@/styles/tree.module.scss'
 import { isEnter } from "@/src/utils/common/keyPressUtil";
-import { validateCreateTree } from "@/src/utils/tree/validation";
+import { validateCreateTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
@@ -68,7 +68,7 @@ const TreeNameInput = ({ isShow, setIsShow, targetTree, uppertree, sameDepthTree
   }
 
   const checkReadyToCreate = () => {
-    const response: ValidationResponse = validateCreateTree(newTree);
+    const response: ValidationResponse<Tree> = validateCreateTree(newTree);
     setNewTree(response.processedData);
     setIsReadyToCreate(response.isValid);
   }
