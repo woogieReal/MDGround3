@@ -1,4 +1,4 @@
-import { Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
+import { Tree, TreeType } from "@/src/models/tree.model";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { validateExecutor } from "../common/commonValidation";
 

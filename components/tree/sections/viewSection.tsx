@@ -16,7 +16,7 @@ import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';
 import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
-import { validateEditContentTree } from '@/src/utils/tree/validation';
+import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 

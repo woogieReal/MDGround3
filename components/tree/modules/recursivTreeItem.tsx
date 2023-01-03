@@ -11,7 +11,7 @@ import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
 import { isEnter } from "@/src/utils/common/keyPressUtil";
-import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/validation";
+import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { cloneDeep } from "lodash";
 
