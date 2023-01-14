@@ -33,32 +33,59 @@ const Home: NextPage = () => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
   const [drawerWidth, setDrawerWidth] = useState<number>(MIN_DRAWER_WIDTH);
 
-  // appBar
-  const [appBarLeft, setAppBarLeft] = useState<number>(APP_BAR_LEFT);
-
-  // tabs
-  const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
-  const [fileTabVaue, setFileTabVaue] = useState<number>(0);
-
-  const [selectedFile, setSelectedFile] = useState<Tree | null>(null);
-  const [files, setFiles] = useState<Tree[]>([]);
-  const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
-
-  const [treeStatusInfo, setTreeStatusInfo] = useState<TreeStatusInfo>(TreeStatusInfo.DEFAULT);
-
-  const handleVerticalTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setVerticalTabVaue(newValue);
-  };
-
-  const handleFileTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setFileTabVaue(newValue);
-  };
-
   const handleDrawerShow = (tabNum: number) => {
     if (verticalTabVaue === tabNum) {
       !drawerOpen && drawerWidth === 0 && setDrawerWidth(MIN_DRAWER_WIDTH);
       setDrawerOpen(!drawerOpen);
     }
+  };
+
+  const drawerResizeHandler = (mouseDownEvent: any) => {
+    const startSize = drawerWidth;
+    const startPosition = mouseDownEvent.pageX;
+
+    const onMouseMove = (mouseMoveEvent: any) => {
+      const width = startSize - startPosition + mouseMoveEvent.pageX;
+      if (width > 0) {
+        setDrawerOpen(true);
+        setDrawerWidth(width);
+      } else {
+        setDrawerOpen(false);
+        setDrawerWidth(0);
+      }
+    }
+    const onMouseUp = () => {
+      document.body.removeEventListener("mousemove", onMouseMove);
+    }
+
+    document.body.addEventListener("mousemove", onMouseMove);
+    document.body.addEventListener("mouseup", onMouseUp, { once: true });
+  };
+
+  useEffect(() => {
+    setAppBarLeft(drawerOpen ? drawerWidth + Number(styles.verticalTabWidth) : Number(styles.verticalTabWidth))
+  }, [drawerOpen, drawerWidth])
+  // -- drawer
+
+  // appBar
+  const [appBarLeft, setAppBarLeft] = useState<number>(APP_BAR_LEFT);
+
+  // 좌측 수직 탭
+  const [verticalTabVaue, setVerticalTabVaue] = useState<number>(0);
+
+  const handleVerticalTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setVerticalTabVaue(newValue);
+  };
+
+  // 상단 평행 탭 (파일)
+  const [fileTabVaue, setFileTabVaue] = useState<number>(0);
+  const [selectedFile, setSelectedFile] = useState<Tree | null>(null);
+  const [files, setFiles] = useState<Tree[]>([]);
+  const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
+  const [treeStatusInfo, setTreeStatusInfo] = useState<TreeStatusInfo>(TreeStatusInfo.DEFAULT);
+
+  const handleFileTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setFileTabVaue(newValue);
   };
 
   const openNewFile = (data: Tree) => {
@@ -120,6 +147,12 @@ const Home: NextPage = () => {
     setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
   }
 
+  useEffect(() => {
+    setSelectedFileIds(files.map((file: Tree) => file.treeId))
+  }, [files])
+  // -- 상단 평행 탭 (파일)
+
+  // API 호출
   const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
@@ -131,38 +164,9 @@ const Home: NextPage = () => {
     },
   });
 
-  const drawerResizeHandler = (mouseDownEvent: any) => {
-    const startSize = drawerWidth;
-    const startPosition = mouseDownEvent.pageX;
-
-    const onMouseMove = (mouseMoveEvent: any) => {
-      const width = startSize - startPosition + mouseMoveEvent.pageX;
-      if (width > 0) {
-        setDrawerOpen(true);
-        setDrawerWidth(width);
-      } else {
-        setDrawerOpen(false);
-        setDrawerWidth(0);
-      }
-    }
-    const onMouseUp = () => {
-      document.body.removeEventListener("mousemove", onMouseMove);
-    }
-
-    document.body.addEventListener("mousemove", onMouseMove);
-    document.body.addEventListener("mouseup", onMouseUp, { once: true });
-  };
-
-  useEffect(() => {
-    setAppBarLeft(drawerOpen ? drawerWidth + Number(styles.verticalTabWidth) : Number(styles.verticalTabWidth))
-  }, [drawerOpen, drawerWidth])
-
-  useEffect(() => {
-    setSelectedFileIds(files.map((file: Tree) => file.treeId))
-  }, [files])
-
   return (
     <Box sx={{ display: 'flex' }}>
+      {/* 좌측 수직 탭 */}
       <Tabs
         orientation="vertical"
         variant="scrollable"
@@ -174,6 +178,8 @@ const Home: NextPage = () => {
         <Tab icon={<MenuIcon />} {...a11yProps(0)} onClick={() => handleDrawerShow(0)} />
         {/* <Tab icon={<SearchOutlinedIcon />} {...a11yProps(1)} onClick={() => handleDrawerShow(1)} /> */}
       </Tabs>
+
+      {/* 상단 평행 탭 (파일) */}
       <AppBar
         id={styles.fileTabSection}
         component="nav"
@@ -209,6 +215,8 @@ const Home: NextPage = () => {
           ))}
         </Tabs>
       </AppBar>
+
+      {/* drawer */}
       <DrawerSection
         open={drawerOpen}
         drawerWidth={drawerWidth}
@@ -217,7 +225,11 @@ const Home: NextPage = () => {
         handleTreeDoubleClick={handleTreeDoubleClick}
         deleteTabByTreeId={deleteTabByTreeId}
       />
+
+      {/* drawer 너비 조정 */}
       <Button id={styles.resizeButton} onMouseDown={drawerResizeHandler} />
+
+      {/* 죄측 탭 패널 */}
       <TabPanel value={verticalTabVaue} index={0}>
         <ViewSection
           open={drawerOpen}
