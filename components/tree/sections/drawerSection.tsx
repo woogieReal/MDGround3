@@ -72,11 +72,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
-    setTrees(addTreeToTrees(trees, tree, false));
+    setTrees(addTreeToTrees(trees, tree));
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setTrees(changeTreeFromTrees(trees, tree, false));
+    setTrees(changeTreeFromTrees(trees, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
@@ -93,11 +93,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
           const isRootFolderTree = methodTargetTree.treePath === '' && methodTargetTree.treeType === TreeType.FORDER && methodTargetTree.treeStatus !== TreeStatusInfo.CREATE;
-          setTrees(addTreeToTrees(trees, methodTargetTree, isRootFolderTree));
+          setTrees(addTreeToTrees(trees, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setTrees(changeTreeFromTrees(trees, methodTargetTree, false));
+          setTrees(changeTreeFromTrees(trees, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);

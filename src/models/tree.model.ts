@@ -16,7 +16,6 @@ export enum TreeType {
 
 export enum TreeStatusInfo {
   DEFAULT = 'default',
-  RE_RENDER = 'reRender',
   CREATE = 'create',
   EDIT_CONTENT = 'editContent',
   RENAME = 'rename',
