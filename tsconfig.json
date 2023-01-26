@@ -22,6 +22,7 @@
       "@/src/*": ["src/*"],
       "@/styles/*": ["styles/*"],
       "@/tests/*": ["tests/*"],
+      "@/logs/*": ["logs/*"],
     },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

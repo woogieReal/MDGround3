@@ -10,7 +10,7 @@ import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
-import { isCtrlEnter } from '@/src/utils/common/keyPressUtil';
+import { checkPressedCtrlEnter } from '@/src/utils/common/keyPressUtil';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 import * as commands from '@uiw/react-md-editor/lib/commands';
@@ -45,8 +45,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     setEachTabContent(currentEachTabContent);
   }
 
-  const handleKeyPress = (e: any) => {
-    isCtrlEnter(e) && checkReadyToEditContent();
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    checkPressedCtrlEnter(e) && checkReadyToEditContent();
   }
 
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
@@ -116,11 +116,11 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       <Box
         id={styles.viewMain}
         sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
-        onKeyPress={handleKeyPress}
       >
         <MDEditor
           value={eachTabContent.get(currentTabTreeId)}
           onChange={handlChangeContent}
+          onKeyUp={handleKeyPress}
           preview={eachTabPreview.get(currentTabTreeId) || 'preview'}
           height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
           previewOptions={{

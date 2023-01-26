@@ -1,4 +1,5 @@
 import mysql, { Connection, ConnectionOptions } from "mysql2/promise";
+import { appLogger } from "../utils/common/loggerUtil";
 
 export default class DBConnection {
   private static options: ConnectionOptions = {
@@ -22,6 +23,7 @@ export default class DBConnection {
       result = await callback(connection);
       await connection.commit();
     } catch (err) {
+      appLogger.error(err);
       await connection.rollback();
       console.log(err);
       throw err;
