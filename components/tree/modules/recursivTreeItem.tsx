@@ -25,13 +25,8 @@ interface Props {
 }
 const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
-  useEffect(() => setTreeData(treeItem), [treeItem])
-  useEffect(() => {
-    if (treeItem.treeStatus) {
-      const statusProcessedTree = { ...treeItem, treeStatus: treeItem.treeStatus === TreeStatusInfo.RE_RENDER ? TreeStatusInfo.DEFAULT : treeItem.treeStatus };
-      setTreeData(statusProcessedTree);
-    }
-  }, [treeItem.treeStatus])
+  useEffect(() => setTreeData(treeItem), [treeItem]);
+  useEffect(() => setTreeData(treeItem), [treeItem.treeStatus]);
 
   const childSameDepthTreeNames = getTreeChildrenNames(treeData);
 
@@ -208,6 +203,8 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }, [isReadyToRename])
   // -- 기존 트리 이름 수정
 
+  console.log(treeData.treeName);
+
   return (
     <Box className={`${styles.treeItemBox}`}>
       <TextField
@@ -251,18 +248,13 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
 const checkEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
   const isEqual = (
-    next.treeItem.treeStatus !== TreeStatusInfo.RE_RENDER
-    && prev.treeItem === next.treeItem
+    prev.treeItem === next.treeItem
     && prev.sameDepthTreeNames === next.sameDepthTreeNames
     && prev.setTrees === next.setTrees
     && prev.setMethodType === next.setMethodType
     && prev.setMethodTargetTree === next.setMethodTargetTree
     && prev.setContextEvent === next.setContextEvent
   );
-  if (next.treeItem.treeStatus === TreeStatusInfo.RE_RENDER) {
-    // console.log(next.treeItem);
-    next.treeItem.treeStatus = TreeStatusInfo.DEFAULT;
-  }
   return isEqual;
 }
 
