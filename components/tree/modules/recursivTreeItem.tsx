@@ -203,8 +203,6 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }, [isReadyToRename])
   // -- 기존 트리 이름 수정
 
-  console.log(treeData.treeName);
-
   return (
     <Box className={`${styles.treeItemBox}`}>
       <TextField
