@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
-import { isEnter } from "@/src/utils/common/keyPressUtil";
+import { checkPressedEnter } from "@/src/utils/common/keyPressUtil";
 import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { cloneDeep } from "lodash";
@@ -119,7 +119,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
   }
 
   const handleKeyPressTreeInput = (e: any) => {
-    if (isEnter(e) && isValidTreeName) {
+    if (checkPressedEnter(e) && isValidTreeName) {
       if (treeData.treeStatus === TreeStatusInfo.CREATE) {
         checkReadyToCreate();
       } else if (treeData.treeStatus === TreeStatusInfo.RENAME) {
