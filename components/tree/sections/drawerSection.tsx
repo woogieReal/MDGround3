@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem, TreeStatusInfo } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem, TreeStatusInfo, RootTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -25,13 +25,13 @@ interface Props {
   deleteTabByTreeId(data: Tree): void;
 }
 const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
-  const [trees, setTrees] = useState<Tree[]>([]);
+  const [rootTree, setRootTree] = useState<Tree>(RootTree);
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
 
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
-      setTrees(createTreeStructure(res.data));
+      setRootTree(createTreeStructure(res.data));
       setSameDepthTreeNames(getTreeChildrenNames(res.data));
     },
   });
@@ -72,15 +72,15 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
-    setTrees(addTreeToTrees(trees, tree));
+    setRootTree(addTreeToTrees(rootTree, tree));
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setTrees(changeTreeFromTrees(trees, tree));
+    setRootTree(changeTreeFromTrees(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, deletedTree));
+    setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
@@ -93,11 +93,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
           const isRootFolderTree = methodTargetTree.treePath === '' && methodTargetTree.treeType === TreeType.FORDER && methodTargetTree.treeStatus !== TreeStatusInfo.CREATE;
-          setTrees(addTreeToTrees(trees, methodTargetTree));
+          setRootTree(addTreeToTrees(rootTree, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setTrees(changeTreeFromTrees(trees, methodTargetTree));
+          setRootTree(changeTreeFromTrees(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
@@ -144,12 +144,12 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
         </Box>
         <Divider />
         <Box id={styles.treeSection}>
-          {trees.map((data: Tree, index: number) => (
+          {rootTree.treeChildren?.map((data: Tree, index: number) => (
             <RecursivTreeItem
               key={`${index}-${data.treeId}`}
               treeItem={data}
               sameDepthTreeNames={sameDepthTreeNames}
-              setTrees={setTrees}
+              setRootTree={setRootTree}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
               setContextEvent={setContextEvent}

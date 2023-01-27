@@ -22,6 +22,15 @@ export enum TreeStatusInfo {
   TEMP_READ = 'tempRead'
 }
 
+export const RootTree: Tree = {
+  treeId: 0,
+  treeType: TreeType.FORDER,
+  treeName: 'ROOT',
+  treeContent: '',
+  treePath: '',
+  treeChildren: [],
+}
+
 export const InitialTree: Tree = {
   treeId: -1,
   treeType: TreeType.FILE,
