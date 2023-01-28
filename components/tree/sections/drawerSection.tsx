@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, InitialTree, MethodTypeForRecursivTreeItem, TreeStatusInfo, RootTree } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo, InitialRootTree } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -12,7 +12,7 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, changeTreeFromTrees, checkInitalTree, createTreeStructure, deleteTreeFromTrees, getTreeChildrenNames } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, replaceTree, createTreeStructure, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree } from '@/src/utils/tree/treeUtil';
 import { cloneDeep } from "lodash";
 import React from "react";
 
@@ -25,26 +25,31 @@ interface Props {
   deleteTabByTreeId(data: Tree): void;
 }
 const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
-  const [rootTree, setRootTree] = useState<Tree>(RootTree);
-  const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
+  const [rootTree, setRootTree] = useState<Tree>(InitialRootTree);
 
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
       setRootTree(createTreeStructure(res.data));
-      setSameDepthTreeNames(getTreeChildrenNames(res.data));
     },
   });
 
   // RecursivTreeItem의 메소드 호출 타입
   // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
   const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
-  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialTree);
+  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialRootTree);
 
   const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree?: Tree) => {
     setMethodType(methodType);
     methodTargetTree && setMethodTargetTree(methodTargetTree);
   }
+
+  // 트리명 중복여부 체크
+  const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
+
+  useEffect(() => {
+    setSameDepthTreeNames(getTreeChildrenNames(rootTree.treeChildren!));
+  }, [rootTree.treeChildren])
 
   // 컨텍스트
   const [contextEvent, setContextEvent] = useState<React.BaseSyntheticEvent<MouseEvent> | null>(null);
@@ -55,7 +60,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.target);
-    setMethodTargetTree(InitialTree);
+    setMethodTargetTree(InitialRootTree);
     setMousePosition({ left: e.nativeEvent.clientX, top: e.nativeEvent.clientY });
   }
 
@@ -76,28 +81,27 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setRootTree(changeTreeFromTrees(rootTree, tree));
+    setRootTree(replaceTree(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, deletedTree));
+    setRootTree(deleteTreeFromTrees(rootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
 
   useEffect(() => {
-    if (!checkInitalTree(methodTargetTree)) {
+    if (!checkInitalRootTree(methodTargetTree)) {
       switch (methodType) {
         case MethodTypeForRecursivTreeItem.OPEN_CONTEXT:
           handleContextMenuForTreeItem(contextEvent!);
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          const isRootFolderTree = methodTargetTree.treePath === '' && methodTargetTree.treeType === TreeType.FORDER && methodTargetTree.treeStatus !== TreeStatusInfo.CREATE;
           setRootTree(addTreeToTrees(rootTree, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(changeTreeFromTrees(rootTree, methodTargetTree));
+          setRootTree(replaceTree(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
@@ -109,7 +113,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           break;
         case MethodTypeForRecursivTreeItem.CLICK:
           handleTreeClick(methodTargetTree);
-          setMethodTargetTree(InitialTree);
+          setMethodTargetTree(InitialRootTree);
           break;
         case MethodTypeForRecursivTreeItem.DOUBLE_CLICK:
           handleTreeDoubleClick(methodTargetTree);
