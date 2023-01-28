@@ -22,7 +22,7 @@ export enum TreeStatusInfo {
   TEMP_READ = 'tempRead'
 }
 
-export const RootTree: Tree = {
+export const InitialRootTree: Tree = {
   treeId: 0,
   treeType: TreeType.FORDER,
   treeName: 'ROOT',
