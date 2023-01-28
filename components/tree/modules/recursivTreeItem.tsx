@@ -18,12 +18,12 @@ import { cloneDeep } from "lodash";
 interface Props {
   treeItem: Tree;
   sameDepthTreeNames: Map<TreeType, string[]>;
-  setTrees: Dispatch<SetStateAction<Tree[]>>
+  setRootTree: Dispatch<SetStateAction<Tree>>
   setMethodType: Dispatch<SetStateAction<MethodTypeForRecursivTreeItem>>
   setMethodTargetTree: Dispatch<SetStateAction<Tree>>
   setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent<MouseEvent> | null>>
 }
-const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
+const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
   const [treeData, setTreeData] = useState<Tree>(treeItem);
   useEffect(() => setTreeData(treeItem), [treeItem]);
   useEffect(() => setTreeData(treeItem), [treeItem.treeStatus]);
@@ -91,7 +91,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
     if (treeData.treeStatus === TreeStatusInfo.CREATE) {
       if (checkEmptyTreeName()) {
         cleanCreateTreeAllState();
-        setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
+        setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, treeData));
       } else if (checkValidTreeName()) {
         checkReadyToCreate();
       }
@@ -153,7 +153,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
 
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
-    setTrees((currTrees: Tree[]) => deleteTreeFromTrees(currTrees, treeData));
+    setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, treeData));
     setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
   }
 
@@ -232,7 +232,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setTrees, setMethodTyp
               key={item.treeId}
               treeItem={item}
               sameDepthTreeNames={childSameDepthTreeNames}
-              setTrees={setTrees}
+              setRootTree={setRootTree}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
               setContextEvent={setContextEvent}
@@ -248,7 +248,7 @@ const checkEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
   const isEqual = (
     prev.treeItem === next.treeItem
     && prev.sameDepthTreeNames === next.sameDepthTreeNames
-    && prev.setTrees === next.setTrees
+    && prev.setRootTree === next.setRootTree
     && prev.setMethodType === next.setMethodType
     && prev.setMethodTargetTree === next.setMethodTargetTree
     && prev.setContextEvent === next.setContextEvent
