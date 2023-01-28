@@ -11,7 +11,7 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
 import { validateDeleteTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { checkInitalTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
+import { checkInitalRootTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -40,7 +40,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
     clickCreate({
       ...InitialTree,
       treeType: treeType,
-      treePath: checkInitalTree(targetTree) ? '' : createTreeFullPath(targetTree),
+      treePath: createTreeFullPath(targetTree),
       treeStatus: TreeStatusInfo.CREATE
     });
   }
@@ -115,7 +115,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
         <Popover
           id={String(targetTree?.treeId)}
           open={isShow}
-          anchorReference={!checkInitalTree(targetTree) ? "anchorEl" : "anchorPosition"}
+          anchorReference={!checkInitalRootTree(targetTree) ? "anchorEl" : "anchorPosition"}
           anchorPosition={{ left: mousePosition.left, top: mousePosition.top }}
           anchorEl={anchorEl}
           onClose={hide}
@@ -126,7 +126,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
         >
           <Box>
             <List>
-              {!checkInitalTree(targetTree) ?
+              {!checkInitalRootTree(targetTree) ?
                 <>
                   {
                     targetTree.treeType === TreeType.FORDER ?
