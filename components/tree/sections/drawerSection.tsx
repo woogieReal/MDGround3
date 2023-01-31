@@ -46,9 +46,10 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   // 트리명 중복여부 체크
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
+  console.log(sameDepthTreeNames);
 
   useEffect(() => {
-    setSameDepthTreeNames(getTreeChildrenNames(rootTree.treeChildren!));
+    setSameDepthTreeNames(getTreeChildrenNames(rootTree.treeChildren || []));
   }, [rootTree.treeChildren])
 
   // 컨텍스트
