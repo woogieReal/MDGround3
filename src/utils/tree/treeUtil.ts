@@ -32,44 +32,68 @@ export const createTreeFullPath = (tree: Tree): string => {
       : String(tree.treeId);
 };
 
-export const createTreeStructure = (trees: Tree[]): Tree => {
-  const cloneTrees = cloneDeep(trees);
-  const rootTree = InitialRootTree;
-  const depthToTree = new Map();
+const getTreeDepth = (tree: Tree): number => {
+  return getTreePathArray(tree.treePath).length;
+}
 
-  while (cloneTrees.length > 0) {
-    const tree: Tree = cloneTrees.pop()!;
-    const treeDepth = !!tree!.treePath ? tree!.treePath.split('|').length : 0;
-    const depthTrees: Tree[] = depthToTree.get(treeDepth) || [];
-    depthTrees.push(tree);
-    depthToTree.set(treeDepth, depthTrees);
+const createDepthToTreesMap = (trees: Tree[]): Map<number, Tree[]> => {
+  const depthToTree = new Map<number, Tree[]>();
+
+  const maxDepthTree = _.maxBy(trees, getTreeDepth)
+  const maxDepth = getTreeDepth(maxDepthTree!);
+
+  for (let i = 0; i <= maxDepth; i++) {
+    const iDepthTrees = _
+      .chain(trees)
+      .filter((tree) => getTreeDepth(tree) === i)
+      .value();
+
+    depthToTree.set(i, iDepthTrees);
   }
 
-  let depths: number[] = Array.from(depthToTree.keys());
-  let maxDepth = Math.max(...depths);
-  let minDepth = Math.min(...depths);
+  return depthToTree;
+}
 
-  while (maxDepth > minDepth) {
-    const childTrees: Tree[] = depthToTree.get(maxDepth);
-    const parentTrees: Tree[] = depthToTree.get(maxDepth - 1);
+const makeTreeStructure = (depthToTreesMap: Map<number, Tree[]>): Tree => {
+  const treeStructureMap = new Map<number, Tree[]>();
+  const maxDepth = _.maxBy(Array.from(depthToTreesMap.keys())) || 0;
+
+  for (let i = 1; i <= maxDepth; i++) {
+    const childTrees: Tree[] = depthToTreesMap.get(i) || [];
+    const parentTrees: Tree[] = depthToTreesMap.get(i - 1) || [];
 
     childTrees.forEach((child: Tree) => {
-      const parentTreeId = Number(child.treePath.split('|').pop());
-      const parentTreeIndex = parentTrees.findIndex(
-        (parent) => parent.treeId === parentTreeId
-      );
-      parentTrees[parentTreeIndex].treeChildren
-        ? parentTrees[parentTreeIndex].treeChildren!.push(child)
-        : (parentTrees[parentTreeIndex].treeChildren = [child]);
+      const parentTreeId = getTreePathArray(child.treePath).pop();
+      const parentTree = parentTrees.find((parent) => parent.treeId === parentTreeId);
+
+      if (parentTree) {
+        parentTree.treeChildren = getEmptyArrayIfNotArray(parentTree.treeChildren);
+        parentTree.treeChildren.push(child);
+      }
     });
 
-    depthToTree.set(maxDepth - 1, parentTrees);
-    maxDepth -= 1;
+    treeStructureMap.set(i - 1, parentTrees);    
   }
 
-  rootTree.treeChildren = depthToTree.get(minDepth);
-  return rootTree;
-};
+  return { ...InitialRootTree, treeChildren: treeStructureMap.get(0) || [] };
+}
+
+const sortingTreeFromRootToLeef = (tree: Tree): Tree => {
+  const copyTree = cloneDeep(tree);
+
+  copyTree.treeChildren = getEmptyArrayIfNotArray(copyTree.treeChildren);
+  copyTree.treeChildren.sort(sortingTreeByTreeName);
+
+  copyTree.treeChildren.forEach((child, idx, children) => children[idx] = sortingTreeFromRootToLeef(child));
+
+  return copyTree;
+}
+
+export const createTreeStructureFromTrees = _.flow([
+  createDepthToTreesMap,
+  makeTreeStructure,
+  sortingTreeFromRootToLeef,
+]);
 
 const getTreePathArray = (treePath: string): number[] => {
   return treePath

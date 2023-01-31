@@ -12,7 +12,7 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, replaceTree, createTreeStructure, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, replaceTree, createTreeStructureFromTrees, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree } from '@/src/utils/tree/treeUtil';
 import { cloneDeep } from "lodash";
 import React from "react";
 
@@ -30,7 +30,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
-      setRootTree(createTreeStructure(res.data));
+      setRootTree(createTreeStructureFromTrees(res.data));
     },
   });
 
@@ -46,7 +46,6 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   // 트리명 중복여부 체크
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
-  console.log(sameDepthTreeNames);
 
   useEffect(() => {
     setSameDepthTreeNames(getTreeChildrenNames(rootTree.treeChildren || []));
