@@ -28,7 +28,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   useEffect(() => setTreeData(treeItem), [treeItem]);
   useEffect(() => setTreeData(treeItem), [treeItem.treeStatus]);
 
-  const childSameDepthTreeNames = getTreeChildrenNames(treeData);
+  const childSameDepthTreeNames = getTreeChildrenNames(treeData.treeChildren || []);
 
   const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
     setMethodType(methodType);

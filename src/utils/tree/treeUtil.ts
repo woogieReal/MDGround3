@@ -5,7 +5,7 @@ import {
   TreeStatusInfo,
   TreeType,
 } from '@/src/models/tree.model';
-import { cloneDeep } from 'lodash';
+import _, { cloneDeep, map as lodashMap } from 'lodash';
 import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
 
 export const checkInitalTree = (tree: Tree): boolean => {
@@ -15,6 +15,14 @@ export const checkInitalTree = (tree: Tree): boolean => {
 export const checkInitalRootTree = (tree: Tree): boolean => {
   return tree.treeId === InitialRootTree.treeId;
 };
+
+export const checkFolderTree = (tree: Tree): boolean => {
+  return tree.treeType === TreeType.FORDER
+}
+
+export const checkFileTree = (tree: Tree): boolean => {
+  return tree.treeType === TreeType.FILE
+}
 
 export const createTreeFullPath = (tree: Tree): string => {
   return checkInitalRootTree(tree) 
@@ -121,25 +129,23 @@ export const addTreeToTrees = (rootTree: Tree, targetTree: Tree): Tree => {
   return replaceTree(rootTree, parentTree);
 };
 
-export const getTreeChildrenNames = (trees: Tree | Tree[]): Map<TreeType, string[]> => {
-  let targetUpperTree: Tree;
-
-  if (Array.isArray(trees)) {
-    targetUpperTree = { ...InitialTree, treeChildren: trees as Tree[] };
-  } else {
-    targetUpperTree = trees as Tree;
-  }
-
-  targetUpperTree.treeChildren = getEmptyArrayIfNotArray(targetUpperTree.treeChildren);
-
-  const folderTrees = targetUpperTree.treeChildren.filter((treeChild: Tree) => treeChild.treeType === TreeType.FORDER);
-  const fileTrees = targetUpperTree.treeChildren.filter((treeChild: Tree) => treeChild.treeType === TreeType.FILE);
+export const getTreeChildrenNames = (targetTrees: Tree[]) : Map<TreeType, string[]> => {
+  const folderTreeNames = _
+    .chain(targetTrees)
+    .filter(checkFolderTree)
+    .map('treeName')
+    .value();
+  
+  const fileTreeNames = _
+    .chain(targetTrees)
+    .filter(checkFileTree)
+    .map('treeName')
+    .value();
 
   return new Map<TreeType, string[]>()
-    .set(TreeType.FORDER, folderTrees.map((treeChild: Tree) => treeChild.treeName))
-    .set(TreeType.FILE, fileTrees.map((treeChild: Tree) => treeChild.treeName))
-  ;
-};
+    .set(TreeType.FORDER, folderTreeNames)
+    .set(TreeType.FILE, fileTreeNames);
+}
 
 export const checkEditableTreeNameStatus = (tree: Tree): boolean => {
   return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!);
