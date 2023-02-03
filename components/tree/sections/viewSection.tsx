@@ -2,7 +2,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
-import { InitialTree, TEST_USER_ID, Tree, TreeStatusInfo } from '@/src/models/tree.model';
+import { TEST_USER_ID, Tree, TreeStatusInfo } from '@/src/models/tree.model';
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import dynamic from "next/dynamic";
@@ -19,6 +19,7 @@ import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
+import { createInitialTree } from '@/src/utils/tree/treeUtil';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor/lib/Editor"),
@@ -36,7 +37,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
-  const [editContentTree, setEditContentTree] = useState<Tree>(InitialTree);
+  const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
   const handlChangeContent = (e: any) => {

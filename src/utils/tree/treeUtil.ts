@@ -8,6 +8,9 @@ import {
 import _, { cloneDeep, map as lodashMap } from 'lodash';
 import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
 
+export const createInitialRootTree = _.constant(InitialRootTree);
+export const createInitialTree = _.constant(InitialTree);
+
 export const checkInitalTree = (tree: Tree): boolean => {
   return tree.treeId === InitialTree.treeId;
 };
@@ -75,7 +78,7 @@ const makeTreeStructure = (depthToTreesMap: Map<number, Tree[]>): Tree => {
     treeStructureMap.set(i - 1, parentTrees);    
   }
 
-  return { ...InitialRootTree, treeChildren: treeStructureMap.get(0) || [] };
+  return { ...createInitialRootTree(), treeChildren: treeStructureMap.get(0) || [] };
 }
 
 const sortingTreeFromRootToLeef = (tree: Tree): Tree => {

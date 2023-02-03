@@ -2,7 +2,7 @@ import { Box, List, ListItem, ListItemButton, ListItemText, Popover } from "@mui
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import { InitialTree, TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
+import { TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import ApiHandler from "@/src/apis/apiHandler";
 import { ApiName } from "@/src/apis/apiInfo";
 import { AxiosResponse } from "axios";
@@ -11,7 +11,7 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
 import { validateDeleteTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { checkInitalRootTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
+import { checkInitalRootTree, createInitialTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -38,7 +38,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
 
   const handleClickCreate = (treeType: TreeType) => {
     clickCreate({
-      ...InitialTree,
+      ...createInitialTree(),
       treeType: treeType,
       treePath: createTreeFullPath(targetTree),
       treeStatus: TreeStatusInfo.CREATE
