@@ -12,7 +12,7 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, replaceTree, createTreeStructureFromTrees, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree } from '@/src/utils/tree/treeUtil';
+import { addTreeToTrees, replaceTree, createTreeStructureFromTrees, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree, createInitialRootTree } from '@/src/utils/tree/treeUtil';
 import { cloneDeep } from "lodash";
 import React from "react";
 
@@ -25,7 +25,7 @@ interface Props {
   deleteTabByTreeId(data: Tree): void;
 }
 const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId }: Props) => {
-  const [rootTree, setRootTree] = useState<Tree>(InitialRootTree);
+  const [rootTree, setRootTree] = useState<Tree>(createInitialRootTree());
 
   const getTrees: UseQueryResult = useQuery([ApiName.GET_TREES], async () => await ApiHandler.callApi(ApiName.GET_TREES, { userId: TEST_USER_ID }), {
     ...CommonQueryOptions,
@@ -37,7 +37,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   // RecursivTreeItem의 메소드 호출 타입
   // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
   const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
-  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(InitialRootTree);
+  const [methodTargetTree, setMethodTargetTree] = useState<Tree>(createInitialRootTree());
 
   const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree?: Tree) => {
     setMethodType(methodType);
@@ -60,7 +60,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
     e.preventDefault();
     e.stopPropagation();
     setAnchorEl(e.target);
-    setMethodTargetTree(InitialRootTree);
+    setMethodTargetTree(createInitialRootTree());
     setMousePosition({ left: e.nativeEvent.clientX, top: e.nativeEvent.clientY });
   }
 
@@ -113,7 +113,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           break;
         case MethodTypeForRecursivTreeItem.CLICK:
           handleTreeClick(methodTargetTree);
-          setMethodTargetTree(InitialRootTree);
+          setMethodTargetTree(createInitialRootTree());
           break;
         case MethodTypeForRecursivTreeItem.DOUBLE_CLICK:
           handleTreeDoubleClick(methodTargetTree);
