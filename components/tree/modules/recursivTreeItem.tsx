@@ -4,7 +4,7 @@ import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { checkEditableTreeNameStatus, deleteTreeFromTrees, getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
+import { getTreeChildrenNames } from "@/src/utils/tree/treeUtil";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import ApiHandler from "@/src/apis/apiHandler";
@@ -14,6 +14,8 @@ import { checkPressedEnter } from "@/src/utils/common/keyPressUtil";
 import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { cloneDeep } from "lodash";
+import { checkEditableTreeNameStatus } from "@/src/utils/tree/treeCheck";
+import { removeTreeFromTrees } from "@/src/utils/tree/treeCRUD";
 
 interface Props {
   treeItem: Tree;
@@ -91,7 +93,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
     if (treeData.treeStatus === TreeStatusInfo.CREATE) {
       if (checkEmptyTreeName()) {
         cleanCreateTreeAllState();
-        setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, treeData));
+        setRootTree((currRootTree: Tree) => removeTreeFromTrees(currRootTree, treeData));
       } else if (checkValidTreeName()) {
         checkReadyToCreate();
       }
@@ -153,7 +155,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
 
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
-    setRootTree((currRootTree: Tree) => deleteTreeFromTrees(currRootTree, treeData));
+    setRootTree((currRootTree: Tree) => removeTreeFromTrees(currRootTree, treeData));
     setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
   }
 

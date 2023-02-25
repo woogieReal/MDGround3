@@ -11,7 +11,8 @@ import LodingBackDrop from "@/components/common/atoms/lodingBackDrop";
 import { useEffect, useState } from "react";
 import { validateDeleteTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
-import { checkInitalRootTree, createInitialTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
+import { createInitialTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
+import { checkInitalRootTree } from "@/src/utils/tree/treeCheck";
 
 const iconStyle = { marginRight: '10px' };
 

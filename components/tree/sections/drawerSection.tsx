@@ -12,9 +12,12 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { addTreeToTrees, replaceTree, createTreeStructureFromTrees, deleteTreeFromTrees, getTreeChildrenNames, checkInitalRootTree, createInitialRootTree } from '@/src/utils/tree/treeUtil';
+import { getTreeChildrenNames, createInitialRootTree } from '@/src/utils/tree/treeUtil';
 import { cloneDeep } from "lodash";
 import React from "react";
+import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
+import { addTreeToTrees, replaceTreeFromTrees, removeTreeFromTrees } from '@/src/utils/tree/treeCRUD';
+import { createTreeStructureFromTrees } from '@/src/utils/tree/treeStructure';
 
 interface Props {
   open: boolean;
@@ -81,11 +84,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setRootTree(replaceTree(rootTree, tree));
+    setRootTree(replaceTreeFromTrees(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree(deleteTreeFromTrees(rootTree, deletedTree));
+    setRootTree(removeTreeFromTrees(rootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
@@ -101,7 +104,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(replaceTree(rootTree, methodTargetTree));
+          setRootTree(replaceTreeFromTrees(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
