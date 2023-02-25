@@ -16,6 +16,8 @@ services:
   mysql:
     container_name: MDGround3-db
     platform: linux/x86_64
+    # for apple silicon
+    # platform: linux/arm64
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: md1234
