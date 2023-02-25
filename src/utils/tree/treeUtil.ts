@@ -8,24 +8,31 @@ import {
 import _, { cloneDeep, map as lodashMap } from 'lodash';
 import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
 
+type CRUDFromRootTreeFn = (rootTree: Tree, targetTree: Tree) => Tree;
+type CheckTreeFn = (targetTree: Tree) => boolean;
+
 export const createInitialRootTree = _.constant(InitialRootTree);
 export const createInitialTree = _.constant(InitialTree);
 
-export const checkInitalTree = (tree: Tree): boolean => {
+export const checkInitalTree: CheckTreeFn = tree => {
   return tree.treeId === InitialTree.treeId;
 };
 
-export const checkInitalRootTree = (tree: Tree): boolean => {
+export const checkInitalRootTree: CheckTreeFn = tree => {
   return tree.treeId === InitialRootTree.treeId;
 };
 
-export const checkFolderTree = (tree: Tree): boolean => {
+export const checkFolderTree: CheckTreeFn = tree => {
   return tree.treeType === TreeType.FORDER
 }
 
-export const checkFileTree = (tree: Tree): boolean => {
+export const checkFileTree: CheckTreeFn = tree => {
   return tree.treeType === TreeType.FILE
 }
+
+export const checkEditableTreeNameStatus: CheckTreeFn = tree => {
+  return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!);
+};
 
 export const createTreeFullPath = (tree: Tree): string => {
   return checkInitalRootTree(tree) 
@@ -119,7 +126,7 @@ const findTreeByTreeFullPath = (rootTree: Tree, treeFullPath: string): Tree => {
   return tmpTree;
 };
 
-export const replaceTree = (rootTree: Tree, targetTree: Tree): Tree => {
+export const replaceTree: CRUDFromRootTreeFn = (rootTree, targetTree) => {
   if (checkInitalRootTree(targetTree)) {
     return cloneDeep(targetTree);
   } else {
@@ -142,13 +149,13 @@ export const replaceTree = (rootTree: Tree, targetTree: Tree): Tree => {
   }
 }
 
-export const deleteTreeFromTrees = (rootTree: Tree, targetTree: Tree): Tree => {
+export const deleteTreeFromTrees: CRUDFromRootTreeFn = (rootTree, targetTree) => {
   const parentTree = findTreeByTreeFullPath(rootTree, targetTree.treePath);
   parentTree.treeChildren = parentTree.treeChildren?.filter(childTree => childTree.treeId !== targetTree.treeId);
   return replaceTree(rootTree, parentTree);
 };
 
-export const addTreeToTrees = (rootTree: Tree, targetTree: Tree): Tree => {
+export const addTreeToTrees: CRUDFromRootTreeFn = (rootTree, targetTree) => {
   const parentTree = findTreeByTreeFullPath(rootTree, targetTree.treePath);
   parentTree.treeChildren = getEmptyArrayIfNotArray(parentTree.treeChildren);
   parentTree.treeChildren.push(targetTree);
@@ -173,10 +180,6 @@ export const getTreeChildrenNames = (targetTrees: Tree[]) : Map<TreeType, string
     .set(TreeType.FORDER, folderTreeNames)
     .set(TreeType.FILE, fileTreeNames);
 }
-
-export const checkEditableTreeNameStatus = (tree: Tree): boolean => {
-  return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!);
-};
 
 const sortingTreeByTreeName = (a: Tree, b: Tree) => {
   if (a.treeType < b.treeType) {
