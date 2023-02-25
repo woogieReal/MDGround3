@@ -246,16 +246,23 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   )
 }
 
+const NEED_CHECK_EQUAL_PROPERTY: {[k in keyof Props]: boolean} = {
+  treeItem: true,
+  sameDepthTreeNames: true,
+  setRootTree: true,
+  setMethodType: true,
+  setMethodTargetTree: true,
+  setContextEvent: true,
+}
+
 const checkEqual = (prev: Readonly<Props>, next: Readonly<Props>): boolean => {
-  const isEqual = (
-    prev.treeItem === next.treeItem
-    && prev.sameDepthTreeNames === next.sameDepthTreeNames
-    && prev.setRootTree === next.setRootTree
-    && prev.setMethodType === next.setMethodType
-    && prev.setMethodTargetTree === next.setMethodTargetTree
-    && prev.setContextEvent === next.setContextEvent
-  );
-  return isEqual;
+  let k: keyof Props;
+  for (k in prev) {
+    if (prev[k] !== next[k] && NEED_CHECK_EQUAL_PROPERTY[k]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
