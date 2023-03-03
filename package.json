@@ -24,6 +24,7 @@
     "@uiw/react-md-editor": "^3.19.3",
     "axios": "^1.1.2",
     "dotenv": "^16.0.2",
+    "fp-ts": "^2.13.1",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
     "log4js": "^6.7.1",
