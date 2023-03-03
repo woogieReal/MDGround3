@@ -3,18 +3,35 @@ import _ from 'lodash';
 import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
 import { checkInitalRootTree } from './treeCheck';
 import { createTreeFullPath, getTreePathArray, sortingTreeByTreeName } from './treeUtil';
+import * as O from 'fp-ts/Option'
+import { pipe } from 'fp-ts/function'
 
 type CUDFromRootTreeFn = (rootTree: Tree, targetTree: Tree) => Tree;
 type RFromRootTreeFn = (rootTree: Tree, treeFullPath: string) => Tree;
 
-export const addTreeToTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
-  const parentTree = findTreeByFullPath(rootTree, targetTree.treePath);
-  parentTree.treeChildren = getEmptyArrayIfNotArray(parentTree.treeChildren);
-  parentTree.treeChildren.push(targetTree);
-  parentTree.treeChildren.sort(sortingTreeByTreeName);
-  return replaceTreeFromTrees(rootTree, parentTree);
-};
+const addChildToTree = (childTree: Tree) => (parentTree: Tree) => {
+  const copyParentTree = _.cloneDeep(parentTree);
+  
+  copyParentTree.treeChildren = getEmptyArrayIfNotArray(copyParentTree.treeChildren);
+  copyParentTree.treeChildren.push(childTree);
+  copyParentTree.treeChildren.sort(sortingTreeByTreeName);
 
+  return copyParentTree;
+}
+
+const removeChildFromTree = (childTree: Tree) => (parentTree: Tree) => {
+  const copyParentTree = _.cloneDeep(parentTree);
+  
+  copyParentTree.treeChildren = copyParentTree.treeChildren?.filter(child => child.treeId !== childTree.treeId);
+
+  return copyParentTree;
+}
+
+export const addTreeToTrees: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+  findTreeByFullPath(rootTree, targetTree.treePath),
+  addChildToTree(targetTree),
+  curriedReplaceTreeFromTrees(rootTree),
+);
 
 export const findTreeByFullPath: RFromRootTreeFn = (rootTree, treeFullPath) => {
   let cloneRootTree = _.cloneDeep(rootTree);
@@ -53,8 +70,10 @@ export const replaceTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) =>
   }
 }
 
-export const removeTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
-  const parentTree = findTreeByFullPath(rootTree, targetTree.treePath);
-  parentTree.treeChildren = parentTree.treeChildren?.filter(childTree => childTree.treeId !== targetTree.treeId);
-  return replaceTreeFromTrees(rootTree, parentTree);
-};
+export const removeTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+  findTreeByFullPath(rootTree, targetTree.treePath),
+  removeChildFromTree(targetTree),
+  curriedReplaceTreeFromTrees(rootTree),
+);
+
+const curriedReplaceTreeFromTrees = _.curry(replaceTreeFromTrees);
