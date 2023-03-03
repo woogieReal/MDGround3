@@ -1,11 +1,28 @@
 import {
-  InitialTree,
-  InitialRootTree,
   Tree,
   TreeType,
+  ROOT_TREE_ID,
+  INITIAL_TREE_ID,
 } from '@/src/models/tree.model';
 import _ from 'lodash';
 import { checkInitalRootTree, checkFolderTree, checkFileTree } from './treeCheck';
+
+const InitialRootTree: Tree = {
+  treeId: ROOT_TREE_ID,
+  treeType: TreeType.FORDER,
+  treeName: 'ROOT',
+  treeContent: '',
+  treePath: '',
+  treeChildren: [],
+}
+
+const InitialTree: Tree = {
+  treeId: INITIAL_TREE_ID,
+  treeType: TreeType.FILE,
+  treeName: '',
+  treeContent: '',
+  treePath: ''
+}
 
 export const createInitialRootTree = _.constant(InitialRootTree);
 export const createInitialTree = _.constant(InitialTree);

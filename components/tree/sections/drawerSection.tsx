@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo, InitialRootTree } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
