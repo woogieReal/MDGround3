@@ -1,24 +1,23 @@
 import { describe, expect, test } from "@jest/globals";
-import { addTreeToTrees, findTreeByFullPath, removeTreeFromTrees } from "@/src/utils/tree/treeCRUD";
+import { addTreeToTrees, findParentTreeFromTrees, removeTreeFromTrees } from "@/src/utils/tree/treeCRUD";
 import { DEPTH_1_TREE, DEPTH_3_TREE, MOCK_TREE_DATA, NEW_TREE } from "@/tests/tree/mockData";
-import { ROOT_TREE_ID, Tree, TreeType } from "@/src/models/tree.model";
 import { cloneDeep } from "lodash";
+import { ROOT_TREE_ID } from "@/src/models/tree.model";
 
 describe("treeCRUD", () => {
-  describe("findTreeByFullPath", () => {
-    test("treeFullPath가 빈 문자열 일 때", () => {
-      const res = findTreeByFullPath(MOCK_TREE_DATA, "");
-      expect(res.treeId).toBe(ROOT_TREE_ID);
+  describe("findParentTreeFromTrees", () => {
+    test("targetTree의 depth가 1일 때", () => {
+      const res = findParentTreeFromTrees(MOCK_TREE_DATA, DEPTH_1_TREE);
+      expect(res._tag === 'Some' && res.value.treeId).toBe(ROOT_TREE_ID);
     });
   
-    test("treeFullPath가 파이프라인이 없을 때 (1 depth)", () => {
-      const res = findTreeByFullPath(MOCK_TREE_DATA, "4");
-      expect(res.treeId).toBe(4);
-    });
-  
-    test("treeFullPath가 파이프라인이 있을 때 (n depth)", () => {
-      const res = findTreeByFullPath(MOCK_TREE_DATA, "6|7|10");
-      expect(res.treeId).toBe(10);
+    test("targetTree의 depth가 n일 때", () => {
+      const res = findParentTreeFromTrees(MOCK_TREE_DATA, DEPTH_3_TREE);
+
+      const targetTree = cloneDeep(DEPTH_3_TREE);
+      const [ parentId1, parentId2 ] = targetTree.treePath.split('|').map(Number);
+
+      expect(res._tag === 'Some' && res.value.treeId).toBe(parentId2);
     });
   });
 
