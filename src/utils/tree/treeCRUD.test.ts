@@ -8,7 +8,7 @@ describe("treeCRUD", () => {
   describe("findParentTreeFromRootTree", () => {
     test("targetTree의 depth가 1일 때", () => {
       const res = findParentTreeFromRootTree(MOCK_TREE_DATA, DEPTH_1_TREE);
-      expect(res._tag === 'Some' && res.value.treeId).toBe(ROOT_TREE_ID);
+      expect(res && res.treeId).toBe(ROOT_TREE_ID);
     });
   
     test("targetTree의 depth가 n일 때", () => {
@@ -17,7 +17,7 @@ describe("treeCRUD", () => {
       const targetTree = cloneDeep(DEPTH_3_TREE);
       const [ parentId1, parentId2 ] = targetTree.treePath.split('|').map(Number);
 
-      expect(res._tag === 'Some' && res.value.treeId).toBe(parentId2);
+      expect(res && res.treeId).toBe(parentId2);
     });
   });
 
