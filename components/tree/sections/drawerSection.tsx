@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo, InitialRootTree } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -16,7 +16,7 @@ import { getTreeChildrenNames, createInitialRootTree } from '@/src/utils/tree/tr
 import { cloneDeep } from "lodash";
 import React from "react";
 import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
-import { addTreeToTrees, replaceTreeFromTrees, removeTreeFromTrees } from '@/src/utils/tree/treeCRUD';
+import { addTreeToRootTree, replaceTreeFromRootTree, removeTreeFromRootTree } from '@/src/utils/tree/treeCRUD';
 import { createTreeStructureFromTrees } from '@/src/utils/tree/treeStructure';
 
 interface Props {
@@ -80,15 +80,15 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
-    setRootTree(addTreeToTrees(rootTree, tree));
+    setRootTree(addTreeToRootTree(rootTree, tree));
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setRootTree(replaceTreeFromTrees(rootTree, tree));
+    setRootTree(replaceTreeFromRootTree(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree(removeTreeFromTrees(rootTree, deletedTree));
+    setRootTree(removeTreeFromRootTree(rootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
@@ -100,11 +100,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           handleContextMenuForTreeItem(contextEvent!);
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          setRootTree(addTreeToTrees(rootTree, methodTargetTree));
+          setRootTree(addTreeToRootTree(rootTree, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(replaceTreeFromTrees(rootTree, methodTargetTree));
+          setRootTree(replaceTreeFromRootTree(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);

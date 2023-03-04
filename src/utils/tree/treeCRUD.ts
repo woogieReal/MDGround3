@@ -1,36 +1,62 @@
 import { Tree } from '@/src/models/tree.model';
 import _ from 'lodash';
 import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
-import { checkInitalRootTree } from './treeCheck';
+import { checkInitalRootTree, checkParentIsRootTree } from './treeCheck';
 import { createTreeFullPath, getTreePathArray, sortingTreeByTreeName } from './treeUtil';
+import * as O from 'fp-ts/Option'
+import { pipe } from 'fp-ts/function'
 
 type CUDFromRootTreeFn = (rootTree: Tree, targetTree: Tree) => Tree;
-type RFromRootTreeFn = (rootTree: Tree, treeFullPath: string) => Tree;
+type CUDFromParentTreeFn = (parentTree: Tree, childTree: Tree) => Tree;
 
-export const addTreeToTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
-  const parentTree = findTreeByFullPath(rootTree, targetTree.treePath);
-  parentTree.treeChildren = getEmptyArrayIfNotArray(parentTree.treeChildren);
-  parentTree.treeChildren.push(targetTree);
-  parentTree.treeChildren.sort(sortingTreeByTreeName);
-  return replaceTreeFromTrees(rootTree, parentTree);
+const addChildToTree: CUDFromParentTreeFn = (parentTree, childTree) => {
+  const copyParentTree = _.cloneDeep(parentTree);
+  
+  copyParentTree.treeChildren = getEmptyArrayIfNotArray(copyParentTree.treeChildren);
+  copyParentTree.treeChildren.push(childTree);
+  copyParentTree.treeChildren.sort(sortingTreeByTreeName);
+
+  return copyParentTree;
+}
+
+const removeChildFromTree: CUDFromParentTreeFn = (parentTree, childTree) => {
+  const copyParentTree = _.cloneDeep(parentTree);
+  
+  copyParentTree.treeChildren = copyParentTree.treeChildren?.filter(child => child.treeId !== childTree.treeId);
+
+  return copyParentTree;
+}
+
+export const addTreeToRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+  O.fromNullableK(findParentTreeFromRootTree)(rootTree, targetTree),
+  O.match(
+    () => rootTree,
+    (parentTree) => pipe(
+      parentTree,
+      curryRightAddChildToTree(targetTree),
+      curryReplaceTreeFromTrees(rootTree),
+    )
+  )
+);
+
+export const findParentTreeFromRootTree = (rootTree: Tree, targetTree: Tree): Tree | undefined => {
+  let tmpTree: Tree | undefined = undefined;
+
+  if (checkParentIsRootTree(targetTree)) {
+    return rootTree;
+  } else {
+    getTreePathArray(targetTree.treePath)
+      .forEach((path: number) => {
+        tmpTree = tmpTree
+          ? tmpTree.treeChildren?.find((tree) => tree.treeId === path)
+          : rootTree.treeChildren?.find((tree) => tree.treeId === path)
+      });
+  
+    return tmpTree;
+  }
 };
 
-
-export const findTreeByFullPath: RFromRootTreeFn = (rootTree, treeFullPath) => {
-  let cloneRootTree = _.cloneDeep(rootTree);
-  let tmpTree: Tree = _.cloneDeep(rootTree);
-
-  getTreePathArray(treeFullPath)
-    .forEach((path: number) => {
-      tmpTree = checkInitalRootTree(tmpTree)
-        ? cloneRootTree.treeChildren?.find((tree) => tree.treeId === path)!
-        : tmpTree.treeChildren?.find((tree) => tree.treeId === path)!
-    });
-
-  return tmpTree;
-};
-
-export const replaceTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
+export const replaceTreeFromRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => {
   if (checkInitalRootTree(targetTree)) {
     return _.cloneDeep(targetTree);
   } else {
@@ -53,8 +79,18 @@ export const replaceTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) =>
   }
 }
 
-export const removeTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
-  const parentTree = findTreeByFullPath(rootTree, targetTree.treePath);
-  parentTree.treeChildren = parentTree.treeChildren?.filter(childTree => childTree.treeId !== targetTree.treeId);
-  return replaceTreeFromTrees(rootTree, parentTree);
-};
+export const removeTreeFromRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+  O.fromNullableK(findParentTreeFromRootTree)(rootTree, targetTree),
+  O.match(
+    () => rootTree,
+    (parentTree) => pipe(
+      parentTree,
+      curryRightRemoveChildFromTree(targetTree),
+      curryReplaceTreeFromTrees(rootTree),
+    )
+  )
+);
+
+const curryReplaceTreeFromTrees = _.curry(replaceTreeFromRootTree);
+const curryRightAddChildToTree = _.curryRight(addChildToTree);
+const curryRightRemoveChildFromTree = _.curryRight(removeChildFromTree);

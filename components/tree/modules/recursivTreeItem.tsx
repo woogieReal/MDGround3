@@ -15,7 +15,7 @@ import { validateCreateTree, validateRenameTree } from "@/src/utils/tree/treeVal
 import { ValidationResponse } from "@/src/models/validation.model";
 import { cloneDeep } from "lodash";
 import { checkEditableTreeNameStatus } from "@/src/utils/tree/treeCheck";
-import { removeTreeFromTrees } from "@/src/utils/tree/treeCRUD";
+import { removeTreeFromRootTree } from "@/src/utils/tree/treeCRUD";
 
 interface Props {
   treeItem: Tree;
@@ -93,7 +93,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
     if (treeData.treeStatus === TreeStatusInfo.CREATE) {
       if (checkEmptyTreeName()) {
         cleanCreateTreeAllState();
-        setRootTree((currRootTree: Tree) => removeTreeFromTrees(currRootTree, treeData));
+        setRootTree((currRootTree: Tree) => removeTreeFromRootTree(currRootTree, treeData));
       } else if (checkValidTreeName()) {
         checkReadyToCreate();
       }
@@ -155,7 +155,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
 
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
-    setRootTree((currRootTree: Tree) => removeTreeFromTrees(currRootTree, treeData));
+    setRootTree((currRootTree: Tree) => removeTreeFromRootTree(currRootTree, treeData));
     setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
   }
 

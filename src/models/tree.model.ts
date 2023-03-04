@@ -22,23 +22,6 @@ export enum TreeStatusInfo {
   TEMP_READ = 'tempRead'
 }
 
-export const InitialRootTree: Tree = {
-  treeId: 0,
-  treeType: TreeType.FORDER,
-  treeName: 'ROOT',
-  treeContent: '',
-  treePath: '',
-  treeChildren: [],
-}
-
-export const InitialTree: Tree = {
-  treeId: -1,
-  treeType: TreeType.FILE,
-  treeName: '',
-  treeContent: '',
-  treePath: ''
-}
-
 export enum MethodTypeForRecursivTreeItem {
   DEFAULT = 'default',
   OPEN_CONTEXT = 'openContext',
@@ -50,3 +33,6 @@ export enum MethodTypeForRecursivTreeItem {
 }
 
 export const TEST_USER_ID = '92aa8f60-51e2-11ed-bf27-0242ac140002';
+
+export const ROOT_TREE_ID = 0;
+export const INITIAL_TREE_ID = -1;
