@@ -27,7 +27,7 @@ const removeChildFromTree: CUDFromParentTreeFn = (parentTree, childTree) => {
   return copyParentTree;
 }
 
-export const addTreeToTrees: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+export const addTreeToRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
   targetTree,
   curryFindParentTreeFromTrees(rootTree),
   O.match(
@@ -40,7 +40,7 @@ export const addTreeToTrees: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
   )
 );
 
-export const findParentTreeFromTrees = (rootTree: Tree, targetTree: Tree): O.Option<Tree> => {
+export const findParentTreeFromRootTree = (rootTree: Tree, targetTree: Tree): O.Option<Tree> => {
   let tmpTree: Tree | undefined = undefined;
 
   if (checkParentIsRootTree(targetTree)) {
@@ -57,7 +57,7 @@ export const findParentTreeFromTrees = (rootTree: Tree, targetTree: Tree): O.Opt
   }
 };
 
-export const replaceTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => {
+export const replaceTreeFromRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => {
   if (checkInitalRootTree(targetTree)) {
     return _.cloneDeep(targetTree);
   } else {
@@ -80,7 +80,7 @@ export const replaceTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) =>
   }
 }
 
-export const removeTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
+export const removeTreeFromRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
   targetTree,
   curryFindParentTreeFromTrees(rootTree),
   O.match(
@@ -93,7 +93,7 @@ export const removeTreeFromTrees: CUDFromRootTreeFn = (rootTree, targetTree) => 
   )
 );
 
-const curryReplaceTreeFromTrees = _.curry(replaceTreeFromTrees);
-const curryFindParentTreeFromTrees = _.curry(findParentTreeFromTrees);
+const curryReplaceTreeFromTrees = _.curry(replaceTreeFromRootTree);
+const curryFindParentTreeFromTrees = _.curry(findParentTreeFromRootTree);
 const curryRightAddChildToTree = _.curryRight(addChildToTree);
 const curryRightRemoveChildFromTree = _.curryRight(removeChildFromTree);
