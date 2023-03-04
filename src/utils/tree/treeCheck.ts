@@ -5,6 +5,7 @@ import {
   ROOT_TREE_ID,
   INITIAL_TREE_ID,
 } from '@/src/models/tree.model';
+import { checkEmptyValue } from '@/src/utils/common/commonUtil';
 
 type CheckTreeFn = (targetTree: Tree) => boolean;
 
@@ -27,3 +28,7 @@ export const checkFileTree: CheckTreeFn = tree => {
 export const checkEditableTreeNameStatus: CheckTreeFn = tree => {
   return [TreeStatusInfo.CREATE, TreeStatusInfo.RENAME].includes(tree.treeStatus!);
 };
+
+export const checkParentIsRootTree: CheckTreeFn = tree => {
+  return checkEmptyValue(tree.treePath);
+}
