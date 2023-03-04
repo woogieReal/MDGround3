@@ -46,6 +46,16 @@ describe("treeCRUD", () => {
 
       expect(addedTree).toEqual(targetTree);
     });
+
+    test("parent 트리를 찾지 못할 경우 root 트리에 추가", () => {
+      const targetTree = cloneDeep(NEW_TREE);
+      targetTree.treePath = "-10";
+
+      const res = addTreeToRootTree(MOCK_TREE_DATA, targetTree);
+      const addedTree = res.treeChildren?.find(child => child.treeId === targetTree.treeId);
+
+      expect(addedTree).toEqual(targetTree);
+    });
   });
 
   describe("removeTreeFromRootTree", () => {
