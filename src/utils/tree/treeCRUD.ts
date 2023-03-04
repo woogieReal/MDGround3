@@ -4,6 +4,7 @@ import { getEmptyArrayIfNotArray } from '../common/arrayUtil';
 import { checkInitalRootTree, checkParentIsRootTree } from './treeCheck';
 import { createTreeFullPath, getTreePathArray, sortingTreeByTreeName } from './treeUtil';
 import * as O from 'fp-ts/Option'
+import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
 
 type CUDFromRootTreeFn = (rootTree: Tree, targetTree: Tree) => Tree;
@@ -29,14 +30,10 @@ const removeChildFromTree: CUDFromParentTreeFn = (parentTree, childTree) => {
 
 export const addTreeToRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pipe(
   O.fromNullableK(findParentTreeFromRootTree)(rootTree, targetTree),
-  O.match(
-    () => rootTree,
-    (parentTree) => pipe(
-      parentTree,
-      curryRightAddChildToTree(targetTree),
-      curryReplaceTreeFromTrees(rootTree),
-    )
-  )
+  E.fromOption(() => rootTree),
+  E.toUnion,
+  curryRightAddChildToTree(targetTree),
+  curryReplaceTreeFromTrees(rootTree),
 );
 
 export const findParentTreeFromRootTree = (rootTree: Tree, targetTree: Tree): Tree | undefined => {
