@@ -6,8 +6,10 @@ import {
   INITIAL_TREE_ID,
 } from '@/src/models/tree.model';
 import { checkEmptyValue } from '@/src/utils/common/commonUtil';
+import { getTreeDepth } from './treeUtil';
 
 type CheckTreeFn = (targetTree: Tree) => boolean;
+type CheckCompareTreesFn = (firstTree: Tree, secondTree: Tree) => boolean;
 
 export const checkInitalTree: CheckTreeFn = tree => {
   return tree.treeId === INITIAL_TREE_ID;
@@ -31,4 +33,8 @@ export const checkEditableTreeNameStatus: CheckTreeFn = tree => {
 
 export const checkParentIsRootTree: CheckTreeFn = tree => {
   return checkEmptyValue(tree.treePath);
+}
+
+export const checkSameTreeDepth: CheckCompareTreesFn = (firstTree, secondTree) => {
+  return getTreeDepth(firstTree) === getTreeDepth(secondTree);
 }

@@ -39,7 +39,6 @@ export const getTreeDepth = (tree: Tree): number => {
   return getTreePathArray(tree.treePath).length;
 }
 
-
 export const getTreePathArray = (treePath: string): number[] => {
   return treePath
     .split('|')

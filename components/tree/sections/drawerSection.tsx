@@ -16,7 +16,7 @@ import { getTreeChildrenNames, createInitialRootTree } from '@/src/utils/tree/tr
 import { cloneDeep } from "lodash";
 import React from "react";
 import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
-import { addTreeToRoot, replaceTreeFromRoot, removeTreeFromRoot } from '@/src/utils/tree/treeRootCRUD';
+import { addTreeToUpper, replaceTreeFromUpper, removeTreeFromUpper } from '@/src/utils/tree/treeCRUD';
 import { createTreeStructureFromTrees } from '@/src/utils/tree/treeStructure';
 
 interface Props {
@@ -80,15 +80,15 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
-    setRootTree(addTreeToRoot(rootTree, tree));
+    setRootTree(addTreeToUpper(rootTree, tree));
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setRootTree(replaceTreeFromRoot(rootTree, tree));
+    setRootTree(replaceTreeFromUpper(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree(removeTreeFromRoot(rootTree, deletedTree));
+    setRootTree(removeTreeFromUpper(rootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
@@ -100,11 +100,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           handleContextMenuForTreeItem(contextEvent!);
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          setRootTree(addTreeToRoot(rootTree, methodTargetTree));
+          setRootTree(addTreeToUpper(rootTree, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(replaceTreeFromRoot(rootTree, methodTargetTree));
+          setRootTree(replaceTreeFromUpper(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
