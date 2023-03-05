@@ -5,7 +5,7 @@ import { createTreeFullPath, getTreeDepth, getTreePathArray } from './treeUtil';
 import * as O from 'fp-ts/Option'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-import { addChildToParentCR, findChildFromParentById, removeChildFromParentCR } from './treeChildCRUD';
+import { addChildToParentCR, findChildFromParentById, removeChildFromParentCR, replaceChildFromParent } from './treeChildCRUD';
 
 type CUDFromRootFn = (upperTree: Tree, lowerTree: Tree) => Tree;
 type RFromRootFn = (upperTree: Readonly<Tree>, fullPathArray: number[]) => Tree | undefined;
@@ -38,22 +38,14 @@ export const replaceTreeFromUpper: CUDFromRootFn = (upperTree, lowerTree) => {
   if (checkSameTreeDepth(upperTree, lowerTree)) {
     return _.cloneDeep(lowerTree);
   } else {
-    let cloneUpperTree = _.cloneDeep(upperTree);
-    let tmpTree: Tree = cloneUpperTree;
-  
-    getTreePathArray(createTreeFullPath(lowerTree))
-      .forEach((path: number, idx: number, paths: number[]) => {
-        if (paths.length -1 !== idx) {
-          tmpTree = checkInitalRootTree(tmpTree)
-            ? cloneUpperTree.treeChildren?.find((tree) => tree.treeId === path)!
-            : tmpTree.treeChildren?.find((tree) => tree.treeId === path)!
-        } else {
-          const index = tmpTree.treeChildren?.findIndex(tree => tree.treeId === path);
-          tmpTree.treeChildren![index!] = lowerTree;
-        }
-      });
-    
-    return cloneUpperTree;
+    const parentTree = findTreeFromUpper(upperTree, getTreePathArray(lowerTree.treePath));
+
+    if (parentTree) {
+      const replacedParentTree = replaceChildFromParent(parentTree, lowerTree);
+      return replaceTreeFromUpper(upperTree, replacedParentTree);
+    } else {
+      return _.cloneDeep(upperTree);
+    }
   }
 }
 
