@@ -15,6 +15,11 @@ export const addChildToParent: CUDFromParentFn = (parentTree, childTree) => {
   return copyParentTree;
 }
 
+export const findChildFromParentById = (
+  parentTree: Readonly<Tree>,
+  childTreeId: number
+): Tree | undefined => _.find(parentTree.treeChildren, { 'treeId': childTreeId });
+
 export const removeChildFromParent: CUDFromParentFn = (parentTree, childTree) => {
   const copyParentTree = _.cloneDeep(parentTree);
   

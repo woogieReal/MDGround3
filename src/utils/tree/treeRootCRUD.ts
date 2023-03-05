@@ -1,38 +1,38 @@
 import { Tree } from '@/src/models/tree.model';
 import _ from 'lodash';
-import { checkInitalRootTree, checkParentIsRootTree } from './treeCheck';
+import { checkInitalRootTree } from './treeCheck';
 import { createTreeFullPath, getTreePathArray, sortingTreeByTreeName } from './treeUtil';
 import * as O from 'fp-ts/Option'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-import { addChildToParentCR, removeChildFromParentCR } from './treeChildCRUD';
+import { addChildToParentCR, findChildFromParentById, removeChildFromParentCR } from './treeChildCRUD';
 
 type CUDFromRootFn = (rootTree: Tree, targetTree: Tree) => Tree;
+type RFromRootFn = (rootTree: Readonly<Tree>, fullPathArray: number[]) => Tree | undefined;
 
 export const addTreeToRoot: CUDFromRootFn = (rootTree, targetTree) => pipe(
-  O.fromNullableK(findParentTreeFromRoot)(rootTree, targetTree),
+  O.fromNullableK(findTreeFromRoot)(rootTree, getTreePathArray(targetTree.treePath)),
   E.fromOption(() => rootTree),
   E.toUnion,
   addChildToParentCR(targetTree),
   replaceTreeFromTreesCL(rootTree),
 );
 
-export const findParentTreeFromRoot = (rootTree: Tree, targetTree: Tree): Tree | undefined => {
-  let tmpTree: Tree | undefined = undefined;
+export const findTreeFromRoot: RFromRootFn = (parentTree, fullPathArray) => {
+  const treeId = fullPathArray.shift();
+  if (treeId) {
+    const childTree = findChildFromParentById(parentTree, treeId);
 
-  if (checkParentIsRootTree(targetTree)) {
-    return rootTree;
+    if (childTree) {
+      return findTreeFromRoot(childTree, fullPathArray);
+    } else {
+      return undefined;
+    }
+    
   } else {
-    getTreePathArray(targetTree.treePath)
-      .forEach((path: number) => {
-        tmpTree = tmpTree
-          ? tmpTree.treeChildren?.find((tree) => tree.treeId === path)
-          : rootTree.treeChildren?.find((tree) => tree.treeId === path)
-      });
-  
-    return tmpTree;
+    return parentTree;
   }
-};
+}
 
 export const replaceTreeFromRoot: CUDFromRootFn = (rootTree, targetTree) => {
   if (checkInitalRootTree(targetTree)) {
@@ -58,7 +58,7 @@ export const replaceTreeFromRoot: CUDFromRootFn = (rootTree, targetTree) => {
 }
 
 export const removeTreeFromRoot: CUDFromRootFn = (rootTree, targetTree) => pipe(
-  O.fromNullableK(findParentTreeFromRoot)(rootTree, targetTree),
+  O.fromNullableK(findTreeFromRoot)(rootTree, getTreePathArray(targetTree.treePath)),
   O.match(
     () => rootTree,
     (parentTree) => pipe(

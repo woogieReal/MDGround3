@@ -1,18 +1,19 @@
 import { describe, expect, test } from "@jest/globals";
-import { addTreeToRoot, findParentTreeFromRoot, removeTreeFromRoot } from "@/src/utils/tree/treeRootCRUD";
+import { addTreeToRoot, findTreeFromRoot, removeTreeFromRoot } from "@/src/utils/tree/treeRootCRUD";
 import { DEPTH_1_TREE, DEPTH_3_TREE, MOCK_TREE_DATA, NEW_TREE } from "@/tests/tree/mockData";
 import { cloneDeep } from "lodash";
 import { ROOT_TREE_ID } from "@/src/models/tree.model";
+import { getTreePathArray } from "@/src/utils/tree/treeUtil";
 
 describe("treeCRUD", () => {
-  describe("findParentTreeFromRoot", () => {
+  describe("findTreeFromRoot", () => {
     test("targetTree의 depth가 1일 때", () => {
-      const res = findParentTreeFromRoot(MOCK_TREE_DATA, DEPTH_1_TREE);
+      const res = findTreeFromRoot(MOCK_TREE_DATA, getTreePathArray(DEPTH_1_TREE.treePath));
       expect(res && res.treeId).toBe(ROOT_TREE_ID);
     });
   
     test("targetTree의 depth가 n일 때", () => {
-      const res = findParentTreeFromRoot(MOCK_TREE_DATA, DEPTH_3_TREE);
+      const res = findTreeFromRoot(MOCK_TREE_DATA, getTreePathArray(DEPTH_3_TREE.treePath));
 
       const targetTree = cloneDeep(DEPTH_3_TREE);
       const [ parentId1, parentId2 ] = targetTree.treePath.split('|').map(Number);
