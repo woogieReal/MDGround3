@@ -16,7 +16,7 @@ import { getTreeChildrenNames, createInitialRootTree } from '@/src/utils/tree/tr
 import { cloneDeep } from "lodash";
 import React from "react";
 import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
-import { addTreeToRootTree, replaceTreeFromRootTree, removeTreeFromRootTree } from '@/src/utils/tree/treeCRUD';
+import { addTreeToRoot, replaceTreeFromRoot, removeTreeFromRoot } from '@/src/utils/tree/treeRootCRUD';
 import { createTreeStructureFromTrees } from '@/src/utils/tree/treeStructure';
 
 interface Props {
@@ -80,15 +80,15 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const clickCreateForContext = (tree: Tree) => {
     setAnchorEl(null);
-    setRootTree(addTreeToRootTree(rootTree, tree));
+    setRootTree(addTreeToRoot(rootTree, tree));
   }
 
   const clickRenameForContext = (tree: Tree) => {
-    setRootTree(replaceTreeFromRootTree(rootTree, tree));
+    setRootTree(replaceTreeFromRoot(rootTree, tree));
   }
 
   const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree(removeTreeFromRootTree(rootTree, deletedTree));
+    setRootTree(removeTreeFromRoot(rootTree, deletedTree));
     setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
   }
   // -- 컨텍스트
@@ -100,11 +100,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           handleContextMenuForTreeItem(contextEvent!);
           break;
         case MethodTypeForRecursivTreeItem.CREATE:
-          setRootTree(addTreeToRootTree(rootTree, methodTargetTree));
+          setRootTree(addTreeToRoot(rootTree, methodTargetTree));
           handleTreeDoubleClick(methodTargetTree);
           break;
         case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(replaceTreeFromRootTree(rootTree, methodTargetTree));
+          setRootTree(replaceTreeFromRoot(rootTree, methodTargetTree));
           setFiles((currFiles: Tree[]) => {
             const cloneFiles = cloneDeep(currFiles);
             const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
