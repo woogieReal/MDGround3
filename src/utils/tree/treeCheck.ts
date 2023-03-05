@@ -36,5 +36,8 @@ export const checkParentIsRootTree: CheckTreeFn = tree => {
 }
 
 export const checkSameTreeDepth: CheckCompareTreesFn = (firstTree, secondTree) => {
-  return getTreeDepth(firstTree) === getTreeDepth(secondTree);
+  return (
+    getTreeDepth(firstTree) === getTreeDepth(secondTree)
+    && checkInitalRootTree(firstTree) === checkInitalRootTree(secondTree)
+  );
 }
