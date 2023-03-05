@@ -32,8 +32,8 @@ export const addTreeToRootTree: CUDFromRootTreeFn = (rootTree, targetTree) => pi
   O.fromNullableK(findParentTreeFromRootTree)(rootTree, targetTree),
   E.fromOption(() => rootTree),
   E.toUnion,
-  curryRightAddChildToTree(targetTree),
-  curryReplaceTreeFromTrees(rootTree),
+  addChildToTreeCR(targetTree),
+  replaceTreeFromTreesCL(rootTree),
 );
 
 export const findParentTreeFromRootTree = (rootTree: Tree, targetTree: Tree): Tree | undefined => {
@@ -82,12 +82,12 @@ export const removeTreeFromRootTree: CUDFromRootTreeFn = (rootTree, targetTree) 
     () => rootTree,
     (parentTree) => pipe(
       parentTree,
-      curryRightRemoveChildFromTree(targetTree),
-      curryReplaceTreeFromTrees(rootTree),
+      removeChildFromTreeCR(targetTree),
+      replaceTreeFromTreesCL(rootTree),
     )
   )
 );
 
-const curryReplaceTreeFromTrees = _.curry(replaceTreeFromRootTree);
-const curryRightAddChildToTree = _.curryRight(addChildToTree);
-const curryRightRemoveChildFromTree = _.curryRight(removeChildFromTree);
+const replaceTreeFromTreesCL = _.curry(replaceTreeFromRootTree);
+const addChildToTreeCR = _.curryRight(addChildToTree);
+const removeChildFromTreeCR = _.curryRight(removeChildFromTree);
