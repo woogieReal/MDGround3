@@ -1,30 +1,25 @@
+import React, { useEffect, useState } from "react";
+
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import Editor from "@monaco-editor/react";
+import Markdown from 'markdown-to-jsx';
+import { EditorViewType, EDITOR_OPTION } from "@/src/models/editor.model";
+
 import CssBaseline from '@mui/material/CssBaseline';
-import { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree, TreeStatusInfo } from '@/src/models/tree.model';
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
-import dynamic from "next/dynamic";
-import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
 import { checkPressedCtrlEnter } from '@/src/utils/common/keyPressUtil';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
-import * as commands from '@uiw/react-md-editor/lib/commands';
-import { PreviewType } from '@uiw/react-md-editor/lib/Context';
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 import { createInitialTree } from '@/src/utils/tree/treeUtil';
-
-const MDEditor = dynamic(
-  () => import("@uiw/react-md-editor/lib/Editor"),
-  { ssr: false }
-);
 
 interface Props {
   open: boolean;
@@ -33,16 +28,19 @@ interface Props {
   files: Tree[];
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
-  const { width, height } = useWindowDimensions();
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
-  const [eachTabPreview, setEachTabPreview] = useState<Map<number, PreviewType>>(new Map());
+  const [eachTabPreview, setEachTabPreview] = useState<Map<number, EditorViewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
-  const handlChangeContent = (e: any) => {
+  const handlChangeContent = (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent,
+  ) => {
     const currentEachTabContent = new Map(eachTabContent);
-    currentEachTabContent.set(currentTabTreeId, e as string);
+    // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
+    currentEachTabContent.set(Number(sessionStorage.getItem('currentTabTreeId')), value || '');
     setEachTabContent(currentEachTabContent);
   }
 
@@ -55,10 +53,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       setIsReadyToContentTree(false);
     },
   });
-
-  const executeExtraCommands = (preview: PreviewType) => {
-    setEachTabPreview(currentEachTabPreview => currentEachTabPreview.set(Number(sessionStorage.getItem('currentTabTreeId')), preview));
-  }
 
   const checkReadyToEditContent = () => {
     const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: eachTabContent.get(currentTabTreeId) });
@@ -80,6 +74,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
+        
         setEachTabContent(currentEachTabContent);
 
         const isContentExist = !!files[fileTabVaue].treeContent;
@@ -114,26 +109,27 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
-      <Box
+      <Grid 
+        container
         id={styles.viewMain}
         sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
       >
-        <MDEditor
-          value={eachTabContent.get(currentTabTreeId)}
-          onChange={handlChangeContent}
-          onKeyUp={handleKeyPress}
-          preview={eachTabPreview.get(currentTabTreeId) || 'preview'}
-          height={height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2)}
-          previewOptions={{
-            remarkPlugins: [[remarkBreaks]]
-          }}
-          extraCommands={[
-            { ...commands.codeEdit, execute: function execute(state, api) { executeExtraCommands('edit') } },
-            { ...commands.codeLive, execute: function execute(state, api) { executeExtraCommands('live') } },
-            { ...commands.codePreview, execute: function execute(state, api) { executeExtraCommands('preview') } },
-          ]}
-        />
-      </Box>
+        <Grid item xs={6}>
+          <Editor
+            value={eachTabContent.get(currentTabTreeId)}
+            defaultValue={eachTabContent.get(currentTabTreeId)}
+            height="94vh"
+            defaultLanguage="markdown"
+            options={EDITOR_OPTION}
+            onChange={handlChangeContent}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <Markdown
+            children={eachTabContent.get(currentTabTreeId) || ''}
+          />
+        </Grid>
+      </Grid>
       <LodingBackDrop isOpen={updateTree.isLoading} />
     </Box>
   );
