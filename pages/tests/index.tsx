@@ -1,25 +1,48 @@
-import { Box, makeStyles, TextField } from "@mui/material";
-import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
-import styles from '@/styles/tree.module.scss'
+import React, { useEffect, useState } from "react";
+
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import Editor, { useMonaco } from "@monaco-editor/react";
+import Markdown from 'markdown-to-jsx';
 
 const Home = () => {
   
+  const monaco = useMonaco();
+
+  const [value, setValue] = useState<string>('');
+
+  const editorOption: monaco.editor.IStandaloneEditorConstructionOptions = {
+    tabSize: 2,
+  }
+
+  const handleEditorChange = (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent,
+  ) => {
+    setValue(value!);
+  }
+
+  useEffect(() => {
+    if (monaco) {
+      // console.log("here is the monaco instance:", monaco);
+    }
+  }, [monaco]);
+
   return (
-    <Box>
-      <Box>
-        <Box className={`${styles.treeItemBox} ${styles.readOnly}`} sx={{ display: 'inline-block' }}>
-          <FolderOutlinedIcon sx={{ mr: 1, }} />
-          <TextField size="small" variant="outlined" disabled value={'아 뭐'} className={styles.readOnly} />
-        </Box>
-      </Box>
-      <Box>
-        <Box className={styles.treeItemBox} sx={{ display: 'inline-block' }}>
-          <FolderOutlinedIcon sx={{ mr: 1, }} />
-          <TextField size="small" variant="outlined" value={'아 뭐'} className={styles.editable} />
-        </Box>
-      </Box>
-    </Box>
-  )
+    <div>
+      <Editor
+        value={value}
+        height="90vh"
+        // defaultValue="// some comment"
+        // theme="vs-dark"
+        defaultLanguage="markdown"
+        options={editorOption}
+        onChange={handleEditorChange}
+      />
+      <Markdown
+        children={value}
+      />
+    </div>
+  );
 }
 
 export default Home;
