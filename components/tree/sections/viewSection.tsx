@@ -13,7 +13,6 @@ import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
 import { checkPressedCtrlEnter } from '@/src/utils/common/keyPressUtil';
-import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import remarkBreaks from 'remark-breaks'
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
@@ -21,6 +20,7 @@ import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 import { createInitialTree } from '@/src/utils/tree/treeUtil';
 import { checkEmptyValue } from "@/src/utils/common/commonUtil";
+import { showSnackbar } from "@/components/common/module/customSnackbar";
 
 interface Props {
   open: boolean;
@@ -49,6 +49,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
+      showSnackbar('saved');
     },
   });
 
@@ -140,7 +141,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           />
         </Grid>
       </Grid>
-      <LodingBackDrop isOpen={updateTree.isLoading} />
     </Box>
   );
 }

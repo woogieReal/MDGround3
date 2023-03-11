@@ -8,6 +8,7 @@ import Head from 'next/head';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from '@/src/theme';
+import { CustomSnackbar } from '@/components/common/module/customSnackbar';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -30,6 +31,7 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
           <ReactQueryDevtools initialIsOpen={false} />
+          <CustomSnackbar />
         </QueryClientProvider>
       </ThemeProvider>
     </CacheProvider>
