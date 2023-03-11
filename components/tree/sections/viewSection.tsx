@@ -1,3 +1,6 @@
+import 'prismjs/themes/prism-coy.css'
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
+
 import React, { useEffect, useState } from "react";
 
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
@@ -43,7 +46,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
     currentEachTabContent.set(Number(sessionStorage.getItem('currentTabTreeId')), value || '');
     setEachTabContent(currentEachTabContent);
-    parseMd(value || '').then(res => setCurrentTabHtml(res));
+    setCurrentTabHtml(parseMd(value));
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
