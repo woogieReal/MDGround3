@@ -1,6 +1,3 @@
-import 'prismjs/themes/prism-coy.css'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
-
 import React, { useEffect, useState } from "react";
 
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
