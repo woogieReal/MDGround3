@@ -1,46 +1,32 @@
-import React, { useEffect, useState } from "react";
-
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import Editor, { useMonaco } from "@monaco-editor/react";
-import Markdown from 'markdown-to-jsx';
+import React, { useState, useEffect } from "react";
 
 const Home = () => {
   
-  const monaco = useMonaco();
-
   const [value, setValue] = useState<string>('');
-
-  const editorOption: monaco.editor.IStandaloneEditorConstructionOptions = {
-    tabSize: 2,
-  }
-
-  const handleEditorChange = (
-    value: string | undefined,
-    ev: monaco.editor.IModelContentChangedEvent,
-  ) => {
-    setValue(value!);
-  }
+  const [isAutoSaved, setIsAutoSaved] = useState<boolean>(false);
 
   useEffect(() => {
-    if (monaco) {
-      // console.log("here is the monaco instance:", monaco);
+    let timeout: NodeJS.Timeout;
+
+    timeout = setTimeout(() => {
+      setIsAutoSaved(true);
+    }, 5000);
+    if (value !== '') {
     }
-  }, [monaco]);
+
+    return () => clearTimeout(timeout);
+  }, [value]);
 
   return (
     <div>
-      <Editor
+      <input
         value={value}
-        height="90vh"
-        // defaultValue="// some comment"
-        // theme="vs-dark"
-        defaultLanguage="markdown"
-        options={editorOption}
-        onChange={handleEditorChange}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setIsAutoSaved(false);
+        }}
       />
-      <Markdown
-        children={value}
-      />
+      {isAutoSaved && <p>It's been 5 seconds since the last change!</p>}
     </div>
   );
 }

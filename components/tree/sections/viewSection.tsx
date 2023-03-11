@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import Editor from "@monaco-editor/react";
+import Editor, { OnChange, OnMount } from "@monaco-editor/react";
 import Markdown from 'markdown-to-jsx';
 import { EditorViewType, EDITOR_OPTION } from "@/src/models/editor.model";
 
@@ -20,6 +20,7 @@ import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 import { createInitialTree } from '@/src/utils/tree/treeUtil';
+import { checkEmptyValue } from "@/src/utils/common/commonUtil";
 
 interface Props {
   open: boolean;
@@ -34,10 +35,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
-  const handlChangeContent = (
-    value: string | undefined,
-    ev: monaco.editor.IModelContentChangedEvent,
-  ) => {
+  const handlChangeContent: OnChange = (value, ev) => {
     const currentEachTabContent = new Map(eachTabContent);
     // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
     currentEachTabContent.set(Number(sessionStorage.getItem('currentTabTreeId')), value || '');
@@ -105,6 +103,18 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       setEachTabPreview(currentEachTabPreview);
     }
   }, [files.length]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    
+    if (!checkEmptyValue(eachTabContent.get(currentTabTreeId))) {
+      timeout = setTimeout(() => {
+        checkReadyToEditContent();
+      }, 5000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [eachTabContent.get(currentTabTreeId)]);
 
   return (
     <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
