@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import Markdown from 'markdown-to-jsx';
 import { EditorViewType, EDITOR_OPTION } from "@/src/models/editor.model";
 
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,7 +11,6 @@ import { useMutation } from '@tanstack/react-query';
 import ApiHandler from '@/src/apis/apiHandler';
 import { ApiName } from '@/src/apis/apiInfo';
 import { checkPressedCtrlEnter } from '@/src/utils/common/keyPressUtil';
-import remarkBreaks from 'remark-breaks'
 import { ValidationResponse } from '@/src/models/validation.model';
 import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
@@ -22,6 +19,7 @@ import { createInitialTree } from '@/src/utils/tree/treeUtil';
 import { checkEmptyValue } from "@/src/utils/common/commonUtil";
 import { showSnackbar } from "@/components/common/module/customSnackbar";
 import useWindowDimensions from "@/src/hooks/useWindowDimensions";
+import parseMd from "@/src/utils/common/parserUtil";
 
 interface Props {
   open: boolean;
@@ -36,6 +34,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, EditorViewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
+  const [currentTabHTML, setCurrentTabHtml] = useState<string>('');
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
 
@@ -44,6 +43,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
     currentEachTabContent.set(Number(sessionStorage.getItem('currentTabTreeId')), value || '');
     setEachTabContent(currentEachTabContent);
+    parseMd(value || '').then(res => setCurrentTabHtml(res));
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -151,10 +151,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             overflowY: 'scroll'
           }}
         >
-          <Markdown
-            options={{  }}
-            children={eachTabContent.get(currentTabTreeId) || ''}
-          />
+          <p dangerouslySetInnerHTML={{ __html: currentTabHTML }} ></p>
         </Grid>
       </Grid>
     </Box>
