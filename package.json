@@ -36,7 +36,13 @@
     "path": "^0.12.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "rehype-raw": "^6.1.1",
+    "rehype-sanitize": "^5.0.1",
+    "rehype-stringify": "^9.0.3",
     "remark-breaks": "^3.0.2",
+    "remark-gfm": "^3.0.1",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
     "sass": "^1.55.0"
   },
   "devDependencies": {
