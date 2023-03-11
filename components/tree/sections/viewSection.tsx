@@ -21,6 +21,7 @@ import { cloneDeep } from "lodash";
 import { createInitialTree } from '@/src/utils/tree/treeUtil';
 import { checkEmptyValue } from "@/src/utils/common/commonUtil";
 import { showSnackbar } from "@/components/common/module/customSnackbar";
+import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 
 interface Props {
   open: boolean;
@@ -29,6 +30,9 @@ interface Props {
   files: Tree[];
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
+  const { width, height } = useWindowDimensions();
+  const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
+
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
   const [eachTabPreview, setEachTabPreview] = useState<Map<number, EditorViewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
@@ -62,6 +66,10 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     isReadyToContentTree && updateTree.mutate();
   }, [isReadyToContentTree])
+
+  useEffect(() => {
+    setCalculatedHeight(height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2));
+  }, [height])
 
   useEffect(() => {
     if (files[fileTabVaue]) {
@@ -135,8 +143,16 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             onChange={handlChangeContent}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+          sx={{
+            height: calculatedHeight,
+            overflowY: 'scroll'
+          }}
+        >
           <Markdown
+            options={{  }}
             children={eachTabContent.get(currentTabTreeId) || ''}
           />
         </Grid>
