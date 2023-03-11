@@ -29,7 +29,6 @@
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
     "log4js": "^6.7.1",
-    "markdown-to-jsx": "^7.1.9",
     "mysql2": "^2.3.3",
     "next": "12.3.1",
     "next-remove-imports": "^1.0.8",
@@ -43,7 +42,8 @@
     "remark-gfm": "^3.0.1",
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
-    "sass": "^1.55.0"
+    "sass": "^1.55.0",
+    "unified": "^10.1.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.4.3",
