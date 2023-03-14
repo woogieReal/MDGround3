@@ -169,7 +169,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             overflowY: 'scroll'
           }}
         >
-          <p dangerouslySetInnerHTML={{ __html: currentTabHTML }} ></p>
+          <div dangerouslySetInnerHTML={{ __html: currentTabHTML }} style={{ marginTop: -20 }} />
         </Grid>
       </Grid>
     </Box>
