@@ -116,11 +116,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     
-    if (!checkEmptyValue(eachTabContent.get(currentTabTreeId))) {
-      timeout = setTimeout(() => {
-        checkReadyToEditContent();
-      }, 5000);
-    }
+    timeout = setTimeout(() => {
+      checkReadyToEditContent();
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, [eachTabContent.get(currentTabTreeId)]);
