@@ -4,7 +4,7 @@ import Editor, { OnChange, OnMount } from "@monaco-editor/react";
 import { EditorViewType, EDITOR_OPTION } from "@/src/models/editor.model";
 
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Grid } from '@mui/material';
+import { Box, Button, ButtonGroup, Grid, IconButton } from '@mui/material';
 import styles from '@/styles/tree.module.scss'
 import { TEST_USER_ID, Tree, TreeStatusInfo } from '@/src/models/tree.model';
 import { useMutation } from '@tanstack/react-query';
@@ -16,10 +16,13 @@ import { validateEditContentTree } from '@/src/utils/tree/treeValidation';
 import { AxiosResponse } from 'axios';
 import { cloneDeep } from "lodash";
 import { createInitialTree } from '@/src/utils/tree/treeUtil';
-import { checkEmptyValue } from "@/src/utils/common/commonUtil";
 import { showSnackbar } from "@/components/common/module/customSnackbar";
 import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 import parseMd from "@/src/utils/common/parserUtil";
+import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import uesViewSize from "@/src/hooks/uesViewSize";
 
 interface Props {
   open: boolean;
@@ -32,11 +35,18 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
 
   const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
-  const [eachTabPreview, setEachTabPreview] = useState<Map<number, EditorViewType>>(new Map());
+  const [eachTabViewType, setEachTabViewType] = useState<Map<number, EditorViewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
   const [currentTabHTML, setCurrentTabHtml] = useState<string>('');
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
+  const [ editorSize, viewerSize ] = uesViewSize(eachTabViewType.get(currentTabTreeId));
+  
+  const handleClickViewType = (viewType: EditorViewType) => {
+    const currentEachTabPreview = cloneDeep(eachTabViewType);
+    currentEachTabPreview.set(currentTabTreeId, viewType);
+    setEachTabViewType(currentEachTabPreview);
+  }
 
   const handlChangeContent: OnChange = (value, ev) => {
     const currentEachTabContent = new Map(eachTabContent);
@@ -77,7 +87,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       setCurrentTabTreeId(targetTreeId);
 
       const currentEachTabContent = cloneDeep(eachTabContent);
-      const currentEachTabPreview = cloneDeep(eachTabPreview);
+      const currentEachTabPreview = cloneDeep(eachTabViewType);
 
       if (!currentEachTabContent.get(targetTreeId)) {
         currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
@@ -86,7 +96,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
         const isContentExist = !!files[fileTabVaue].treeContent;
         currentEachTabPreview.set(targetTreeId, isContentExist ? 'preview' : 'live');
-        setEachTabPreview(currentEachTabPreview);
+        setEachTabViewType(currentEachTabPreview);
       }
 
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
@@ -98,7 +108,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
     if (checkTabClosed()) {
       const currentEachTabContent = cloneDeep(eachTabContent);
-      const currentEachTabPreview = cloneDeep(eachTabPreview);
+      const currentEachTabPreview = cloneDeep(eachTabViewType);
 
       const treeIdsBeforeTabClosed = Array.from(currentEachTabContent.keys());
       const treeIdsAfterTabClosed = files.map((file: Tree) => file.treeId);
@@ -109,7 +119,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       currentEachTabPreview.delete(tabClosedTreeId!);
 
       setEachTabContent(currentEachTabContent);
-      setEachTabPreview(currentEachTabPreview);
+      setEachTabViewType(currentEachTabPreview);
     }
   }, [files.length]);
 
@@ -130,20 +140,30 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         container
         id={styles.viewMain}
         sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
+        rowSpacing={2}
       >
-        <Grid item xs={6}>
+        <Grid item xs={12}>
+          <ButtonGroup size="small" aria-label="small button group">
+            <IconButton onClick={() => handleClickViewType('edit')} children={<EditOutlinedIcon />} />
+            <IconButton onClick={() => handleClickViewType('live')} children={<ImportContactsOutlinedIcon />} />
+            <IconButton onClick={() => handleClickViewType('preview')} children={<RemoveRedEyeOutlinedIcon />} />
+          </ButtonGroup>
+        </Grid>
+        <Grid item
+          xs={editorSize}
+        >
           <Editor
             value={eachTabContent.get(currentTabTreeId)}
             defaultValue={eachTabContent.get(currentTabTreeId)}
-            height="94vh"
+            width={editorSize === 0 ? editorSize : "100%"}
+            height={editorSize === 0 ? editorSize : "94vh"}
             defaultLanguage="markdown"
             options={EDITOR_OPTION}
             onChange={handlChangeContent}
           />
         </Grid>
-        <Grid
-          item
-          xs={6}
+        <Grid item
+          xs={viewerSize}
           sx={{
             height: calculatedHeight,
             overflowY: 'scroll'
