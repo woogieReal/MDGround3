@@ -78,7 +78,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }, [isReadyToContentTree])
 
   useEffect(() => {
-    setCalculatedHeight(height - (Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2));
+    setCalculatedHeight(height - (40 + Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2));
   }, [height])
 
   useEffect(() => {
@@ -140,7 +140,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         container
         id={styles.viewMain}
         sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
-        rowSpacing={2}
+        rowSpacing={1}
       >
         <Grid item xs={12}>
           <ButtonGroup size="small" aria-label="small button group">
@@ -156,7 +156,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             value={eachTabContent.get(currentTabTreeId)}
             defaultValue={eachTabContent.get(currentTabTreeId)}
             width={editorSize === 0 ? editorSize : "100%"}
-            height={editorSize === 0 ? editorSize : "94vh"}
+            height={editorSize === 0 ? editorSize : "89vh"}
             defaultLanguage="markdown"
             options={EDITOR_OPTION}
             onChange={handlChangeContent}
