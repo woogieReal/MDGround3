@@ -134,7 +134,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }, [eachTabContent.get(currentTabTreeId)]);
 
   return (
-    <Box sx={{ marginTop: styles.appHeaderHeightPX }} >
+    <Box id={styles.viewSection} sx={{ marginTop: styles.appHeaderHeightPX }} >
       <CssBaseline />
       <Grid 
         container
@@ -169,7 +169,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             overflowY: 'scroll'
           }}
         >
-          <div dangerouslySetInnerHTML={{ __html: currentTabHTML }} style={{ marginTop: -20 }} />
+          <div id={styles.viewer} dangerouslySetInnerHTML={{ __html: currentTabHTML }} style={{ marginTop: -20 }} />
         </Grid>
       </Grid>
     </Box>
