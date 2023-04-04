@@ -132,7 +132,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     
     timeout = setTimeout(() => {
       checkReadyToEditContent();
-    }, 3000);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, [eachTabContent.get(currentTabTreeId)]);
