@@ -47,6 +47,10 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     currentEachTabPreview.set(currentTabTreeId, viewType);
     setEachTabViewType(currentEachTabPreview);
   }
+  
+  const handleMountEditor: OnMount = (editor, monaco) => {
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => checkReadyToEditContent(editor.getValue()))
+  }
 
   const handlChangeContent: OnChange = (value, ev) => {
     const currentEachTabContent = new Map(eachTabContent);
@@ -67,8 +71,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     },
   });
 
-  const checkReadyToEditContent = () => {
-    const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: eachTabContent.get(currentTabTreeId) });
+  const checkReadyToEditContent = (content?: string) => {
+    const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: content || eachTabContent.get(currentTabTreeId) });
     setEditContentTree(response.processedData);
     setIsReadyToContentTree(response.isValid);
   }
@@ -159,6 +163,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             height={editorSize === 0 ? editorSize : "89vh"}
             defaultLanguage="markdown"
             options={EDITOR_OPTION}
+            onMount={handleMountEditor}
             onChange={handlChangeContent}
           />
         </Grid>
