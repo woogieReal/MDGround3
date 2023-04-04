@@ -44,7 +44,8 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       break;
     case "PUT":
       DBConnection.transactionExecutor(async (connection: Connection) => {
-        const request = JSON.parse(body)
+        // const request = JSON.parse(body)
+        const request = body
         let query = '';
         let params: any[] = [];
 
