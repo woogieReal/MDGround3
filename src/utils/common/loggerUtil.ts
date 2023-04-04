@@ -19,6 +19,13 @@ if (process.env.NODE_ENV === 'development') {
   };
 } else {
   // produnction 모드일 때 추가 필요
+  // 임시로 development 모드와 동일하게 적용
+  appenders = {
+    ...appenders,
+    app: { type: "file", filename: "logs/app.log" },
+    auth: { type: "file", filename: "logs/tree.log" },
+    tree: { type: "file", filename: "logs/auth.log" },
+  };
 }
 
 

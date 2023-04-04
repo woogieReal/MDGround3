@@ -2,7 +2,7 @@ import DrawerSection from '@/components/tree/sections/drawerSection'
 import ViewSection from '@/components/tree/sections/viewSection'
 import { Box, Button, Tabs, Tab, AppBar, IconButton } from '@mui/material'
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import styles from '@/styles/tree.module.scss'
 import MenuIcon from '@mui/icons-material/Menu';
 import TabPanel from '@/components/common/atoms/tabPanel'
@@ -198,8 +198,8 @@ const Home: NextPage = () => {
           textColor="inherit"
         >
           {files?.map((file: Tree, index: number) => (
-            <Tab key={`${index}-${file.treeId}`} {...a11yProps(index)} component={() => (
-              <Box className={styles.fileTabBox}>
+            <Tab key={`${index}-${file.treeId}`} {...a11yProps(index)} component={forwardRef((props, ref) => (
+              <Box className={styles.fileTabBox} ref={ref}>
                 <Button
                   className={`${styles.fileTabButton} ${file.treeStatus === TreeStatusInfo.TEMP_READ && styles.tempRead}`}
                   sx={{ color: 'inherit', font: 'inherit' }}
@@ -211,7 +211,7 @@ const Home: NextPage = () => {
                   <ClearOutlinedIcon fontSize="inherit" />
                 </IconButton>
               </Box>
-            )} />
+            ))} />
           ))}
         </Tabs>
       </AppBar>

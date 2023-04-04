@@ -1,25 +1,15 @@
-import { Box, makeStyles, TextField } from "@mui/material";
-import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
-import styles from '@/styles/tree.module.scss'
+import { CustomSnackbar, showSnackbar } from '@/components/common/module/customSnackbar';
+import * as React from 'react';
 
-const Home = () => {
-  
+const Test = () => {
+  // showSnackbar('!!!!');
+
   return (
-    <Box>
-      <Box>
-        <Box className={`${styles.treeItemBox} ${styles.readOnly}`} sx={{ display: 'inline-block' }}>
-          <FolderOutlinedIcon sx={{ mr: 1, }} />
-          <TextField size="small" variant="outlined" disabled value={'아 뭐'} className={styles.readOnly} />
-        </Box>
-      </Box>
-      <Box>
-        <Box className={styles.treeItemBox} sx={{ display: 'inline-block' }}>
-          <FolderOutlinedIcon sx={{ mr: 1, }} />
-          <TextField size="small" variant="outlined" value={'아 뭐'} className={styles.editable} />
-        </Box>
-      </Box>
-    </Box>
-  )
+    <div>
+      <button onClick={() => showSnackbar('???')} >클릭해!</button>
+      <CustomSnackbar />
+    </div>
+  ) 
 }
 
-export default Home;
+export default Test;
