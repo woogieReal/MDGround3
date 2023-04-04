@@ -38,6 +38,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const [eachTabViewType, setEachTabViewType] = useState<Map<number, EditorViewType>>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
   const [currentTabHTML, setCurrentTabHtml] = useState<string>('');
+  const [savedContent, setSavedContent] = useState<string>('');
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
   const [ editorSize, viewerSize ] = uesViewSize(eachTabViewType.get(currentTabTreeId));
@@ -67,6 +68,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
+      setSavedContent(editContentTree.treeContent || '');
       showSnackbar('saved');
     },
   });
@@ -102,8 +104,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         currentEachTabPreview.set(targetTreeId, isContentExist ? 'preview' : 'live');
         setEachTabViewType(currentEachTabPreview);
       }
-
+      
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
+      setSavedContent(files[fileTabVaue].treeContent || '');
     }
   }, [files[fileTabVaue]]);
 
@@ -128,13 +131,16 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }, [files.length]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    
-    timeout = setTimeout(() => {
-      checkReadyToEditContent();
-    }, 5000);
-
-    return () => clearTimeout(timeout);
+    if (savedContent !== eachTabContent.get(currentTabTreeId)) {
+      console.log('!');
+      let timeout: NodeJS.Timeout;
+      
+      timeout = setTimeout(() => {
+        checkReadyToEditContent();
+      }, 5000);
+  
+      return () => clearTimeout(timeout);
+    }
   }, [eachTabContent.get(currentTabTreeId)]);
 
   return (
