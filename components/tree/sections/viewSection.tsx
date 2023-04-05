@@ -23,6 +23,7 @@ import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlin
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import uesViewSize from "@/src/hooks/uesViewSize";
+import { checkNotUndefined } from "@/src/utils/common/commonUtil";
 
 interface Props {
   open: boolean;
@@ -107,6 +108,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
       setSavedContent(files[fileTabVaue].treeContent || '');
+      setCurrentTabHtml(parseMd(files[fileTabVaue].treeContent));
     }
   }, [files[fileTabVaue]]);
 
@@ -132,7 +134,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   useEffect(() => {
     if (savedContent !== eachTabContent.get(currentTabTreeId)) {
-      console.log('!');
       let timeout: NodeJS.Timeout;
       
       timeout = setTimeout(() => {
@@ -162,16 +163,17 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         <Grid item
           xs={editorSize}
         >
-          <Editor
-            value={eachTabContent.get(currentTabTreeId)}
-            defaultValue={eachTabContent.get(currentTabTreeId)}
-            width={editorSize === 0 ? editorSize : "100%"}
-            height={editorSize === 0 ? editorSize : "89vh"}
-            defaultLanguage="markdown"
-            options={EDITOR_OPTION}
-            onMount={handleMountEditor}
-            onChange={handlChangeContent}
-          />
+          {checkNotUndefined(eachTabContent.get(currentTabTreeId)) &&
+            <Editor
+              value={eachTabContent.get(currentTabTreeId)}
+              width={editorSize === 0 ? editorSize : "100%"}
+              height={editorSize === 0 ? editorSize : "89vh"}
+              defaultLanguage="markdown"
+              options={EDITOR_OPTION}
+              onMount={handleMountEditor}
+              onChange={handlChangeContent}
+            />
+          }
         </Grid>
         <Grid item
           xs={viewerSize}
