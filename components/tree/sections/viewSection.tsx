@@ -23,7 +23,8 @@ import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlin
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import uesViewSize from "@/src/hooks/uesViewSize";
-import { checkNotUndefined } from "@/src/utils/common/commonUtil";
+import { checkEmptyValue, checkNotUndefined } from "@/src/utils/common/commonUtil";
+import { EachTabData, TabData, updateEachTabData } from "./utils/viewSection";
 
 interface Props {
   open: boolean;
@@ -35,47 +36,35 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
   const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
 
-  const [eachTabContent, setEachTabContent] = useState<Map<number, string>>(new Map());
-  const [eachTabViewType, setEachTabViewType] = useState<Map<number, EditorViewType>>(new Map());
+  const [eachTabData, setEachTabData] = useState<EachTabData>(new Map());
   const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
-  const [currentTabHTML, setCurrentTabHtml] = useState<string>('');
-  const [savedContent, setSavedContent] = useState<string>('');
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
-  const [ editorSize, viewerSize ] = uesViewSize(eachTabViewType.get(currentTabTreeId));
-  
-  const handleClickViewType = (viewType: EditorViewType) => {
-    const currentEachTabPreview = cloneDeep(eachTabViewType);
-    currentEachTabPreview.set(currentTabTreeId, viewType);
-    setEachTabViewType(currentEachTabPreview);
-  }
+  const [ editorSize, viewerSize ] = uesViewSize(eachTabData.get(currentTabTreeId)?.viewType);
   
   const handleMountEditor: OnMount = (editor, monaco) => {
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => checkReadyToEditContent(editor.getValue()))
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => checkReadyToEditContent(editor.getValue()));
   }
-
+  
+  const handleClickViewType = (viewType: EditorViewType) => {
+    setEachTabData(updateEachTabData(eachTabData, currentTabTreeId, { viewType }));
+  }
+  
+  // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
   const handlChangeContent: OnChange = (value, ev) => {
-    const currentEachTabContent = new Map(eachTabContent);
-    // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
-    currentEachTabContent.set(Number(sessionStorage.getItem('currentTabTreeId')), value || '');
-    setEachTabContent(currentEachTabContent);
-    setCurrentTabHtml(parseMd(value));
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    checkPressedCtrlEnter(e) && checkReadyToEditContent();
+    setEachTabData(updateEachTabData(eachTabData, Number(sessionStorage.getItem('currentTabTreeId')), { MDContent: value }));
   }
 
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
-      setSavedContent(editContentTree.treeContent || '');
       showSnackbar('saved');
+      setEachTabData(updateEachTabData(eachTabData, currentTabTreeId, { savedMDContent: editContentTree.treeContent }));
     },
   });
 
   const checkReadyToEditContent = (content?: string) => {
-    const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: content || eachTabContent.get(currentTabTreeId) });
+    const response: ValidationResponse<Tree> = validateEditContentTree({ ...files[fileTabVaue], treeContent: content || eachTabData.get(currentTabTreeId)?.MDContent });
     setEditContentTree(response.processedData);
     setIsReadyToContentTree(response.isValid);
   }
@@ -91,58 +80,44 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     if (files[fileTabVaue]) {
       const targetTreeId = files[fileTabVaue].treeId;
+      const MDContent = files[fileTabVaue].treeContent || ''; 
       setCurrentTabTreeId(targetTreeId);
 
-      const currentEachTabContent = cloneDeep(eachTabContent);
-      const currentEachTabPreview = cloneDeep(eachTabViewType);
-
-      if (!currentEachTabContent.get(targetTreeId)) {
-        currentEachTabContent.set(targetTreeId, files[fileTabVaue].treeContent || '');
-        
-        setEachTabContent(currentEachTabContent);
-
-        const isContentExist = !!files[fileTabVaue].treeContent;
-        currentEachTabPreview.set(targetTreeId, isContentExist ? 'preview' : 'live');
-        setEachTabViewType(currentEachTabPreview);
-      }
-      
+      setEachTabData(updateEachTabData(eachTabData, targetTreeId, { MDContent }));
       sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
-      setSavedContent(files[fileTabVaue].treeContent || '');
-      setCurrentTabHtml(parseMd(files[fileTabVaue].treeContent));
     }
   }, [files[fileTabVaue]]);
 
   useEffect(() => {
-    const checkTabClosed = (): boolean => files.length < eachTabContent.size;
+    const checkTabClosed = (): boolean => files.length < eachTabData.size;
 
     if (checkTabClosed()) {
-      const currentEachTabContent = cloneDeep(eachTabContent);
-      const currentEachTabPreview = cloneDeep(eachTabViewType);
+      const currentEachTabData = cloneDeep(eachTabData);
 
-      const treeIdsBeforeTabClosed = Array.from(currentEachTabContent.keys());
+      const treeIdsBeforeTabClosed = Array.from(currentEachTabData.keys());
       const treeIdsAfterTabClosed = files.map((file: Tree) => file.treeId);
 
       const tabClosedTreeId = treeIdsBeforeTabClosed.find((treeId: number) => !treeIdsAfterTabClosed.includes(treeId));
 
-      currentEachTabContent.delete(tabClosedTreeId!);
-      currentEachTabPreview.delete(tabClosedTreeId!);
+      currentEachTabData.delete(tabClosedTreeId!);
 
-      setEachTabContent(currentEachTabContent);
-      setEachTabViewType(currentEachTabPreview);
+      setEachTabData(currentEachTabData);
     }
   }, [files.length]);
 
   useEffect(() => {
-    if (savedContent !== eachTabContent.get(currentTabTreeId)) {
+    const tabContant = eachTabData.get(currentTabTreeId);
+
+    if (tabContant && tabContant.savedMDContent !== tabContant.MDContent) {
       let timeout: NodeJS.Timeout;
       
       timeout = setTimeout(() => {
         checkReadyToEditContent();
-      }, 5000);
+      }, 500);
   
       return () => clearTimeout(timeout);
     }
-  }, [eachTabContent.get(currentTabTreeId)]);
+  }, [eachTabData.get(currentTabTreeId)]);
 
   return (
     <Box id={styles.viewSection} sx={{ marginTop: styles.appHeaderHeightPX }} >
@@ -163,9 +138,9 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         <Grid item
           xs={editorSize}
         >
-          {checkNotUndefined(eachTabContent.get(currentTabTreeId)) &&
+          {checkNotUndefined(eachTabData.get(currentTabTreeId)?.viewType) &&
             <Editor
-              value={eachTabContent.get(currentTabTreeId)}
+              value={eachTabData.get(currentTabTreeId)?.MDContent}
               width={editorSize === 0 ? editorSize : "100%"}
               height={editorSize === 0 ? editorSize : "89vh"}
               defaultLanguage="markdown"
@@ -182,7 +157,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
             overflowY: 'scroll'
           }}
         >
-          <div id={styles.viewer} dangerouslySetInnerHTML={{ __html: currentTabHTML }} style={{ marginTop: -20 }} />
+          <div id={styles.viewer} dangerouslySetInnerHTML={{ __html: eachTabData.get(currentTabTreeId)?.HTMLContent || '' }} style={{ marginTop: -20 }} />
         </Grid>
       </Grid>
     </Box>
