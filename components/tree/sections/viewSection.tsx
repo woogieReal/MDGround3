@@ -24,7 +24,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import uesViewSize from "@/src/hooks/uesViewSize";
 import { checkEmptyValue, checkNotUndefined } from "@/src/utils/common/commonUtil";
-import { EachTabData, TabData, updateEachTabData } from "./utils/viewSection";
+import { NullableEditTabData, updateEachTabData, useCalculatedHeight, useCurrentTabTreeId, useEachTabContent } from "./utils/viewSection";
 
 interface Props {
   open: boolean;
@@ -34,12 +34,16 @@ interface Props {
 }
 const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   const { width, height } = useWindowDimensions();
-  const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
 
-  const [eachTabData, setEachTabData] = useState<EachTabData>(new Map());
-  const [currentTabTreeId, setCurrentTabTreeId] = useState<number>(0);
+  const [editTabData, setEditTabData] = useState<NullableEditTabData>(null);
+  
   const [editContentTree, setEditContentTree] = useState<Tree>(createInitialTree());
   const [isReadyToContentTree, setIsReadyToContentTree] = useState<boolean>(false);
+
+  const eachTabData = useEachTabContent(files, fileTabVaue, editTabData);
+  const currentTabTreeId = useCurrentTabTreeId(files, fileTabVaue);
+  const calculatedHeight = useCalculatedHeight(height, Number(styles.appHeaderHeight), Number(styles.resizeButtonWidhth));
+
   const [ editorSize, viewerSize ] = uesViewSize(eachTabData.get(currentTabTreeId)?.viewType);
   
   const handleMountEditor: OnMount = (editor, monaco) => {
@@ -47,19 +51,19 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }
   
   const handleClickViewType = (viewType: EditorViewType) => {
-    setEachTabData(updateEachTabData(eachTabData, currentTabTreeId, { viewType }));
+    setEditTabData([currentTabTreeId, { viewType }]);
   }
   
   // currentTabTreeId state 값이 변경되기 전에 호출되는 문제로 sessionStorage 사용
   const handlChangeContent: OnChange = (value, ev) => {
-    setEachTabData(updateEachTabData(eachTabData, Number(sessionStorage.getItem('currentTabTreeId')), { MDContent: value }));
+    setEditTabData([Number(sessionStorage.getItem('currentTabTreeId')), { MDContent: value }]);
   }
 
   const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
       showSnackbar('saved');
-      setEachTabData(updateEachTabData(eachTabData, currentTabTreeId, { savedMDContent: editContentTree.treeContent }));
+      setEditTabData([currentTabTreeId, { savedMDContent: editContentTree.treeContent }]);
     },
   });
 
@@ -72,38 +76,6 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   useEffect(() => {
     isReadyToContentTree && updateTree.mutate();
   }, [isReadyToContentTree])
-
-  useEffect(() => {
-    setCalculatedHeight(height - (40 + Number(styles.appHeaderHeight) + Number(styles.resizeButtonWidhth) * 2));
-  }, [height])
-
-  useEffect(() => {
-    if (files[fileTabVaue]) {
-      const targetTreeId = files[fileTabVaue].treeId;
-      const MDContent = files[fileTabVaue].treeContent || ''; 
-      setCurrentTabTreeId(targetTreeId);
-
-      setEachTabData(updateEachTabData(eachTabData, targetTreeId, { MDContent }));
-      sessionStorage.setItem('currentTabTreeId', String(targetTreeId));
-    }
-  }, [files[fileTabVaue]]);
-
-  useEffect(() => {
-    const checkTabClosed = (): boolean => files.length < eachTabData.size;
-
-    if (checkTabClosed()) {
-      const currentEachTabData = cloneDeep(eachTabData);
-
-      const treeIdsBeforeTabClosed = Array.from(currentEachTabData.keys());
-      const treeIdsAfterTabClosed = files.map((file: Tree) => file.treeId);
-
-      const tabClosedTreeId = treeIdsBeforeTabClosed.find((treeId: number) => !treeIdsAfterTabClosed.includes(treeId));
-
-      currentEachTabData.delete(tabClosedTreeId!);
-
-      setEachTabData(currentEachTabData);
-    }
-  }, [files.length]);
 
   useEffect(() => {
     const tabContant = eachTabData.get(currentTabTreeId);
