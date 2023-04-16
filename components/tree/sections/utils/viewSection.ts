@@ -49,7 +49,7 @@ export const useEachTabContent = (files: Tree[], fileTabVaue: number, editTabDat
   const [eachTabData, setEachTabData] = useState<EachTabData>(new Map());
 
   useEffect(() => {
-    if (files[fileTabVaue]) {
+    if (files[fileTabVaue] && checkEmptyValue(eachTabData.get(files[fileTabVaue].treeId))) {
       const targetTreeId = files[fileTabVaue].treeId;
       const MDContent = files[fileTabVaue].treeContent || ''; 
       setEachTabData(updateEachTabData(eachTabData, targetTreeId, { MDContent }));
