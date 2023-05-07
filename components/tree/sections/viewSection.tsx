@@ -92,12 +92,17 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }, [eachTabData.get(currentTabTreeId)]);
 
   return (
-    <Box id={styles.viewSection} sx={{ marginTop: styles.appHeaderHeightPX }} >
+    <Box
+      id={styles.viewSection}
+      sx={{
+        marginTop: styles.appHeaderHeightPX,
+        marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px`
+      }}
+    >
       <CssBaseline />
       <Grid 
         container
         id={styles.viewMain}
-        sx={{ marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px` }}
         rowSpacing={1}
       >
         <Grid item xs={12}>
