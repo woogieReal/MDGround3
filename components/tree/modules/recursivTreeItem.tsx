@@ -1,4 +1,4 @@
-import { MethodTypeForRecursivTreeItem, TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
+import { RecursivTreeEvent, TEST_USER_ID, Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import styles from '@/styles/tree.module.scss'
 import { Box, InputAdornment, TextField } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -20,7 +20,7 @@ interface Props {
   treeItem: Tree;
   sameDepthTreeNames: Map<TreeType, string[]>;
   setRootTree: Dispatch<SetStateAction<Tree>>
-  setMethodType: Dispatch<SetStateAction<MethodTypeForRecursivTreeItem>>
+  setMethodType: Dispatch<SetStateAction<RecursivTreeEvent>>
   setMethodTargetTree: Dispatch<SetStateAction<Tree>>
   setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent<MouseEvent> | null>>
 }
@@ -28,7 +28,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   const { treeData, updateTreeData } = useTreeData(treeItem);
   const childSameDepthTreeNames = getTreeChildrenNames(treeData.treeChildren || []);
 
-  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree: Tree) => {
+  const setMethod = (methodType: RecursivTreeEvent, methodTargetTree: Tree) => {
     setMethodType(methodType);
     setMethodTargetTree(methodTargetTree);
   }
@@ -39,10 +39,10 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   const handleTreeClickItem = () => {
     if (isTreeNameEditable) return;
     treeData.treeType === TreeType.FORDER && setIsShowChildrenTree(show => !show);
-    setMethod(MethodTypeForRecursivTreeItem.CLICK, treeData);
+    setMethod(['target', 'click'], treeData);
   }
 
-  const handleTreeDoubleClickItem = () => setMethod(MethodTypeForRecursivTreeItem.DOUBLE_CLICK, treeData);
+  const handleTreeDoubleClickItem = () => setMethod(['target', 'doubleClick'], treeData);
   // -- 트리 클릭
 
   // 트리 우클릭
@@ -50,7 +50,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
     e.preventDefault();
     e.stopPropagation();
     setContextEvent(e);
-    setMethod(MethodTypeForRecursivTreeItem.OPEN_CONTEXT, treeData)
+    setMethod(['context', 'openContext'], treeData)
   }
   // -- 트리 우클릭
 
@@ -107,7 +107,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   const handleAfterCreate = (createdTree: Tree) => {
     cleanCreateTreeAllState();
     setRootTree((currRootTree: Tree) => removeTreeFromUpper(currRootTree, treeData));
-    setMethod(MethodTypeForRecursivTreeItem.CREATE, createdTree);
+    setMethod(['target', 'create'], createdTree);
   }
 
   const cleanCreateTreeAllState = () => {
@@ -131,7 +131,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   const handleAfterRename = () => {
     cleanRenameTreeAllState();
     updateTreeData({ treeStatus: TreeStatusInfo.DEFAULT });
-    setMethod(MethodTypeForRecursivTreeItem.RENAME, { ...treeData, treeStatus: TreeStatusInfo.DEFAULT });
+    setMethod(['target', 'rename'], { ...treeData, treeStatus: TreeStatusInfo.DEFAULT });
   }
 
   const cleanRenameTreeAllState = () => {
