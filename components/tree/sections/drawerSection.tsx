@@ -1,7 +1,7 @@
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import styles from '@/styles/tree.module.scss'
-import { Tree, TreeType, TEST_USER_ID, MethodTypeForRecursivTreeItem, TreeStatusInfo } from '@/src/models/tree.model';
+import { Tree, TreeType, TEST_USER_ID, RecursivTreeEvent, RecursivTreeContextEventType, RecursivTreeTargetEventType, RecursivTreeEventGroup } from '@/src/models/tree.model';
 import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -18,11 +18,12 @@ import React from "react";
 import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
 import { addTreeToUpper, replaceTreeFromUpper, removeTreeFromUpper } from '@/src/utils/tree/treeCRUD';
 import { createTreeStructureFromTrees } from '@/src/utils/tree/treeStructure';
+import _ from 'lodash';
 
 interface Props {
   open: boolean;
   drawerWidth: number;
-  setFiles: Dispatch<SetStateAction<Tree[]>>
+  setFiles: Dispatch<SetStateAction<Tree[]>>;
   handleTreeClick(data: Tree): void;
   handleTreeDoubleClick(data: Tree): void;
   deleteTabByTreeId(data: Tree): void;
@@ -39,10 +40,10 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   // RecursivTreeItem의 메소드 호출 타입
   // handleTreeClick, handleTreeDoubleClick, deleteTabByTreeId를 props로 직접 내려주면 성능이슈 발생
-  const [methodType, setMethodType] = useState<MethodTypeForRecursivTreeItem>(MethodTypeForRecursivTreeItem.DEFAULT);
+  const [methodType, setMethodType] = useState<RecursivTreeEvent>(['inactive', 'default']);
   const [methodTargetTree, setMethodTargetTree] = useState<Tree>(createInitialRootTree());
 
-  const setMethod = (methodType: MethodTypeForRecursivTreeItem, methodTargetTree?: Tree) => {
+  const setMethod = (methodType: RecursivTreeEvent, methodTargetTree?: Tree) => {
     setMethodType(methodType);
     methodTargetTree && setMethodTargetTree(methodTargetTree);
   }
@@ -89,42 +90,52 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
 
   const afterDeleteForContext = (deletedTree: Tree) => {
     setRootTree(removeTreeFromUpper(rootTree, deletedTree));
-    setMethod(MethodTypeForRecursivTreeItem.DELETE_TAB, deletedTree);
+    setMethod(['target', 'deleteTab'], deletedTree);
   }
   // -- 컨텍스트
 
+  const switchHandleRecursivTreeEvent: {
+    [key in RecursivTreeEventGroup]: Function
+  } = {
+    ['inactive']: () => {},
+    ['context']: (type: RecursivTreeContextEventType) => handleRecursivTreeEventForContext[type],
+    ['target']: (type: RecursivTreeTargetEventType) => handleRecursivTreeEventForTarget[type],
+  }
+
+  const handleRecursivTreeEventForContext: {
+    [key in RecursivTreeContextEventType]: () => void
+  } = {
+    ['openContext']: () => handleContextMenuForTreeItem(contextEvent!),
+  }
+
+  const handleRecursivTreeEventForTarget: {
+    [key in RecursivTreeTargetEventType]: () => void
+  } = {
+    ['create']: () => {
+      setRootTree(addTreeToUpper(rootTree, methodTargetTree));
+      handleTreeDoubleClick(methodTargetTree);
+    },
+    ['rename']: () => {
+      setRootTree(replaceTreeFromUpper(rootTree, methodTargetTree));
+      setFiles((currFiles: Tree[]) => {
+        const cloneFiles = cloneDeep(currFiles);
+        const targetIndex = _.findIndex(cloneFiles, { 'treeId': methodTargetTree.treeId });
+        cloneFiles[targetIndex].treeName = methodTargetTree.treeName;
+        return cloneFiles;
+      })      
+    },
+    ['click']: () => {
+      handleTreeClick(methodTargetTree);
+      setMethodTargetTree(createInitialRootTree());
+    },
+    ['doubleClick']: () => handleTreeDoubleClick(methodTargetTree),
+    ['deleteTab']: () => deleteTabByTreeId(methodTargetTree),
+  }
+
   useEffect(() => {
     if (!checkInitalRootTree(methodTargetTree)) {
-      switch (methodType) {
-        case MethodTypeForRecursivTreeItem.OPEN_CONTEXT:
-          handleContextMenuForTreeItem(contextEvent!);
-          break;
-        case MethodTypeForRecursivTreeItem.CREATE:
-          setRootTree(addTreeToUpper(rootTree, methodTargetTree));
-          handleTreeDoubleClick(methodTargetTree);
-          break;
-        case MethodTypeForRecursivTreeItem.RENAME:
-          setRootTree(replaceTreeFromUpper(rootTree, methodTargetTree));
-          setFiles((currFiles: Tree[]) => {
-            const cloneFiles = cloneDeep(currFiles);
-            const targetIndex = cloneFiles.findIndex((file: Tree) => file.treeId === methodTargetTree.treeId);
-            if (targetIndex >= 0) {
-              cloneFiles[targetIndex].treeName = methodTargetTree.treeName;
-            }
-            return cloneFiles;
-          })
-          break;
-        case MethodTypeForRecursivTreeItem.CLICK:
-          handleTreeClick(methodTargetTree);
-          setMethodTargetTree(createInitialRootTree());
-          break;
-        case MethodTypeForRecursivTreeItem.DOUBLE_CLICK:
-          handleTreeDoubleClick(methodTargetTree);
-          break;
-        case MethodTypeForRecursivTreeItem.DELETE_TAB:
-          deleteTabByTreeId(methodTargetTree);
-          break;
-      }
+      const [group, type] = methodType;
+      switchHandleRecursivTreeEvent[group](type)();
     }
   }, [methodType, methodTargetTree, contextEvent])
 

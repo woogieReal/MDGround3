@@ -22,15 +22,16 @@ export enum TreeStatusInfo {
   TEMP_READ = 'tempRead'
 }
 
-export enum MethodTypeForRecursivTreeItem {
-  DEFAULT = 'default',
-  OPEN_CONTEXT = 'openContext',
-  CREATE = 'create',
-  RENAME = 'rename',
-  CLICK = 'click',
-  DOUBLE_CLICK = 'doubleClick',
-  DELETE_TAB = 'deleteTab',
-}
+export type RecursivTreeEvent = RecursivTreeInactiveEvent | RecursivTreeContextEvent | RecursivTreeTargetEvent;
+
+export type RecursivTreeEventGroup = 'inactive' | 'context' | 'target';
+export type RecursivTreeInactiveEvent = ['inactive', RecursivTreeInactiveEventType];
+export type RecursivTreeContextEvent = ['context', RecursivTreeContextEventType];
+export type RecursivTreeTargetEvent = ['target', RecursivTreeTargetEventType];
+
+export type RecursivTreeInactiveEventType = 'default';
+export type RecursivTreeContextEventType = 'openContext';
+export type RecursivTreeTargetEventType = 'create' | 'rename' | 'click' | 'doubleClick' | 'deleteTab';
 
 export const TEST_USER_ID = '92aa8f60-51e2-11ed-bf27-0242ac140002';
 
