@@ -4,7 +4,9 @@ import fs from  'fs';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 
-dotenv.config();
+const ENV_PATH = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+
+dotenv.config({ path: ENV_PATH });
 
 const getRawSqlClient = async () => {
 	const options = {
