@@ -172,6 +172,13 @@ $resizeButtonWidhthPX: 12px;
         color: -webkit-link;
         cursor: pointer;
       }
+
+      blockquote {
+        padding: 0 1em;
+        color: #656d76;
+        border-left: .25em solid #d0d7de;
+        margin-left: 0;
+      }
     }
   }
 }
