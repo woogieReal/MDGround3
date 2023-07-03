@@ -153,7 +153,7 @@ const Home: NextPage = () => {
   // -- 상단 평행 탭 (파일)
 
   // API 호출
-  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
+  const getTree: UseQueryResult = useQuery([ApiName.GET_TREE, selectedFile?.treeId], async () => selectedFile && selectedFile.treeId > 0 && await ApiHandler.callApi(ApiName.GET_TREE, { userId: TEST_USER_ID }, null, selectedFile.treeId), {
     ...CommonQueryOptions,
     onSuccess(res: AxiosResponse) {
       if (res) {
