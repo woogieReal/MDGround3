@@ -120,7 +120,9 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
       setFiles((currFiles: Tree[]) => {
         const cloneFiles = cloneDeep(currFiles);
         const targetIndex = _.findIndex(cloneFiles, { 'treeId': methodTargetTree.treeId });
-        cloneFiles[targetIndex].treeName = methodTargetTree.treeName;
+        if (targetIndex !== -1) {
+          cloneFiles[targetIndex].treeName = methodTargetTree.treeName;
+        }
         return cloneFiles;
       })      
     },
