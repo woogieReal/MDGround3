@@ -93,6 +93,22 @@ export const useTextFieldClassName = (
   return textFieldClassName;
 }
 
+export const useBackgroundColorCode = (
+  multiSelectedTreeId: number[],
+  treeData: Tree,
+) => {
+  const whiteCode = '#ffffff';
+  const focusCode = '#EEE7E5';
+
+  const [backgroundColorCode, setBackgroundColorCode] = useState<string>(whiteCode);
+
+  useEffect(() => {
+    setBackgroundColorCode(checkMultiSelected(multiSelectedTreeId, treeData) ? focusCode : whiteCode);
+  }, [multiSelectedTreeId, treeData])
+
+  return backgroundColorCode;
+}
+
 export type CheckReadyToUpsert = (
   treeData: Tree,
   updateTreeData: UpdateTreeData,
@@ -108,3 +124,7 @@ export const checkReadyToRename: CheckReadyToUpsert = (treeData, updateTreeData,
   updateTreeData(response.processedData);
   setIsReadyToRename(response.isValid);
 }
+
+export const checkMultiSelected = (multiSelectedTreeId: number[], treeData: Tree): boolean => multiSelectedTreeId.includes(treeData.treeId);
+
+export const addOrRemoveIfExists = (treeDataList: Tree[], treeData: Tree) => _.some(treeDataList, { 'treeId': treeData.treeId }) ? _.reject(treeDataList, { 'treeId': treeData.treeId }) : _.concat(treeDataList, treeData);

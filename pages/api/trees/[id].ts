@@ -28,6 +28,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , created_datetime AS createdDatetime
             , updated_datetime AS updatedDatetime
             , deleted_datetime AS deletedDatetime
+            , user_id AS userId
           FROM tree
           WHERE user_id = ?
           AND delete_yn = 'N'
@@ -70,44 +71,6 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         params.push(id);
 
         const result = await connection.execute(query, params);
-        res.status(200).json(result[0]);
-      });
-      break;
-    case "DELETE":
-      DBConnection.transactionExecutor(async (connection: Connection) => {
-        const request: Tree = body;
-        let query = '';
-        let params: any[] = [];
-
-        query += `
-          UPDATE tree 
-          SET delete_yn = 'Y'
-            , deleted_datetime = CURRENT_TIMESTAMP
-          WHERE user_id = ?
-          AND tree_id = ?
-        `;
-
-        params.push(request.userId);
-        params.push(id);
-
-        if (request.treeType === TreeType.FORDER) {
-          const treeFullPath = createTreeFullPath(request);
-
-          query += ';';
-
-          query += `
-            UPDATE tree 
-            SET delete_yn = 'Y'
-              , deleted_datetime = CURRENT_TIMESTAMP
-            WHERE user_id = ?
-            AND tree_path LIKE CONCAT(?, '%')
-            AND delete_yn <> 'Y'
-          `;
-          params.push(request.userId);
-          params.push(treeFullPath);
-        }
-
-        const result = await connection.query(query, params);
         res.status(200).json(result[0]);
       });
       break;
