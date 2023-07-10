@@ -74,44 +74,6 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         res.status(200).json(result[0]);
       });
       break;
-    case "DELETE":
-      DBConnection.transactionExecutor(async (connection: Connection) => {
-        const request: Tree = body;
-        let query = '';
-        let params: any[] = [];
-
-        query += `
-          UPDATE tree 
-          SET delete_yn = 'Y'
-            , deleted_datetime = CURRENT_TIMESTAMP
-          WHERE user_id = ?
-          AND tree_id = ?
-        `;
-
-        params.push(request.userId);
-        params.push(id);
-
-        if (request.treeType === TreeType.FORDER) {
-          const treeFullPath = createTreeFullPath(request);
-
-          query += ';';
-
-          query += `
-            UPDATE tree 
-            SET delete_yn = 'Y'
-              , deleted_datetime = CURRENT_TIMESTAMP
-            WHERE user_id = ?
-            AND tree_path LIKE CONCAT(?, '%')
-            AND delete_yn <> 'Y'
-          `;
-          params.push(request.userId);
-          params.push(treeFullPath);
-        }
-
-        const result = await connection.query(query, params);
-        res.status(200).json(result[0]);
-      });
-      break;
     default:
       res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
       res.status(405).end(`Method ${method} Not Allowed`);
