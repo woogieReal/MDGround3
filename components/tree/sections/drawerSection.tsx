@@ -6,7 +6,7 @@ import RecursivTreeItem from '../modules/recursivTreeItem';
 import { Box } from '@mui/material';
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ApiName } from '@/src/apis/apiInfo';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
@@ -43,10 +43,24 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   const [methodType, setMethodType] = useState<RecursivTreeEvent>(['inactive', 'default']);
   const [methodTargetTree, setMethodTargetTree] = useState<Tree>(createInitialRootTree());
 
-  const setMethod = (methodType: RecursivTreeEvent, methodTargetTree?: Tree) => {
+  const setMethod = (methodType: RecursivTreeEvent, methodTargetTree: Tree) => {
     setMethodType(methodType);
-    methodTargetTree && setMethodTargetTree(methodTargetTree);
+    setMethodTargetTree(methodTargetTree);
   }
+
+  // 멀티 셀렉트
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+  const [methodTargetTreeList, setMethodTargetTreeList] = useState<Tree[]>([]);
+  const multiSelectedTreeId = _.map(methodTargetTreeList, 'treeId');
+
+  useEffect(() => {
+    const handleOutsideClose = (e: {target: any}) => {
+      if(!drawerRef.current?.contains(e.target)) setMethodTargetTreeList([]);
+    };
+    document.addEventListener('click', handleOutsideClose);
+    
+    return () => document.removeEventListener('click', handleOutsideClose);
+  }, []);
 
   // 트리명 중복여부 체크
   const [sameDepthTreeNames, setSameDepthTreeNames] = useState<Map<TreeType, string[]>>(new Map());
@@ -144,6 +158,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
   return (
     <Box id={styles.resizableContainer}>
       <Drawer
+        ref={drawerRef}
         id={styles.resizableDrawer}
         sx={{
           width: drawerWidth,
@@ -169,9 +184,11 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
               key={`${index}-${data.treeId}`}
               treeItem={data}
               sameDepthTreeNames={sameDepthTreeNames}
+              multiSelectedTreeId={multiSelectedTreeId}
               setRootTree={setRootTree}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
+              setMethodTargetTreeList={setMethodTargetTreeList}
               setContextEvent={setContextEvent}
             />
           ))}

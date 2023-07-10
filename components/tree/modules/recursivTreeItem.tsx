@@ -13,18 +13,20 @@ import { AxiosResponse } from "axios";
 import { checkPressedEnter } from "@/src/utils/common/keyPressUtil";
 import { checkEditableTreeNameStatus } from "@/src/utils/tree/treeCheck";
 import { removeTreeFromUpper } from "@/src/utils/tree/treeCRUD";
-import { checkEmptyTreeName, checkReadyToCreate, checkReadyToRename, checkValidTreeName, useTextFieldClassName, useTreeData, useVerifyTreeName } from "./utils/recursivTreeItem";
+import { addOrRemoveIfExists, checkEmptyTreeName, checkMultiSelected, checkReadyToCreate, checkReadyToRename, checkValidTreeName, useBackgroundColorCode, useTextFieldClassName, useTreeData, useVerifyTreeName } from "./utils/recursivTreeItem";
 import _ from "lodash";
 
 interface Props {
   treeItem: Tree;
   sameDepthTreeNames: Map<TreeType, string[]>;
+  multiSelectedTreeId: number[];
   setRootTree: Dispatch<SetStateAction<Tree>>
   setMethodType: Dispatch<SetStateAction<RecursivTreeEvent>>
   setMethodTargetTree: Dispatch<SetStateAction<Tree>>
+  setMethodTargetTreeList: Dispatch<SetStateAction<Tree[]>>
   setContextEvent: Dispatch<SetStateAction<React.BaseSyntheticEvent<MouseEvent> | null>>
 }
-const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethodType, setMethodTargetTree, setContextEvent }: Props) => {
+const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, multiSelectedTreeId, setRootTree, setMethodType, setMethodTargetTree, setMethodTargetTreeList, setContextEvent }: Props) => {
   const { treeData, updateTreeData } = useTreeData(treeItem);
   const childSameDepthTreeNames = getTreeChildrenNames(treeData.treeChildren || []);
 
@@ -36,8 +38,16 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   // 트리 클릭
   const [isShowChildrenTree, setIsShowChildrenTree] = useState<boolean>(false);
 
-  const handleTreeClickItem = () => {
-    if (isTreeNameEditable) return;
+  const handleTreeClickItem = (e: any) => {
+    if (isTreeNameEditable) {
+      return;
+    }
+
+    if (e.metaKey) {
+      setMethodTargetTreeList(treeList => { return addOrRemoveIfExists(treeList, treeData) });
+      return;
+    }
+
     treeData.treeType === TreeType.FORDER && setIsShowChildrenTree(show => !show);
     setMethod(['target', 'click'], treeData);
   }
@@ -58,6 +68,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
   const isTreeNameEditable = checkEditableTreeNameStatus(treeData);
   const { isValidTreeName, setInvalidTreeName } = useVerifyTreeName(treeData, isTreeNameEditable, sameDepthTreeNames, treeItem.treeName);
   const textFieldClassName = useTextFieldClassName(styles, isTreeNameEditable, isValidTreeName);
+  const backgroundColorCode = useBackgroundColorCode(multiSelectedTreeId, treeData);
 
   const handleChangeName = (e: React.BaseSyntheticEvent) => updateTreeData({ treeName: e.target.value });
 
@@ -159,6 +170,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
         disabled={!isTreeNameEditable}
         value={treeData.treeName}
         className={textFieldClassName}
+        style={{ backgroundColor: backgroundColorCode }}
         onClick={handleTreeClickItem}
         onDoubleClick={handleTreeDoubleClickItem}
         onContextMenu={handleContextMenu}
@@ -173,9 +185,11 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
               key={item.treeId}
               treeItem={item}
               sameDepthTreeNames={childSameDepthTreeNames}
+              multiSelectedTreeId={multiSelectedTreeId}
               setRootTree={setRootTree}
               setMethodType={setMethodType}
               setMethodTargetTree={setMethodTargetTree}
+              setMethodTargetTreeList={setMethodTargetTreeList}
               setContextEvent={setContextEvent}
             />
           </Box>
@@ -188,9 +202,11 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, setRootTree, setMethod
 const NEED_CHECK_EQUAL_PROPERTY: {[k in keyof Props]: boolean} = {
   treeItem: true,
   sameDepthTreeNames: true,
+  multiSelectedTreeId: true,
   setRootTree: true,
   setMethodType: true,
   setMethodTargetTree: true,
+  setMethodTargetTreeList: true,
   setContextEvent: true,
 }
 
