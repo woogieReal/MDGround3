@@ -102,9 +102,10 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
     setRootTree(replaceTreeFromUpper(rootTree, tree));
   }
 
-  const afterDeleteForContext = (deletedTree: Tree) => {
-    setRootTree(removeTreeFromUpper(rootTree, deletedTree));
-    setMethod(['target', 'deleteTab'], deletedTree);
+  const afterDeleteForContext = (deletedTreeList: Tree[]) => {
+    deletedTreeList.forEach(deletedTree => setMethod(['target', 'deleteTab'], deletedTree));
+    const newRootTree = deletedTreeList.reduce((tmpRootTree, deletedTree) => removeTreeFromUpper(tmpRootTree, deletedTree), rootTree);
+    setRootTree(newRootTree);
   }
   // -- 컨텍스트
 
@@ -198,7 +199,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           isShow={Boolean(anchorEl)}
           hide={handleClosePopup}
           targetTree={methodTargetTree}
-          multiSelectedTreeId={multiSelectedTreeId}
+          targetTreeList={methodTargetTreeList}
           mousePosition={mousePosition}
           clickCreate={clickCreateForContext}
           clickRename={clickRenameForContext}
