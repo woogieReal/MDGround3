@@ -7,26 +7,28 @@ const checkInvalidTreeType = (treeType: TreeType) => ![...Object.values(TreeType
 const checkInvalidTreeName = (treeName: string) => !treeName;
 const checkInvalidTreeContent = (treeContent: any) => typeof treeContent === 'undefined' || treeContent === null;
 
-export const validateCreateTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
-  return validateExecutor(tree, ['treeName'], (processedData: T): Array<boolean> => {
+type ValidateSingleTreeFn = (tree: Tree) => ValidationResponse<Tree>;
+
+export const validateCreateTree: ValidateSingleTreeFn = (tree) => {
+  return validateExecutor(tree, ['treeName'], (processedData: Tree): Array<boolean> => {
     return [checkInvalidTreeType(processedData.treeType), checkInvalidTreeName(processedData.treeName)];
   })
 }
 
-export const validateEditContentTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
-  return validateExecutor(tree, [], (processedData: T): Array<boolean> => {
+export const validateEditContentTree: ValidateSingleTreeFn = (tree) => {
+  return validateExecutor(tree, [], (processedData: Tree): Array<boolean> => {
     return [checkInvalidTreeId(processedData.treeId), checkInvalidTreeContent(processedData.treeContent)];
   })
 }
 
-export const validateDeleteTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
-  return validateExecutor(tree, [], (processedData: T): Array<boolean> => {
+export const validateDeleteTree: ValidateSingleTreeFn = (tree) => {
+  return validateExecutor(tree, [], (processedData: Tree): Array<boolean> => {
     return [checkInvalidTreeId(processedData.treeId), checkInvalidTreeType(processedData.treeType)];
   })
 }
 
-export const validateRenameTree = <T extends Tree>(tree: T): ValidationResponse<T> => {
-  return validateExecutor(tree, ['treeName'], (processedData: T): Array<boolean> => {
+export const validateRenameTree: ValidateSingleTreeFn = (tree) => {
+  return validateExecutor(tree, ['treeName'], (processedData: Tree): Array<boolean> => {
     return [checkInvalidTreeId(processedData.treeId), checkInvalidTreeName(processedData.treeName)];
   })
 };
