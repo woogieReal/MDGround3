@@ -23,6 +23,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , tree_name AS treeName
             , tree_path AS treePath
             , delete_yn AS deleteYn
+            , user_id AS userId
           FROM tree
           WHERE user_id = ?
           AND delete_yn = 'N'

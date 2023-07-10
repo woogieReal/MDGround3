@@ -133,7 +133,7 @@ const RecursivTreeItem = ({ treeItem, sameDepthTreeNames, multiSelectedTreeId, s
 
   // 기존 트리 이름 수정
   const [isReadyToRename, setIsReadyToRename] = useState<boolean>(false);
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...treeData, treeStatus: TreeStatusInfo.RENAME, userId: TEST_USER_ID, }, treeData.treeId), {
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...treeData, treeStatus: TreeStatusInfo.RENAME }, treeData.treeId), {
     onSuccess(res: AxiosResponse) {
       handleAfterRename();
     },

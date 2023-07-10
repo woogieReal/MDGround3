@@ -59,7 +59,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     setEditTabData([Number(sessionStorage.getItem('currentTabTreeId')), { MDContent: value }]);
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT , userId: TEST_USER_ID, }, files[fileTabVaue]?.treeId), {
+  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT }, files[fileTabVaue]?.treeId), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
       showSnackbar('saved');

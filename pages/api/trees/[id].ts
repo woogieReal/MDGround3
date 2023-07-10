@@ -28,6 +28,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
             , created_datetime AS createdDatetime
             , updated_datetime AS updatedDatetime
             , deleted_datetime AS deletedDatetime
+            , user_id AS userId
           FROM tree
           WHERE user_id = ?
           AND delete_yn = 'N'
