@@ -198,6 +198,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           isShow={Boolean(anchorEl)}
           hide={handleClosePopup}
           targetTree={methodTargetTree}
+          multiSelectedTreeId={multiSelectedTreeId}
           mousePosition={mousePosition}
           clickCreate={clickCreateForContext}
           clickRename={clickRenameForContext}

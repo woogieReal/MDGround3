@@ -13,6 +13,7 @@ import { validateDeleteTree } from "@/src/utils/tree/treeValidation";
 import { ValidationResponse } from "@/src/models/validation.model";
 import { createInitialTree, createTreeFullPath } from "@/src/utils/tree/treeUtil";
 import { checkInitalRootTree } from "@/src/utils/tree/treeCheck";
+import { TreeContextType, useTreeContextType } from "./utils/treeContext";
 
 const iconStyle = { marginRight: '10px' };
 
@@ -21,12 +22,14 @@ interface Props {
   isShow: boolean;
   hide(): void;
   targetTree: Tree
+  multiSelectedTreeId: number[],
   mousePosition: { left: number, top: number };
   clickCreate(tree: Tree): void;
   clickRename(tree: Tree): void;
   afterDelete(tree: Tree): void;
 }
-const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterDelete, clickCreate, clickRename }: Props) => {
+const TreeContext = ({ anchorEl, isShow, hide, targetTree, multiSelectedTreeId, mousePosition, afterDelete, clickCreate, clickRename }: Props) => {
+  const contextType: TreeContextType = useTreeContextType(targetTree, multiSelectedTreeId);
   const [deleteTargetTree, setDeleteTargetTree] = useState<Tree>();
   const [isReadyToDelete, setIsReadyToDelete] = useState<boolean>(false);
 
@@ -47,7 +50,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
   }
 
   const handleClickRename = () => {
-    clickRename({ ...targetTree!, treeStatus: TreeStatusInfo.RENAME });
+    clickRename({ ...targetTree, treeStatus: TreeStatusInfo.RENAME });
     hide();
   }
 
@@ -57,7 +60,7 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
   }
 
   const checkReadyToDelete = () => {
-    const response: ValidationResponse<Tree> = validateDeleteTree(targetTree!);
+    const response: ValidationResponse<Tree> = validateDeleteTree(targetTree);
     setDeleteTargetTree(response.processedData);
     setIsReadyToDelete(response.isValid);
   }
@@ -127,28 +130,34 @@ const TreeContext = ({ anchorEl, isShow, hide, targetTree, mousePosition, afterD
         >
           <Box>
             <List>
-              {!checkInitalRootTree(targetTree) ?
-                <>
-                  {
-                    targetTree.treeType === TreeType.FORDER ?
-                      <>
-                        {renderCreateFile()}
-                        {renderCreateForder()}
-                        {renderRenameTree()}
-                        {renderDeleteTree()}
-                      </>
-                      :
-                      <>
-                        {renderRenameTree()}
-                        {renderDeleteTree()}
-                      </>
-                  }
-                </>
-                :
-                <>
-                  {renderCreateFile()}
-                  {renderCreateForder()}
-                </>
+              {
+                {
+                  'folder': (
+                    <>
+                      {renderCreateFile()}
+                      {renderCreateForder()}
+                      {renderRenameTree()}
+                      {renderDeleteTree()}
+                    </>
+                  ),
+                  'file': (
+                    <>
+                      {renderRenameTree()}
+                      {renderDeleteTree()}
+                    </>
+                  ),
+                  'multiSelect': (
+                    <>
+                      {renderDeleteTree()}
+                    </>
+                  ),
+                  'root': (
+                    <>
+                      {renderCreateFile()}
+                      {renderCreateForder()}  
+                    </>
+                  )
+                }[contextType]
               }
             </List>
           </Box>
