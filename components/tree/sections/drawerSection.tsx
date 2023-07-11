@@ -12,7 +12,7 @@ import ApiHandler from '@/src/apis/apiHandler';
 import { CommonQueryOptions } from '@/src/apis/reactQuery';
 import LodingBackDrop from '@/components/common/atoms/lodingBackDrop';
 import TreeContext from '@/components/tree/modules/treeContext';
-import { getTreeChildrenNames, createInitialRootTree } from '@/src/utils/tree/treeUtil';
+import { getTreeChildrenNames, createInitialRootTree, createTreeFullPath } from '@/src/utils/tree/treeUtil';
 import { cloneDeep } from "lodash";
 import React from "react";
 import { checkInitalRootTree } from '@/src/utils/tree/treeCheck';
@@ -106,6 +106,13 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
     deletedTreeList.forEach(deletedTree => setMethod(['target', 'deleteTab'], deletedTree));
     const newRootTree = deletedTreeList.reduce((tmpRootTree, deletedTree) => removeTreeFromUpper(tmpRootTree, deletedTree), rootTree);
     setRootTree(newRootTree);
+  }
+
+  const afterCutForContext = (toTree: Tree, cutTreeList: Tree[]) => {
+    const removedRootTree = cutTreeList.reduce((tmpRootTree, cutTree) => removeTreeFromUpper(tmpRootTree, cutTree), rootTree);
+    const pathChangedTreeList = cutTreeList.reduce((tmpTreeList, cutTree) => _.concat(tmpTreeList, [{ ...cutTree, treePath: createTreeFullPath(toTree) }]), [] as Tree[]);
+    const addedRootTree = pathChangedTreeList.reduce((tmpRootTree, cutTree) => addTreeToUpper(tmpRootTree, cutTree), removedRootTree);
+    setRootTree(addedRootTree);
   }
   // -- 컨텍스트
 
@@ -204,6 +211,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
           clickCreate={clickCreateForContext}
           clickRename={clickRenameForContext}
           afterDelete={afterDeleteForContext}
+          afterCut={afterCutForContext}
         />
       </Drawer>
       <LodingBackDrop isOpen={getTrees.isLoading} />

@@ -9,6 +9,11 @@ export interface Tree {
   treeStatus?: TreeStatusInfo;
 }
 
+export interface MultiTreeCutOrCopy {
+  toTree: Tree;
+  targetTreeList: Tree[];
+}
+
 export enum TreeType {
   FORDER = 10,
   FILE = 20,
