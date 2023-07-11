@@ -97,13 +97,12 @@ export const useBackgroundColorCode = (
   multiSelectedTreeId: number[],
   treeData: Tree,
 ) => {
-  const whiteCode = '#ffffff';
   const focusCode = '#EEE7E5';
 
-  const [backgroundColorCode, setBackgroundColorCode] = useState<string>(whiteCode);
+  const [backgroundColorCode, setBackgroundColorCode] = useState<string>('');
 
   useEffect(() => {
-    setBackgroundColorCode(checkMultiSelected(multiSelectedTreeId, treeData) ? focusCode : whiteCode);
+    setBackgroundColorCode(checkMultiSelected(multiSelectedTreeId, treeData) ? focusCode : '');
   }, [multiSelectedTreeId, treeData])
 
   return backgroundColorCode;
