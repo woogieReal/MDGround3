@@ -3,6 +3,7 @@ import {
   TreeType,
   ROOT_TREE_ID,
   INITIAL_TREE_ID,
+  MultiTreeCutOrCopy,
 } from '@/src/models/tree.model';
 import _ from 'lodash';
 import { checkInitalRootTree, checkFolderTree, checkFileTree } from './treeCheck';
@@ -26,6 +27,13 @@ const InitialTree: Tree = {
 
 export const createInitialRootTree = _.constant(InitialRootTree);
 export const createInitialTree = _.constant(InitialTree);
+
+const InitialMultiTreeCutAndCopyRequest: MultiTreeCutOrCopy = {
+  toTree: createInitialRootTree(),
+  targetTreeList: [],
+}
+
+export const createInitialMultiTreeRequest = _.constant(InitialMultiTreeCutAndCopyRequest);
 
 export const createTreeFullPath = (tree: Tree): string => {
   return checkInitalRootTree(tree) 

@@ -40,3 +40,9 @@ export const validateRenameTree: ValidateSingleTreeFn = (tree) => {
     return [checkInvalidSingleTreeId(processedData.treeId), checkInvalidSingleTreeName(processedData.treeName)];
   })
 };
+
+export const validateCutOrCopyTree: ValidateMultiTreeCutAndCopyFn = (cutAndCopyTree) => {
+  return validateExecutor(cutAndCopyTree, [], (processedData: MultiTreeCutOrCopy): Array<boolean> => {
+    return [];
+  })
+}
