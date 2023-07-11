@@ -42,7 +42,11 @@ export const validateRenameTree: ValidateSingleTreeFn = (tree) => {
 };
 
 export const validateCutOrCopyTree: ValidateMultiTreeCutAndCopyFn = (cutAndCopyTree) => {
-  return validateExecutor(cutAndCopyTree, [], (processedData: MultiTreeCutOrCopy): Array<boolean> => {
-    return [];
+  return validateExecutor(cutAndCopyTree, [], (processedData: typeof cutAndCopyTree): Array<boolean> => {
+    return [
+      checkInvalidSingleTreeId(processedData.toTree.treeId),
+      checkInvalidMultiTreeId(_.map(processedData.targetTreeList, 'treeId')),
+      checkInvalidMultiTreeId(_.map(processedData.targetTreeList, 'treeType'))
+    ];
   })
 }
