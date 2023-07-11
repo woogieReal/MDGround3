@@ -53,6 +53,11 @@ $resizeButtonWidhthPX: 12px;
   }
 }
 
+#accountSection {
+  min-height: $appHeaderHeightPX;
+  max-height: $appHeaderHeightPX;
+}
+
 #treeSection {
   margin-top: 7px;
 
