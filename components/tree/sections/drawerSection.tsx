@@ -182,7 +182,7 @@ const DrawerSection = ({ open, drawerWidth, setFiles, handleTreeClick, handleTre
         open={open}
         onContextMenu={handleContextMenuForDrawer}
       >
-        <Box sx={{ height: styles.appHeaderHeightPX }}>
+        <Box id={styles.accountSection}>
 
         </Box>
         <Divider />
