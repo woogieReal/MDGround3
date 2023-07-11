@@ -20,7 +20,6 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         const response: any = [];
 
         targetTreeList.forEach(async (targetTree) => {
-          const { treePath } = toTree;
           const { userId, treeId, treeType } = targetTree;
           let query = '';
           let params: any[] = [];
