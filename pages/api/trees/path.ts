@@ -50,7 +50,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
               AND tree_path LIKE CONCAT(?, '%')
               AND delete_yn <> 'Y'
             `;
-            params.push(newTreePath);
+            params.push(newTreePath + '|' + treeId);
             params.push(userId);
             params.push(treeFullPath);
           }
