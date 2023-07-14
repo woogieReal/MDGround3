@@ -17,6 +17,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { removeTargetIndexDataFromArray } from '@/src/utils/common/arrayUtil'
 import { oneMinusUnlessZero } from '@/src/utils/common/numberUtil'
 import { cloneDeep } from 'lodash'
+import { useLeavePageConfirmation } from '@/src/hooks/useLeavePageConfirmation'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -163,6 +164,9 @@ const Home: NextPage = () => {
       }
     },
   });
+
+  // 탭이 열려 있을 때 페이지 이동 시 컨펌
+  useLeavePageConfirmation(files.length > 0);
 
   return (
     <Box sx={{ display: 'flex' }}>
