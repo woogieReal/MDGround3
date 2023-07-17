@@ -3,12 +3,13 @@ import { useEffect } from 'react';
 /**
  * Inspiration from: https://stackoverflow.com/a/70759912/2592233
  */
-export const useLeavePageConfirmation = (shouldPreventLeaving: boolean) => {
+export const useLeavePageConfirmation = (shouldPreventLeaving: boolean, beforeConfirm?: Function) => {
   useEffect(() => {
     const originalOnBeforeUnloadFunction = window.onbeforeunload;
 
     if (shouldPreventLeaving) {
       window.onbeforeunload = () => {
+        if (beforeConfirm) beforeConfirm();
         return ''
       };
     } else {
