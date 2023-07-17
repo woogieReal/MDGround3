@@ -7,8 +7,6 @@ export const useLeavePageConfirmation = (shouldPreventLeaving: boolean) => {
   useEffect(() => {
     const originalOnBeforeUnloadFunction = window.onbeforeunload;
 
-    console.log(shouldPreventLeaving, window.onbeforeunload);
-
     if (shouldPreventLeaving) {
       window.onbeforeunload = () => {
         return ''
