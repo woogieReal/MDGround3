@@ -1,8 +1,9 @@
 import mysql, { Connection, ConnectionOptions } from "mysql2/promise";
 import { appLogger } from "../utils/common/loggerUtil";
+import { RedisClientOptions, RedisClientType, createClient } from "redis";
 
 export default class DBConnection {
-  private static options: ConnectionOptions = {
+  private static rdsOptions: ConnectionOptions = {
     host: process.env.MYSQL_HOST,
     port: Number(process.env.MYSQL_PORT),
     user: process.env.MYSQL_USER,
@@ -11,24 +12,44 @@ export default class DBConnection {
     multipleStatements: true,
   };
 
+  private static redisOptions: RedisClientOptions = {
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+  };
+
   static async transactionExecutor(
-    callback: (connection: Connection) => Promise<any> | void
+    callback: (
+      connection: Connection,
+      redisClient: ReturnType<typeof createClient>
+    ) => Promise<any> | void,
+    option?: {
+      useRedis?: boolean
+    }
   ) {
-    let connection: Connection = await mysql.createConnection(this.options);
+    let redisClient;
+    let connection;
     let result: any;
-
-    await connection.beginTransaction();
-
+    
     try {
-      result = await callback(connection);
+      if (option) {
+        const { useRedis } = option;
+        if (useRedis) {
+          redisClient = createClient(this.redisOptions);
+          await redisClient.connect();
+        }
+      }
+  
+      connection = await mysql.createConnection(this.rdsOptions);  
+      await connection.beginTransaction();
+
+      result = await callback(connection, redisClient!);
       await connection.commit();
     } catch (err) {
       appLogger.error(err);
-      await connection.rollback();
-      console.log(err);
+      if (connection) await connection.rollback();
       throw err;
     } finally {
-      connection.end();
+      if (connection) connection.end();
+      if (redisClient) redisClient.disconnect();
     }
     return result;
   }
