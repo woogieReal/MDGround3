@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import DBConnection from "@/src/apis/dbConnection";
+import RDSConnection from "@/src/apis/rdsConnection";
 import { Connection, RowDataPacket } from "mysql2/promise";
 import { Tree, TreeStatusInfo, TreeType } from "@/src/models/tree.model";
 import { createTreeFullPath } from "@/src/utils/tree/treeUtil";
@@ -13,7 +13,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case "GET":
-      DBConnection.transactionExecutor(async (connection: Connection) => {
+      RDSConnection.transactionExecutor(async (connection: Connection) => {
         let query = '';
         let params: any[] = [];
 
@@ -44,7 +44,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       });
       break;
     case "PUT":
-      DBConnection.transactionExecutor(async (connection: Connection, redisClient) => {
+      RDSConnection.transactionExecutor(async (connection: Connection) => {
         const { treeId, treeName, treeContent, userId, treeStatus } = body as Tree;
         let query = '';
         let params: any[] = [];
@@ -71,7 +71,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
 
         const result = await connection.execute(query, params);
         res.status(200).json(result[0]);
-      }, { useRedis: true });
+      });
       break;
     default:
       res.setHeader("Allow", ["GET", "PUT", "DELETE"]);

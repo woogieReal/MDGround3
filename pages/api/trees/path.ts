@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import DBConnection from "@/src/apis/dbConnection";
+import RDSConnection from "@/src/apis/rdsConnection";
 import { Connection } from "mysql2/promise";
 import { MultiTreeCutOrCopy, Tree, TreeType } from "@/src/models/tree.model";
 import { createTreeFullPath } from "@/src/utils/tree/treeUtil";
@@ -13,7 +13,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case "PUT":
-      DBConnection.transactionExecutor(async (connection: Connection) => {
+      RDSConnection.transactionExecutor(async (connection: Connection) => {
         const request: MultiTreeCutOrCopy = body;
         const { toTree, targetTreeList } = request;
         const newTreePath = createTreeFullPath(toTree);
