@@ -1,4 +1,4 @@
-import DBConnection from "@/src/apis/dbConnection";
+import RDSConnection from "@/src/apis/rdsConnection";
 import { Tree } from "@/src/models/tree.model";
 import { appLogger } from "@/src/utils/common/loggerUtil";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -15,7 +15,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json("Hello");
       break;
     case "POST":
-      DBConnection.transactionExecutor(async (connection, redisClient) => {
+      RDSConnection.transactionExecutorWithRedis(async (connection, redisClient) => {
         const { treeIdList, userId } = body as { treeIdList: number[], userId: string };
 
         let query = '';
@@ -50,7 +50,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
         }
 
         res.status(200).json(result);
-      }, { useRedis: true });
+      });
       break;
     default:
       res.setHeader("Allow", ["POST"]);

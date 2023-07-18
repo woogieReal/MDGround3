@@ -6,6 +6,10 @@ export default class RedisConnection {
     url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
   };
 
+  static createRedisClinet() {
+    return createClient(this.redisOptions);
+  }
+
   static async redisExecutor(
     callback: (
       redisClient: ReturnType<typeof createClient>
@@ -15,7 +19,7 @@ export default class RedisConnection {
     let result: any;
     
     try {
-      redisClient = createClient(this.redisOptions);
+      redisClient = this.createRedisClinet();
       await redisClient.connect();
   
       result = await callback(redisClient);
