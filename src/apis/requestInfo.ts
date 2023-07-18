@@ -8,4 +8,6 @@ export const ApiRequest = new Map<string, AxiosRequestConfig>()
   .set(ApiName.CREATE_TREE, { method: "POST", url: "/trees" })
   .set(ApiName.DELETE_TREE, { method: "DELETE", url: "/trees" })
   .set(ApiName.CUT_TREE, { method: "PUT", url: "/trees/path" })
+  .set(ApiName.SET_REDIS, { method: "PUT", url: "/redis" })
+  .set(ApiName.SET_REDIS_TREE_SYNC, { method: "POST", url: "/redis/tree" })
 ;

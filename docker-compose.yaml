@@ -39,3 +39,11 @@ services:
     restart: always
     ports:
       - 8098:8080
+  
+  redis:
+    container_name: MDGround3-redis
+    image: redis:latest
+    ports:
+      - "63791:6379"
+    restart: always
+    command: redis-server

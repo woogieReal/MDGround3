@@ -5,4 +5,6 @@ export enum ApiName {
   CREATE_TREE = "createTree",
   DELETE_TREE = "deleteTree",
   CUT_TREE = "cutTree",
+  SET_REDIS = "setRedis",
+  SET_REDIS_TREE_SYNC = "setRedisTreeSync",
 }

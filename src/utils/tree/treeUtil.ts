@@ -7,6 +7,8 @@ import {
 } from '@/src/models/tree.model';
 import _ from 'lodash';
 import { checkInitalRootTree, checkFolderTree, checkFileTree } from './treeCheck';
+import ApiHandler from '@/src/apis/apiHandler';
+import { ApiName } from '@/src/apis/apiInfo';
 
 const InitialRootTree: Tree = {
   treeId: ROOT_TREE_ID,
@@ -90,3 +92,5 @@ export const sortingTreeByTreeName = (a: Tree, b: Tree) => {
     }
   }
 };
+
+export const setRedisTreeSync = (treeIdList: number[], userId: string) => ApiHandler.callApi(ApiName.SET_REDIS_TREE_SYNC, null, { treeIdList, userId });

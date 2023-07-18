@@ -51,7 +51,7 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
     case "POST":
       DBConnection.transactionExecutor(async (connection: Connection) => {
         // const request = JSON.parse(body)
-        const request = body;
+        const { treeType, treeName, treeContent, treePath, userId } = body as Tree;
         let query = '';
         let params: any[] = [];
 
@@ -59,15 +59,15 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
           SELECT MAX(IFNULL(t.tree_id, 0)) + 1 AS treeId
           FROM tree t 
           WHERE t.user_id = ?
-        `, [request.userId]);
+        `, [userId]);
 
         const newTree: Tree = {
           ...(rows as { treeId: number; }[])[0],
-          treeType: request.treeType,
-          treeName: request.treeName,
-          treeContent: request.treeContent,
-          treePath: request.treePath,
-          userId: request.userId,
+          treeType,
+          treeName,
+          treeContent,
+          treePath,
+          userId,
         };
 
         query += `

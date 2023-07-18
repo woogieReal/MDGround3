@@ -44,9 +44,8 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
       });
       break;
     case "PUT":
-      DBConnection.transactionExecutor(async (connection: Connection) => {
-        // const request = JSON.parse(body)
-        const request = body
+      DBConnection.transactionExecutor(async (connection: Connection, redisClient) => {
+        const { treeId, treeName, treeContent, userId, treeStatus } = body as Tree;
         let query = '';
         let params: any[] = [];
 
@@ -55,24 +54,24 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
           SET updated_datetime = CURRENT_TIMESTAMP
         `;
 
-        if (request.treeStatus === TreeStatusInfo.EDIT_CONTENT) {
+        if (treeStatus === TreeStatusInfo.EDIT_CONTENT) {
             query += ` , tree_content = ? `;
-            params.push(request.treeContent);
-        } else if (request.treeStatus === TreeStatusInfo.RENAME) {
+            params.push(treeContent);
+        } else if (treeStatus === TreeStatusInfo.RENAME) {
           query += ` , tree_name = ? `;
-          params.push(request.treeName);
+          params.push(treeName);
         }
 
         query += `
           WHERE user_id = ?
           AND tree_id = ?
         `;
-        params.push(request.userId);
+        params.push(userId);
         params.push(id);
 
         const result = await connection.execute(query, params);
         res.status(200).json(result[0]);
-      });
+      }, { useRedis: true });
       break;
     default:
       res.setHeader("Allow", ["GET", "PUT", "DELETE"]);

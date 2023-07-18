@@ -18,6 +18,8 @@ import { removeTargetIndexDataFromArray } from '@/src/utils/common/arrayUtil'
 import { oneMinusUnlessZero } from '@/src/utils/common/numberUtil'
 import { cloneDeep } from 'lodash'
 import { useLeavePageConfirmation } from '@/src/hooks/useLeavePageConfirmation'
+import _ from 'lodash';
+import { setRedisTreeSync } from '@/src/utils/tree/treeUtil'
 
 const MIN_DRAWER_WIDTH = 240;
 const APP_BAR_LEFT = MIN_DRAWER_WIDTH + Number(styles.verticalTabWidth);
@@ -146,6 +148,7 @@ const Home: NextPage = () => {
     targetTabNum <= fileTabVaue && setFileTabVaue(oneMinusUnlessZero);
     data.treeId === selectedFile?.treeId && setSelectedFile(null);
     setFiles(files => removeTargetIndexDataFromArray(files, targetTabNum));
+    setRedisTreeSync([data.treeId], TEST_USER_ID);
   }
 
   useEffect(() => {
@@ -165,8 +168,19 @@ const Home: NextPage = () => {
     },
   });
 
-  // 탭이 열려 있을 때 페이지 이동 시 컨펌
-  useLeavePageConfirmation(files.length > 0);
+  // 탭이 열려 있을 때 페이지 이동 시 컨펌 및 Redis <> RDS와 동기화
+  useEffect(() => {
+    sessionStorage.setItem('currentTabTreeIdList', JSON.stringify(_.map(files, 'treeId')));
+  }, [files.length]);
+
+  const syncRedisToRds = () => {
+    const treeIdList = JSON.parse(sessionStorage.getItem('currentTabTreeIdList') || '');
+    if (Array.isArray(treeIdList) && treeIdList.length > 0) {
+      setRedisTreeSync(treeIdList, TEST_USER_ID);
+    }
+  }
+
+  useLeavePageConfirmation(files.length > 0, syncRedisToRds);
 
   return (
     <Box sx={{ display: 'flex' }}>

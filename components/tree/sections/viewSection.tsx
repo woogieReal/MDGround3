@@ -59,7 +59,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
     setEditTabData([Number(sessionStorage.getItem('currentTabTreeId')), { MDContent: value }]);
   }
 
-  const updateTree = useMutation(async () => await ApiHandler.callApi(ApiName.UPDATE_TREE, null, { ...editContentTree, treeStatus: TreeStatusInfo.EDIT_CONTENT }, files[fileTabVaue]?.treeId), {
+  const updateTreeInRedis = useMutation(async () => await ApiHandler.callApi(ApiName.SET_REDIS, null, { key: `${editContentTree.userId}-${files[fileTabVaue]?.treeId}`, value: editContentTree.treeContent, expireSecond: 1800 }), {
     onSuccess(res: AxiosResponse) {
       setIsReadyToContentTree(false);
       showSnackbar('saved');
@@ -74,7 +74,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
   }
 
   useEffect(() => {
-    isReadyToContentTree && updateTree.mutate();
+    isReadyToContentTree && updateTreeInRedis.mutate();
   }, [isReadyToContentTree])
 
   useEffect(() => {
