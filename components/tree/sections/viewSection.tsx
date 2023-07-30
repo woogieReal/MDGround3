@@ -117,15 +117,17 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           xs={editorSize}
         >
           {checkNotUndefined(eachTabData.get(currentTabTreeId)?.viewType) &&
-            <Editor
-              value={eachTabData.get(currentTabTreeId)?.MDContent}
-              width={editorSize === 0 ? editorSize : "100%"}
-              height={editorSize === 0 ? editorSize : "89vh"}
-              defaultLanguage="markdown"
-              options={EDITOR_OPTION}
-              onMount={handleMountEditor}
-              onChange={handlChangeContent}
-            />
+            <Box sx={{ display: editorSize === 0 ? 'none' : 'block' }}>
+              <Editor
+                value={eachTabData.get(currentTabTreeId)?.MDContent}
+                width={editorSize === 0 ? editorSize : "100%"}
+                height={editorSize === 0 ? editorSize : "89vh"}
+                defaultLanguage="markdown"
+                options={EDITOR_OPTION}
+                onMount={handleMountEditor}
+                onChange={handlChangeContent}
+              />
+            </Box>
           }
         </Grid>
         <Grid item
