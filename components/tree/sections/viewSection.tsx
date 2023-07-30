@@ -24,7 +24,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import uesViewSize from "@/src/hooks/uesViewSize";
 import { checkEmptyValue, checkNotUndefined } from "@/src/utils/common/commonUtil";
-import { NullableEditTabData, updateEachTabData, useCalculatedHeight, useCurrentTabTreeId, useEachTabContent } from "./utils/viewSection";
+import { NullableEditTabData, updateEachTabData, useCalculatedHeight, useCalculatedWidth, useCurrentTabTreeId, useEachTabContent } from "./utils/viewSection";
 
 interface Props {
   open: boolean;
@@ -42,7 +42,8 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   const eachTabData = useEachTabContent(files, fileTabVaue, editTabData);
   const currentTabTreeId = useCurrentTabTreeId(files, fileTabVaue);
-  const calculatedHeight = useCalculatedHeight(height, Number(styles.appHeaderHeight), Number(styles.resizeButtonWidhth));
+  const calculatedHeight = useCalculatedHeight();
+  const calculatedWidth = useCalculatedWidth(open, drawerWidth);
 
   const [ editorSize, viewerSize ] = uesViewSize(eachTabData.get(currentTabTreeId)?.viewType);
   
@@ -96,7 +97,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       id={styles.viewSection}
       sx={{
         marginTop: styles.appHeaderHeightPX,
-        marginRight: open ? `${drawerWidth + Number(styles.verticalTabWidth)}px` : styles.verticalTabWidthPX,
+        width: `${calculatedWidth}px`,
       }}
     >
       <CssBaseline />

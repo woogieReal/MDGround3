@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import _ from 'lodash';
 import { checkEmptyValue } from "@/src/utils/common/commonUtil";
 import parseMd from "@/src/utils/common/parserUtil";
+import styles from '@/styles/tree.module.scss'
+import useWindowDimensions from "@/src/hooks/useWindowDimensions";
 
 export type TabData = {
   viewType: EditorViewType,
@@ -97,12 +99,32 @@ export const useCurrentTabTreeId = (files: Tree[], fileTabVaue: number) => {
   return currentTabTreeId;
 }
 
-export const useCalculatedHeight = (windowHeight: number, appHeaderHeight: number, resizeButtonWidhth: number) => {
+export const useCalculatedHeight = () => {
+  const { height } = useWindowDimensions();
   const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
+  const appHeaderHeight: number = Number(styles.appHeaderHeight);
+  const resizeButtonWidhth: number = Number(styles.resizeButtonWidhth);
 
   useEffect(() => {
-    setCalculatedHeight(windowHeight - (40 + Number(appHeaderHeight) + Number(resizeButtonWidhth) * 2));
-  }, [windowHeight]);
+    setCalculatedHeight(height - (40 + Number(appHeaderHeight) + Number(resizeButtonWidhth) * 2));
+  }, [height]);
 
   return calculatedHeight;
+}
+
+export const useCalculatedWidth = (drawerOpen: boolean, drawerWidth: number) => {
+  const { width } = useWindowDimensions();
+  const [calculatedWidth, setCalculatedWidth] = useState<number>(width); 
+  const verticalTabWidth: number = Number(styles.verticalTabWidth);
+  const resizeButtonWidhth: number = Number(styles.resizeButtonWidhth);
+
+  useEffect(() => {
+    if (drawerOpen) {
+      setCalculatedWidth(width - (drawerWidth + verticalTabWidth + resizeButtonWidhth));
+    } else {
+      setCalculatedWidth(width - (verticalTabWidth + resizeButtonWidhth))
+    }
+  }, [drawerOpen, drawerWidth, width]);
+
+  return calculatedWidth;
 }
