@@ -96,7 +96,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       id={styles.viewSection}
       sx={{
         marginTop: styles.appHeaderHeightPX,
-        marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px`
+        marginRight: open ? `${drawerWidth + Number(styles.verticalTabWidth)}px` : styles.verticalTabWidthPX,
       }}
     >
       <CssBaseline />
@@ -104,6 +104,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         container
         id={styles.viewMain}
         rowSpacing={1}
+        columnSpacing={2}
       >
         <Grid item xs={12}>
           <ButtonGroup size="small" aria-label="small button group">
@@ -116,22 +117,24 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           xs={editorSize}
         >
           {checkNotUndefined(eachTabData.get(currentTabTreeId)?.viewType) &&
-            <Editor
-              value={eachTabData.get(currentTabTreeId)?.MDContent}
-              width={editorSize === 0 ? editorSize : "100%"}
-              height={editorSize === 0 ? editorSize : "89vh"}
-              defaultLanguage="markdown"
-              options={EDITOR_OPTION}
-              onMount={handleMountEditor}
-              onChange={handlChangeContent}
-            />
+            <Box sx={{ display: editorSize === 0 ? 'none' : 'block' }}>
+              <Editor
+                value={eachTabData.get(currentTabTreeId)?.MDContent}
+                width={editorSize === 0 ? editorSize : "100%"}
+                height={editorSize === 0 ? editorSize : "89vh"}
+                defaultLanguage="markdown"
+                options={EDITOR_OPTION}
+                onMount={handleMountEditor}
+                onChange={handlChangeContent}
+              />
+            </Box>
           }
         </Grid>
         <Grid item
           xs={viewerSize}
           sx={{
             height: calculatedHeight,
-            overflowY: 'scroll'
+            overflowY: 'scroll',
           }}
         >
           <div id={styles.viewer} dangerouslySetInnerHTML={{ __html: eachTabData.get(currentTabTreeId)?.HTMLContent || '' }} style={{ marginTop: -20 }} />

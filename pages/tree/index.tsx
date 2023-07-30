@@ -237,7 +237,7 @@ const Home: NextPage = () => {
       {/* drawer */}
       <DrawerSection
         open={drawerOpen}
-        drawerWidth={drawerWidth}
+        drawerWidth={drawerOpen ? drawerWidth : 0}
         setFiles={setFiles}
         handleTreeClick={handleTreeClick}
         handleTreeDoubleClick={handleTreeDoubleClick}
