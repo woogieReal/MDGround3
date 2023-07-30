@@ -4,4 +4,7 @@ export type EditorViewType = 'edit' | 'live' | 'preview';
 
 export const EDITOR_OPTION: monaco.editor.IStandaloneEditorConstructionOptions = {
   tabSize: 2,
+  minimap: {
+    enabled: false
+  }
 }
