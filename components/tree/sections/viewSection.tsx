@@ -96,7 +96,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
       id={styles.viewSection}
       sx={{
         marginTop: styles.appHeaderHeightPX,
-        marginLeft: open ? '0px' : `-${drawerWidth - Number(styles.resizeButtonWidhth)}px`
+        marginRight: open ? `${drawerWidth + Number(styles.verticalTabWidth)}px` : styles.verticalTabWidthPX,
       }}
     >
       <CssBaseline />
