@@ -42,7 +42,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
 
   const eachTabData = useEachTabContent(files, fileTabVaue, editTabData);
   const currentTabTreeId = useCurrentTabTreeId(files, fileTabVaue);
-  const calculatedHeight = useCalculatedHeight(height, Number(styles.appHeaderHeight), Number(styles.resizeButtonWidhth));
+  const calculatedHeight = useCalculatedHeight();
   const calculatedWidth = useCalculatedWidth(open, drawerWidth);
 
   const [ editorSize, viewerSize ] = uesViewSize(eachTabData.get(currentTabTreeId)?.viewType);

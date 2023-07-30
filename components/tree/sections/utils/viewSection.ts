@@ -99,12 +99,15 @@ export const useCurrentTabTreeId = (files: Tree[], fileTabVaue: number) => {
   return currentTabTreeId;
 }
 
-export const useCalculatedHeight = (windowHeight: number, appHeaderHeight: number, resizeButtonWidhth: number) => {
+export const useCalculatedHeight = () => {
+  const { height } = useWindowDimensions();
   const [calculatedHeight, setCalculatedHeight] = useState<number>(1000);
+  const appHeaderHeight: number = Number(styles.appHeaderHeight);
+  const resizeButtonWidhth: number = Number(styles.resizeButtonWidhth);
 
   useEffect(() => {
-    setCalculatedHeight(windowHeight - (40 + Number(appHeaderHeight) + Number(resizeButtonWidhth) * 2));
-  }, [windowHeight]);
+    setCalculatedHeight(height - (40 + Number(appHeaderHeight) + Number(resizeButtonWidhth) * 2));
+  }, [height]);
 
   return calculatedHeight;
 }
