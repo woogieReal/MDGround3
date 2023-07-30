@@ -104,6 +104,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
         container
         id={styles.viewMain}
         rowSpacing={1}
+        columnSpacing={2}
       >
         <Grid item xs={12}>
           <ButtonGroup size="small" aria-label="small button group">
@@ -131,7 +132,7 @@ const ViewSection = ({ open, drawerWidth, fileTabVaue, files }: Props) => {
           xs={viewerSize}
           sx={{
             height: calculatedHeight,
-            overflowY: 'scroll'
+            overflowY: 'scroll',
           }}
         >
           <div id={styles.viewer} dangerouslySetInnerHTML={{ __html: eachTabData.get(currentTabTreeId)?.HTMLContent || '' }} style={{ marginTop: -20 }} />
